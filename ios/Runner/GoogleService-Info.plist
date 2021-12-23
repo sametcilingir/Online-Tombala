@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>902803951272-mjir5ccsjeqogprdbtp87rvuq7en1lll.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.902803951272-mjir5ccsjeqogprdbtp87rvuq7en1lll</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>902803951272-2hdm7pic56i6ncujp9eovq86r63gbi21.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB0q3jG0uw615WFXlL6uTDU9EeM48BQbuw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>902803951272</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.stappenterprise.tombala</string>
+	<key>PROJECT_ID</key>
+	<string>i-like-bingo-game</string>
+	<key>STORAGE_BUCKET</key>
+	<string>i-like-bingo-game.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:902803951272:ios:71f65f9586166944e97c9d</string>
+</dict>
+</plist>

@@ -12,8 +12,13 @@ class WaitingScreen extends StatelessWidget {
     return Observer(builder: (_) {
       return Scaffold(
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text("Players", style: TextStyle(fontSize: 50)),
+            SizedBox(height: 20),
             Container(
+              color: Colors.green[900],
               height: 500,
               width: 500,
               child: StreamBuilder<QuerySnapshot>(
@@ -32,8 +37,18 @@ class WaitingScreen extends StatelessWidget {
                         snapshot.data!.docs.map((DocumentSnapshot document) {
                       Map<String, dynamic> data =
                           document.data()! as Map<String, dynamic>;
-                      return ListTile(
-                        title: Text(data['userName']),
+                      return Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            data['userName'],
+                            style: TextStyle(
+                              fontSize: 28,
+                              
+                            ),
+                          ),
+                        ),
                       );
                     }).toList(),
                   );

@@ -69,6 +69,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$contextAtom = Atom(name: '_ViewModelBase.context');
+
+  @override
+  BuildContext? get context {
+    _$contextAtom.reportRead();
+    return super.context;
+  }
+
+  @override
+  set context(BuildContext? value) {
+    _$contextAtom.reportWrite(value, super.context, () {
+      super.context = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
@@ -103,7 +118,8 @@ mixin _$ViewModel on _ViewModelBase, Store {
 formKeyUserName: ${formKeyUserName},
 formKeyRoomId: ${formKeyRoomId},
 userName: ${userName},
-roomId: ${roomId}
+roomId: ${roomId},
+context: ${context}
     ''';
   }
 }

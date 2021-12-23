@@ -24,6 +24,9 @@ abstract class _ViewModelBase with Store {
   @observable
   String? roomId;
 
+  @observable
+  BuildContext? context;
+
   @action
   Future<bool> createRoom() async {
     try {
@@ -43,10 +46,29 @@ abstract class _ViewModelBase with Store {
   @action
   Future<bool> joinRoom() async {
     try {
-      await _firebaseDatabaseService.joinRoom(
+      bool isRoomExist = await _firebaseDatabaseService.joinRoom(
           roomId: roomId, userName: userName);
-      return true;
+      if (isRoomExist) {
+        return true;
+      } else {
+        ScaffoldMessenger.of(context!).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Oda katiliminda hata oluştu",
+            ),
+          ),
+        );
+        return false;
+      }
     } catch (e) {
+      ScaffoldMessenger.of(context!).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Oda katiliminda hata oluştu",
+          ),
+        ),
+      );
+
       print("Odaya katilimda hata oluştu: $e");
       return false;
     }

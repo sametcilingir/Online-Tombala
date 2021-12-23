@@ -1,9 +1,12 @@
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:tombala/locator.dart';
+import 'package:tombala/views/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-//  setupLocator();
+  setupLocator();
   runApp(MyApp());
 }
 
@@ -30,7 +33,7 @@ class _MyAppState extends State<MyApp> {
 
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
-//      await Firebase.initializeApp();
+      await Firebase.initializeApp();
       setState(() {
         _initialized = true;
         //print("firebase onaylandı");
@@ -90,7 +93,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         title: 'Tombala',
-        home: Container(),
+        home:  HomeScreen(),
       );
     }
     return const CircularProgressIndicator();

@@ -102,23 +102,26 @@ class WaitingScreen extends StatelessWidget {
                       snapshot.data?.data() as Map<String, dynamic>;
                   if (data['isGameStarted'] == true &&
                       data['roomCreator'] != _viewModel.userName) {
+
+                    _viewModel.createGameCard();
+                    
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => GameCardScreen()));
                   }
                   return Row(
-                  children: [
-                    Container(
-                      height: 50,
-                      width: 50,
-                      child: CircularProgressIndicator(),
-                    ),
-                    SizedBox(width: 20),
-                    Text("Game starting soon",
-                        style: TextStyle(fontSize: 20)),
-                  ],
-                );
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(width: 20),
+                      Text("Game starting soon",
+                          style: TextStyle(fontSize: 20)),
+                    ],
+                  );
                 }
 
                 return Row(

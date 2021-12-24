@@ -149,6 +149,36 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$randomColorAtom = Atom(name: '_ViewModelBase.randomColor');
+
+  @override
+  Color get randomColor {
+    _$randomColorAtom.reportRead();
+    return super.randomColor;
+  }
+
+  @override
+  set randomColor(Color value) {
+    _$randomColorAtom.reportWrite(value, super.randomColor, () {
+      super.randomColor = value;
+    });
+  }
+
+  final _$isMyNumberShownAtom = Atom(name: '_ViewModelBase.isMyNumberShown');
+
+  @override
+  bool get isMyNumberShown {
+    _$isMyNumberShownAtom.reportRead();
+    return super.isMyNumberShown;
+  }
+
+  @override
+  set isMyNumberShown(bool value) {
+    _$isMyNumberShownAtom.reportWrite(value, super.isMyNumberShown, () {
+      super.isMyNumberShown = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
@@ -162,6 +192,15 @@ mixin _$ViewModel on _ViewModelBase, Store {
   @override
   Future<bool> joinRoom({required BuildContext context}) {
     return _$joinRoomAsyncAction.run(() => super.joinRoom(context: context));
+  }
+
+  final _$gameDocumentFutureAsyncAction =
+      AsyncAction('_ViewModelBase.gameDocumentFuture');
+
+  @override
+  Future<void> gameDocumentFuture() {
+    return _$gameDocumentFutureAsyncAction
+        .run(() => super.gameDocumentFuture());
   }
 
   final _$startGameAsyncAction = AsyncAction('_ViewModelBase.startGame');
@@ -213,6 +252,17 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
+  bool checkMyNumber(BuildContext context) {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.checkMyNumber');
+    try {
+      return super.checkMyNumber(context);
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 formKeyUserName: ${formKeyUserName},
@@ -223,7 +273,9 @@ context: ${context},
 isGameStarted: ${isGameStarted},
 allNumbersListDatabase: ${allNumbersListDatabase},
 allNumbersListTable: ${allNumbersListTable},
-randomNumbersForCards: ${randomNumbersForCards}
+randomNumbersForCards: ${randomNumbersForCards},
+randomColor: ${randomColor},
+isMyNumberShown: ${isMyNumberShown}
     ''';
   }
 }

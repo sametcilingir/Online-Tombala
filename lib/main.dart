@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         title: 'Tombala',
-        home:  GameCardScreen(),
+        home:  HomeScreen(),
       );
     }
     return const CircularProgressIndicator();

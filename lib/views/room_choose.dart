@@ -22,6 +22,7 @@ class RoomChooseScreen extends StatelessWidget {
               ElevatedButton(
                   onPressed: () async {
                     bool createRoomProcces = await _viewModel.createRoom(context: context);
+                    
                     if (createRoomProcces) {
                       Navigator.push(
                           context,

@@ -17,7 +17,7 @@ class FirebaseDatabaseService {
   }
 
   Future<bool> joinRoom({String? roomId, String? userName}) async {
-    var value = await _firestore.collection("rooms").doc(roomId!).get();
+    var value = await _firestore.collection("rooms").doc(roomId).get();
 
     if (value.exists) {
       print(value.data()!["isGameStarted"]);
@@ -51,6 +51,13 @@ class FirebaseDatabaseService {
     return a.snapshots();
   }
 
+  Future<dynamic> gameDocumentFuture({String? roomId}) {
+    dynamic b;
+    DocumentReference a = _firestore.collection("rooms").doc(roomId!);
+    a.get().then((value) => b = value.data());
+    return b;
+  }
+
   Future<bool> startGame({String? roomId, String? userName}) async {
     var allNumbersList = List<int>.generate(99, (i) => i + 1);
     var value = await _firestore.collection("rooms").doc(roomId!).get();
@@ -67,7 +74,7 @@ class FirebaseDatabaseService {
   }
 
   Future<bool> takeNumber({String? roomId, int? number}) async {
-    var value = await _firestore.collection("rooms").doc(roomId!).get();
+    var value = await _firestore.collection("rooms").doc(roomId).get();
     if (value.exists) {
       await _firestore.collection("rooms").doc(roomId).update({
         "allNumbersList": FieldValue.arrayRemove([number]),
@@ -78,4 +85,23 @@ class FirebaseDatabaseService {
       return false;
     }
   }
+
+  /*Future<bool> createGameCard(
+      {String? roomId, String? userName, List? randomNumbersForCards}) async {
+    var value = await _firestore
+        .collection("rooms")
+        .doc(roomId!)
+        .collection(userName!)
+        .doc()
+        .get();
+    if (value.exists) {
+      await _firestore.collection("rooms").doc(roomId).update({
+        "userNumbersList": randomNumbersForCards,
+      });
+
+      return true;
+    } else {
+      return false;
+    }
+  }*/
 }

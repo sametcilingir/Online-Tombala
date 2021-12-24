@@ -84,18 +84,107 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$isGameStartedAtom = Atom(name: '_ViewModelBase.isGameStarted');
+
+  @override
+  bool? get isGameStarted {
+    _$isGameStartedAtom.reportRead();
+    return super.isGameStarted;
+  }
+
+  @override
+  set isGameStarted(bool? value) {
+    _$isGameStartedAtom.reportWrite(value, super.isGameStarted, () {
+      super.isGameStarted = value;
+    });
+  }
+
+  final _$allNumbersListDatabaseAtom =
+      Atom(name: '_ViewModelBase.allNumbersListDatabase');
+
+  @override
+  List<dynamic> get allNumbersListDatabase {
+    _$allNumbersListDatabaseAtom.reportRead();
+    return super.allNumbersListDatabase;
+  }
+
+  @override
+  set allNumbersListDatabase(List<dynamic> value) {
+    _$allNumbersListDatabaseAtom
+        .reportWrite(value, super.allNumbersListDatabase, () {
+      super.allNumbersListDatabase = value;
+    });
+  }
+
+  final _$allNumbersListTableAtom =
+      Atom(name: '_ViewModelBase.allNumbersListTable');
+
+  @override
+  List<dynamic> get allNumbersListTable {
+    _$allNumbersListTableAtom.reportRead();
+    return super.allNumbersListTable;
+  }
+
+  @override
+  set allNumbersListTable(List<dynamic> value) {
+    _$allNumbersListTableAtom.reportWrite(value, super.allNumbersListTable, () {
+      super.allNumbersListTable = value;
+    });
+  }
+
+  final _$randomNumbersForCardsAtom =
+      Atom(name: '_ViewModelBase.randomNumbersForCards');
+
+  @override
+  List<dynamic> get randomNumbersForCards {
+    _$randomNumbersForCardsAtom.reportRead();
+    return super.randomNumbersForCards;
+  }
+
+  @override
+  set randomNumbersForCards(List<dynamic> value) {
+    _$randomNumbersForCardsAtom.reportWrite(value, super.randomNumbersForCards,
+        () {
+      super.randomNumbersForCards = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
-  Future<bool> createRoom() {
-    return _$createRoomAsyncAction.run(() => super.createRoom());
+  Future<bool> createRoom({required BuildContext context}) {
+    return _$createRoomAsyncAction
+        .run(() => super.createRoom(context: context));
   }
 
   final _$joinRoomAsyncAction = AsyncAction('_ViewModelBase.joinRoom');
 
   @override
-  Future<bool> joinRoom() {
-    return _$joinRoomAsyncAction.run(() => super.joinRoom());
+  Future<bool> joinRoom({required BuildContext context}) {
+    return _$joinRoomAsyncAction.run(() => super.joinRoom(context: context));
+  }
+
+  final _$startGameAsyncAction = AsyncAction('_ViewModelBase.startGame');
+
+  @override
+  Future<bool> startGame() {
+    return _$startGameAsyncAction.run(() => super.startGame());
+  }
+
+  final _$takeNumberAsyncAction = AsyncAction('_ViewModelBase.takeNumber');
+
+  @override
+  Future<bool> takeNumber({required BuildContext context}) {
+    return _$takeNumberAsyncAction
+        .run(() => super.takeNumber(context: context));
+  }
+
+  final _$createGameCardAsyncAction =
+      AsyncAction('_ViewModelBase.createGameCard');
+
+  @override
+  Future<bool> createGameCard() {
+    return _$createGameCardAsyncAction.run(() => super.createGameCard());
   }
 
   final _$_ViewModelBaseActionController =
@@ -113,13 +202,28 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
+  Stream<DocumentSnapshot<Object?>> gameDocumentStream() {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.gameDocumentStream');
+    try {
+      return super.gameDocumentStream();
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 formKeyUserName: ${formKeyUserName},
 formKeyRoomId: ${formKeyRoomId},
 userName: ${userName},
 roomId: ${roomId},
-context: ${context}
+context: ${context},
+isGameStarted: ${isGameStarted},
+allNumbersListDatabase: ${allNumbersListDatabase},
+allNumbersListTable: ${allNumbersListTable},
+randomNumbersForCards: ${randomNumbersForCards}
     ''';
   }
 }

@@ -19,9 +19,9 @@ class RoomChooseScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              TextButton(
+              ElevatedButton(
                   onPressed: () async {
-                    bool createRoomProcces = await _viewModel.createRoom();
+                    bool createRoomProcces = await _viewModel.createRoom(context: context);
                     if (createRoomProcces) {
                       Navigator.push(
                           context,
@@ -30,7 +30,7 @@ class RoomChooseScreen extends StatelessWidget {
                     }
                   },
                   child: Text('Oda Oluştur')),
-              TextButton(
+              ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).push(PageRouteBuilder(
                     opaque: false,

@@ -42,13 +42,13 @@ class RoomJoinScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                TextButton(
+                ElevatedButton(
                     onPressed: () async {
                       _viewModel.formKeyRoomId.currentState!.save();
 
                       _viewModel.context = context;
 
-                      bool createJointProcces = await _viewModel.joinRoom();
+                      bool createJointProcces = await _viewModel.joinRoom(context: context);
                       if (createJointProcces) {
                         Navigator.push(
                             context,

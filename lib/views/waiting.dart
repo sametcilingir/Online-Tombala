@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/view_model/view_model.dart';
+import 'package:tombala/views/game_card.dart';
+import 'package:tombala/views/game_table.dart';
 
 class WaitingScreen extends StatelessWidget {
   final ViewModel _viewModel = locator<ViewModel>();
@@ -16,6 +18,11 @@ class WaitingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text("Players", style: TextStyle(fontSize: 50)),
+            SizedBox(height: 20),
+            Text(
+              "Room Key: ${_viewModel.roomId}",
+              style: TextStyle(fontSize: 30),
+            ),
             SizedBox(height: 20),
             Container(
               color: Colors.green[900],
@@ -45,7 +52,6 @@ class WaitingScreen extends StatelessWidget {
                             data['userName'],
                             style: TextStyle(
                               fontSize: 28,
-                              
                             ),
                           ),
                         ),
@@ -55,25 +61,83 @@ class WaitingScreen extends StatelessWidget {
                 },
               ),
             ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                bool isGameStarted = await _viewModel.startGame();
+                if (isGameStarted) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GameTableScreen()));
+                }
+              },
+              child: Text("Start Game"),
+            ),
+            SizedBox(height: 20),
+            StreamBuilder<DocumentSnapshot>(
+              stream: _viewModel.gameDocumentStream(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Something went wrong');
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(width: 20),
+                      Text("Game is just about to start",
+                          style: TextStyle(fontSize: 20)),
+                    ],
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  Map<String, dynamic> data =
+                      snapshot.data?.data() as Map<String, dynamic>;
+                  if (data['isGameStarted'] == true &&
+                      data['roomCreator'] != _viewModel.userName) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GameCardScreen()));
+                  }
+                  return Row(
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(),
+                    ),
+                    SizedBox(width: 20),
+                    Text("Game starting soon",
+                        style: TextStyle(fontSize: 20)),
+                  ],
+                );
+                }
+
+                return Row(
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      child: CircularProgressIndicator(),
+                    ),
+                    SizedBox(width: 20),
+                    Text("Game is just about to start",
+                        style: TextStyle(fontSize: 20)),
+                  ],
+                );
+              },
+            )
           ],
         ),
       );
     });
-  }
-}
-
-class WaitingWebScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class WaitingPhoneScreen extends StatelessWidget {
-  const WaitingPhoneScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }

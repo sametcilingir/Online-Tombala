@@ -136,13 +136,13 @@ mixin _$ViewModel on _ViewModelBase, Store {
       Atom(name: '_ViewModelBase.randomNumbersForCards');
 
   @override
-  List<dynamic> get randomNumbersForCards {
+  List<int> get randomNumbersForCards {
     _$randomNumbersForCardsAtom.reportRead();
     return super.randomNumbersForCards;
   }
 
   @override
-  set randomNumbersForCards(List<dynamic> value) {
+  set randomNumbersForCards(List<int> value) {
     _$randomNumbersForCardsAtom.reportWrite(value, super.randomNumbersForCards,
         () {
       super.randomNumbersForCards = value;
@@ -164,6 +164,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$playerNumbersMapAtom = Atom(name: '_ViewModelBase.playerNumbersMap');
+
+  @override
+  Map<String, dynamic>? get playerNumbersMap {
+    _$playerNumbersMapAtom.reportRead();
+    return super.playerNumbersMap;
+  }
+
+  @override
+  set playerNumbersMap(Map<String, dynamic>? value) {
+    _$playerNumbersMapAtom.reportWrite(value, super.playerNumbersMap, () {
+      super.playerNumbersMap = value;
+    });
+  }
+
   final _$isMyNumberShownAtom = Atom(name: '_ViewModelBase.isMyNumberShown');
 
   @override
@@ -176,6 +191,71 @@ mixin _$ViewModel on _ViewModelBase, Store {
   set isMyNumberShown(bool value) {
     _$isMyNumberShownAtom.reportWrite(value, super.isMyNumberShown, () {
       super.isMyNumberShown = value;
+    });
+  }
+
+  final _$isMyNumberCheckedAtom =
+      Atom(name: '_ViewModelBase.isMyNumberChecked');
+
+  @override
+  bool get isMyNumberChecked {
+    _$isMyNumberCheckedAtom.reportRead();
+    return super.isMyNumberChecked;
+  }
+
+  @override
+  set isMyNumberChecked(bool value) {
+    _$isMyNumberCheckedAtom.reportWrite(value, super.isMyNumberChecked, () {
+      super.isMyNumberChecked = value;
+    });
+  }
+
+  final _$takenNumbersListDatabaseAtom =
+      Atom(name: '_ViewModelBase.takenNumbersListDatabase');
+
+  @override
+  List<dynamic>? get takenNumbersListDatabase {
+    _$takenNumbersListDatabaseAtom.reportRead();
+    return super.takenNumbersListDatabase;
+  }
+
+  @override
+  set takenNumbersListDatabase(List<dynamic>? value) {
+    _$takenNumbersListDatabaseAtom
+        .reportWrite(value, super.takenNumbersListDatabase, () {
+      super.takenNumbersListDatabase = value;
+    });
+  }
+
+  final _$playerNumbersListDatabaseAtom =
+      Atom(name: '_ViewModelBase.playerNumbersListDatabase');
+
+  @override
+  List<dynamic>? get playerNumbersListDatabase {
+    _$playerNumbersListDatabaseAtom.reportRead();
+    return super.playerNumbersListDatabase;
+  }
+
+  @override
+  set playerNumbersListDatabase(List<dynamic>? value) {
+    _$playerNumbersListDatabaseAtom
+        .reportWrite(value, super.playerNumbersListDatabase, () {
+      super.playerNumbersListDatabase = value;
+    });
+  }
+
+  final _$gameCreatorAtom = Atom(name: '_ViewModelBase.gameCreator');
+
+  @override
+  String? get gameCreator {
+    _$gameCreatorAtom.reportRead();
+    return super.gameCreator;
+  }
+
+  @override
+  set gameCreator(String? value) {
+    _$gameCreatorAtom.reportWrite(value, super.gameCreator, () {
+      super.gameCreator = value;
     });
   }
 
@@ -192,15 +272,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
   @override
   Future<bool> joinRoom({required BuildContext context}) {
     return _$joinRoomAsyncAction.run(() => super.joinRoom(context: context));
-  }
-
-  final _$gameDocumentFutureAsyncAction =
-      AsyncAction('_ViewModelBase.gameDocumentFuture');
-
-  @override
-  Future<void> gameDocumentFuture() {
-    return _$gameDocumentFutureAsyncAction
-        .run(() => super.gameDocumentFuture());
   }
 
   final _$startGameAsyncAction = AsyncAction('_ViewModelBase.startGame');
@@ -224,6 +295,15 @@ mixin _$ViewModel on _ViewModelBase, Store {
   @override
   Future<bool> createGameCard() {
     return _$createGameCardAsyncAction.run(() => super.createGameCard());
+  }
+
+  final _$checkMyNumberAsyncAction =
+      AsyncAction('_ViewModelBase.checkMyNumber');
+
+  @override
+  Future<bool> checkMyNumber(BuildContext context, int number) {
+    return _$checkMyNumberAsyncAction
+        .run(() => super.checkMyNumber(context, number));
   }
 
   final _$_ViewModelBaseActionController =
@@ -252,11 +332,11 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  bool checkMyNumber(BuildContext context) {
+  dynamic getColor(dynamic index) {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.checkMyNumber');
+        name: '_ViewModelBase.getColor');
     try {
-      return super.checkMyNumber(context);
+      return super.getColor(index);
     } finally {
       _$_ViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -275,7 +355,12 @@ allNumbersListDatabase: ${allNumbersListDatabase},
 allNumbersListTable: ${allNumbersListTable},
 randomNumbersForCards: ${randomNumbersForCards},
 randomColor: ${randomColor},
-isMyNumberShown: ${isMyNumberShown}
+playerNumbersMap: ${playerNumbersMap},
+isMyNumberShown: ${isMyNumberShown},
+isMyNumberChecked: ${isMyNumberChecked},
+takenNumbersListDatabase: ${takenNumbersListDatabase},
+playerNumbersListDatabase: ${playerNumbersListDatabase},
+gameCreator: ${gameCreator}
     ''';
   }
 }

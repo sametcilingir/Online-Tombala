@@ -47,11 +47,12 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 _viewModel.formKeyUserName.currentState!.save();
                 
-                Navigator.of(context).push(PageRouteBuilder(
+                /*Navigator.of(context).push(PageRouteBuilder(
                   opaque: false,
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       RoomChooseScreen(),
-                ));
+                ));*/
+                Navigator.of(context).popAndPushNamed('/room_choose');
               },
               child: Text('Giris'),
             ),

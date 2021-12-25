@@ -51,9 +51,6 @@ abstract class _ViewModelBase with Store {
       await _firebaseDatabaseService
           .createRoom(userName: userName)
           .then((value) => roomId = value);
-
-      joinRoom(context: context);
-
       return true;
     } catch (e) {
       print("Oda oluşturmada hata oluştu: $e");
@@ -112,7 +109,7 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  @action
+  /*@action
   Future<void> gameDocumentFuture() async {
     try {
       var a = await _firebaseDatabaseService.gameDocumentFuture(roomId: roomId);
@@ -121,7 +118,7 @@ abstract class _ViewModelBase with Store {
     } catch (e) {
       print("gameDocumentFuture hata oluştu: $e");
     }
-  }
+  }*/
 
   @action
   Future<bool> startGame() async {
@@ -143,8 +140,6 @@ abstract class _ViewModelBase with Store {
     try {
       if (allNumbersListTable.isNotEmpty) {
         var randomNumber = (allNumbersListDatabase..shuffle()).first;
-        //takenNumber!.addAll([randomNumber]);
-
         print("randomNumber: $randomNumber");
         await _firebaseDatabaseService.takeNumber(
             roomId: roomId, number: randomNumber);
@@ -197,121 +192,203 @@ abstract class _ViewModelBase with Store {
   }
 
   @observable
-  List randomNumbersForCards = [];
+  List<int> randomNumbersForCards = [];
 
   @observable
   Color randomColor = Colors.transparent;
+
+  @observable
+  Map<String, dynamic>? playerNumbersMap;
 
   @action
   Future<bool> createGameCard() async {
     try {
       randomNumbersForCards.clear();
-      var a0 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      var a0 = [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+      ];
       var a1 = (a0..shuffle()).first;
       a0.remove(a1);
       var a2 = (a0..shuffle()).first;
       a0.remove(a2);
       var a3 = (a0..shuffle()).first;
+      a0.remove(a3);
+      var a4 = (a0..shuffle()).first;
 
-      var b0 = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+      var b0 = [
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+      ];
       var b1 = (b0..shuffle()).first;
       b0.remove(b1);
       var b2 = (b0..shuffle()).first;
       b0.remove(b2);
       var b3 = (b0..shuffle()).first;
+      b0.remove(b3);
+      var b4 = (b0..shuffle()).first;
 
-      var c0 = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+      var c0 = [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+      ];
       var c1 = (c0..shuffle()).first;
       c0.remove(c1);
       var c2 = (c0..shuffle()).first;
       c0.remove(c2);
       var c3 = (c0..shuffle()).first;
+      c0.remove(c3);
+      var c4 = (c0..shuffle()).first;
 
-      var d0 = [31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
+      var d0 = [46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
       var d1 = (d0..shuffle()).first;
       d0.remove(d1);
       var d2 = (d0..shuffle()).first;
       d0.remove(d2);
       var d3 = (d0..shuffle()).first;
+      d0.remove(d3);
+      var d4 = (d0..shuffle()).first;
 
-      var e0 = [41, 42, 43, 44, 45, 46, 47, 48, 49, 50];
+      var e0 = [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+      ];
       var e1 = (e0..shuffle()).first;
       e0.remove(e1);
       var e2 = (e0..shuffle()).first;
       e0.remove(e2);
       var e3 = (e0..shuffle()).first;
+      e0.remove(e3);
+      var e4 = (e0..shuffle()).first;
 
-      var f0 = [51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
+      var f0 = [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90];
       var f1 = (f0..shuffle()).first;
       f0.remove(f1);
       var f2 = (f0..shuffle()).first;
       f0.remove(f2);
       var f3 = (f0..shuffle()).first;
+      f0.remove(f3);
+      var f4 = (f0..shuffle()).first;
 
-      var g0 = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
+      var g0 = [91, 92, 93, 94, 95, 96, 97, 98, 99];
       var g1 = (g0..shuffle()).first;
       g0.remove(g1);
       var g2 = (g0..shuffle()).first;
       g0.remove(g2);
       var g3 = (g0..shuffle()).first;
 
-      var h0 = [71, 72, 73, 74, 75, 76, 77, 78, 79, 80];
-      var h1 = (h0..shuffle()).first;
-      h0.remove(h1);
-      var h2 = (h0..shuffle()).first;
-      h0.remove(h2);
-      var h3 = (h0..shuffle()).first;
-
-      var i0 = [81, 82, 83, 84, 85, 86, 87, 88, 89, 90];
-      var i1 = (i0..shuffle()).first;
-      i0.remove(i1);
-      var i2 = (i0..shuffle()).first;
-      i0.remove(i2);
-      var i3 = (i0..shuffle()).first;
-
-      var j0 = [91, 92, 93, 94, 95, 96, 97, 98, 99];
-      var j1 = (j0..shuffle()).first;
-      j0.remove(j1);
-      var j2 = (j0..shuffle()).first;
-      j0.remove(j2);
-      var j3 = (j0..shuffle()).first;
-
       randomNumbersForCards.addAll(
         [
           a1,
           a2,
           a3,
+          a4,
           b1,
           b2,
           b3,
+          b4,
           c1,
           c2,
           c3,
+          c4,
           d1,
           d2,
           d3,
+          d4,
           e1,
           e2,
           e3,
+          e4,
           f1,
           f2,
           f3,
+          f4,
           g1,
           g2,
           g3,
-          h1,
-          h2,
-          h3,
-          i1,
-          i2,
-          i3,
-          j1,
-          j2,
-          j3,
         ],
       );
 
       randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+
+      print(randomNumbersForCards);
+
+      playerNumbersMap = {
+        a1.toString(): false,
+        a3.toString(): false,
+        b1.toString(): false,
+        b3.toString(): false,
+        c1.toString(): false,
+        c3.toString(): false,
+        d1.toString(): false,
+        d3.toString(): false,
+        e1.toString(): false,
+        e3.toString(): false,
+        f1.toString(): false,
+        f3.toString(): false,
+        g1.toString(): false,
+        g3.toString(): false,
+      };
+
+      await _firebaseDatabaseService.createGameCard(
+        roomId: roomId,
+        userName: userName,
+        playerRandomNumbersForCards: playerNumbersMap,
+      );
+
+      print(playerNumbersMap.toString());
 
       return true;
     } catch (e) {
@@ -323,11 +400,24 @@ abstract class _ViewModelBase with Store {
   @observable
   bool isMyNumberShown = false;
 
+  @observable
+  bool isMyNumberChecked = false;
+
+  @observable
+  List<dynamic>? takenNumbersListDatabase = <dynamic>[];
+
+  @observable
+  List<dynamic>? playerNumbersListDatabase = <dynamic>[];
+
   @action
-  bool checkMyNumber(BuildContext context) {
-    if (allNumbersListTable.contains(randomNumbersForCards)) {
-      isMyNumberShown = true;
-      // if (randomNumber == myNumber) {
+  Future<bool> checkMyNumber(BuildContext context, int number) async {
+    print("checkMyNumber: $number");
+    print(takenNumbersListDatabase);
+    if (takenNumbersListDatabase!.contains(number)) {
+      playerNumbersMap!.update(number.toString(), (value) => value = true);
+
+      print("değiştirilen map" + playerNumbersMap.toString());
+
       AwesomeDialog(
         context: context,
         dialogType: DialogType.INFO,
@@ -336,10 +426,19 @@ abstract class _ViewModelBase with Store {
         title: 'Tebrikler',
         desc: 'Tebrikler, sayınız doğru',
       ).show();
-      return true;
-    } else {
-      isMyNumberShown = false;
 
+      try {
+        await _firebaseDatabaseService.setMyNumberTrue(
+          roomId: roomId,
+          userName: userName,
+          playerNumbersMap: playerNumbersMap,
+        );
+        return true;
+      } catch (e) {
+        print("check my number hatası: $e");
+        return false;
+      }
+    } else {
       AwesomeDialog(
         context: context,
         dialogType: DialogType.INFO,
@@ -351,4 +450,16 @@ abstract class _ViewModelBase with Store {
       return false;
     }
   }
+
+  @action
+  getColor(index) {
+    if (playerNumbersMap![randomNumbersForCards[index].toString()] == true) {
+      return Colors.greenAccent[400];
+    } else {
+      return Colors.white.withOpacity(0.5);
+    }
+  }
+
+  @observable
+  String? gameCreator;
 }

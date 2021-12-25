@@ -50,10 +50,11 @@ class RoomJoinScreen extends StatelessWidget {
 
                       bool createJointProcces = await _viewModel.joinRoom(context: context);
                       if (createJointProcces) {
-                        Navigator.push(
+                     /*   Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => WaitingScreen()));
+                                builder: (context) => WaitingScreen()));*/
+                                Navigator.of(context).popAndPushNamed( '/waiting_room');
                       }
                     },
                     child: Text('Odaya gir')),

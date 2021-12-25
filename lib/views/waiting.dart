@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/view_model/view_model.dart';
-import 'package:tombala/views/game_card.dart';
-import 'package:tombala/views/game_table.dart';
 
 class WaitingScreen extends StatelessWidget {
   final ViewModel _viewModel = locator<ViewModel>();
@@ -33,10 +31,28 @@ class WaitingScreen extends StatelessWidget {
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
-                    return Text('Something went wrong');
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Something went wrong",
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    );
                   }
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Text("Loading");
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 50,
+                          child: CircularProgressIndicator(),
+                        ),
+                        SizedBox(width: 50),
+                        Text("Game is waiting for players",
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    );
                   }
 
                   return ListView(
@@ -62,35 +78,30 @@ class WaitingScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                bool isGameStarted = await _viewModel.startGame();
-                if (isGameStarted) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => GameTableScreen()));
-                }
-              },
-              child: Text("Start Game"),
-            ),
             SizedBox(height: 20),
-            StreamBuilder<DocumentSnapshot>(
+            StreamBuilder<DocumentSnapshot<Object?>>(
               stream: _viewModel.gameDocumentStream(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text('Something went wrong');
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Something went wrong",
+                          style: TextStyle(fontSize: 20)),
+                    ],
+                  );
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
                         height: 50,
                         width: 50,
                         child: CircularProgressIndicator(),
                       ),
-                      SizedBox(width: 20),
+                      SizedBox(width: 50),
                       Text("Game is just about to start",
                           style: TextStyle(fontSize: 20)),
                     ],
@@ -102,26 +113,40 @@ class WaitingScreen extends StatelessWidget {
                       snapshot.data?.data() as Map<String, dynamic>;
                   if (data['isGameStarted'] == true &&
                       data['roomCreator'] != _viewModel.userName) {
-
                     _viewModel.createGameCard();
-                    
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => GameCardScreen()));
+                    Center(child: CircularProgressIndicator());
+                    Future.delayed(Duration(seconds: 2), () {
+                      Navigator.popAndPushNamed(context, '/game_card');
+                    });
+                  } else if (data['roomCreator'] == _viewModel.userName) {
+                    return ElevatedButton(
+                      onPressed: () async {
+                        bool isGameStarted = await _viewModel.startGame();
+                        if (isGameStarted) {
+                          /* Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GameTableScreen()));*/
+                          Navigator.of(context).popAndPushNamed('/game_table');
+                        }
+                      },
+                      child: Text("Start Game"),
+                    );
+                  } else {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 50,
+                          child: CircularProgressIndicator(),
+                        ),
+                        SizedBox(width: 50),
+                        Text("Game starting soon",
+                            style: TextStyle(fontSize: 20)),
+                      ],
+                    );
                   }
-                  return Row(
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        child: CircularProgressIndicator(),
-                      ),
-                      SizedBox(width: 20),
-                      Text("Game starting soon",
-                          style: TextStyle(fontSize: 20)),
-                    ],
-                  );
                 }
 
                 return Row(

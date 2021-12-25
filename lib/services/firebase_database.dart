@@ -11,7 +11,14 @@ class FirebaseDatabaseService {
         _firestore.collection("rooms").doc(roomId);
     await documentReference.set({
       "roomCreator": userName,
+      "takenNumbersList": FieldValue.arrayUnion([]),
       "isGameStarted": false,
+      "isfirstAnounced": false,
+      "firstWinner": "",
+      "isSecondAnounced": false,
+      "secondWinner": "",
+      "isThirdAnounced": false,
+      "thirdWinner": "",
     });
     return roomId;
   }
@@ -27,9 +34,10 @@ class FirebaseDatabaseService {
             .collection("rooms")
             .doc(roomId)
             .collection("players")
-            .doc()
+            .doc(userName)
             .set({
           "userName": userName,
+          "playerNumbersList": [],
         });
         return true;
       } else {
@@ -51,10 +59,10 @@ class FirebaseDatabaseService {
     return a.snapshots();
   }
 
-  Future<dynamic> gameDocumentFuture({String? roomId}) {
+  Future<dynamic> gameDocumentFuture({String? roomId}) async {
     dynamic b;
     DocumentReference a = _firestore.collection("rooms").doc(roomId!);
-    a.get().then((value) => b = value.data());
+    await a.get().then((value) => b = value.data());
     return b;
   }
 
@@ -78,6 +86,7 @@ class FirebaseDatabaseService {
     if (value.exists) {
       await _firestore.collection("rooms").doc(roomId).update({
         "allNumbersList": FieldValue.arrayRemove([number]),
+        "takenNumbersList": FieldValue.arrayUnion([number]),
       });
 
       return true;
@@ -86,22 +95,53 @@ class FirebaseDatabaseService {
     }
   }
 
-  /*Future<bool> createGameCard(
-      {String? roomId, String? userName, List? randomNumbersForCards}) async {
+  Future<bool> createGameCard(
+      {String? roomId,
+      String? userName,
+      Map<String, dynamic>? playerRandomNumbersForCards}) async {
     var value = await _firestore
         .collection("rooms")
         .doc(roomId!)
-        .collection(userName!)
-        .doc()
+        .collection("players")
+        .doc(userName)
         .get();
     if (value.exists) {
-      await _firestore.collection("rooms").doc(roomId).update({
-        "userNumbersList": randomNumbersForCards,
+      await _firestore
+          .collection("rooms")
+          .doc(roomId)
+          .collection("players")
+          .doc(userName)
+          .update({
+        "playerNumbersList": playerRandomNumbersForCards!,
       });
 
       return true;
     } else {
       return false;
     }
-  }*/
+  }
+
+  Future<bool> setMyNumberTrue(
+      {String? roomId, String? userName,  Map<String, dynamic>? playerNumbersMap}) async {
+    var value = await _firestore
+        .collection("rooms")
+        .doc(roomId!)
+        .collection("players")
+        .doc(userName)
+        .get();
+    if (value.exists) {
+      
+      await _firestore
+          .collection("rooms")
+          .doc(roomId)
+          .collection("players")
+          .doc(userName)
+          .update({
+        "playerNumbersList": playerNumbersMap!,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

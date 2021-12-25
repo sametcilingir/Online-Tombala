@@ -1,9 +1,12 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/views/game_card.dart';
+import 'package:tombala/views/game_table.dart';
 import 'package:tombala/views/home.dart';
+import 'package:tombala/views/room_choose.dart';
+import 'package:tombala/views/room_join.dart';
+import 'package:tombala/views/waiting.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,7 +97,14 @@ class _MyAppState extends State<MyApp> {
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         title: 'Tombala',
-        home:  HomeScreen(),
+        routes: {
+          '/': (context) => HomeScreen(),
+          "/room_choose": (context) => RoomChooseScreen(),
+          "/waiting_room": (context) => WaitingScreen(),
+          "/room_join": (context) => RoomJoinScreen(),
+          "/game_card": (context) => GameCardScreen(),
+          "/game_table": (context) => GameTableScreen(),
+        },
       );
     }
     return const CircularProgressIndicator();

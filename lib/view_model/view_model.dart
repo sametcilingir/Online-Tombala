@@ -46,17 +46,22 @@ abstract class _ViewModelBase with Store {
       List<dynamic>.generate(100, (i) => i + 1).map((i) => i).toList();
 
   @action
-  Future<bool> createRoom({required BuildContext context}) async {
+  Future<bool> createRoom() async {
     try {
-      await _firebaseDatabaseService
-          .createRoom(userName: userName)
-          .then((value) => roomId = value);
-      return true;
+      var isRoomCreated =
+          await _firebaseDatabaseService.createRoom(userName: userName);
+      if (isRoomCreated) {
+        roomId = _firebaseDatabaseService.roomId;
+        return true;
+      } else {
+        return false;
+      }
     } catch (e) {
       print("Oda oluşturmada hata oluştu: $e");
       return false;
     }
   }
+
 
   @action
   Future<bool> joinRoom({required BuildContext context}) async {
@@ -462,4 +467,197 @@ abstract class _ViewModelBase with Store {
 
   @observable
   String? gameCreator;
+
+  @observable
+  bool isFirstAnounced = false;
+
+  @observable
+  bool isSecondAnounced = false;
+
+  @observable
+  bool isThirdAnounced = false;
+
+  @observable
+  String? firstWinner;
+  @observable
+  String? secondWinner;
+  @observable
+  String? thirdWinner;
+
+  @observable
+  bool isGameFinished = false;
+
+  @action
+  Future<void> birinciCinkoIlanEt(BuildContext context) async {
+    try {
+      if (playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[24].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[27].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+        String anouncedInformation = await _firebaseDatabaseService
+            .setFirstWinner(roomId: roomId, userName: userName);
+        if (anouncedInformation == "Ok") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Tebrikler',
+            desc: 'Tebrikler, ilk çinkoyu yaptınız',
+          ).show();
+        } else if (anouncedInformation == "Already Announced") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Üzgünüm',
+            desc: 'Üzgünüm, ilk çinkoyu zaten yapıldı.',
+          ).show();
+        }
+      } else {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.INFO,
+          animType: AnimType.BOTTOMSLIDE,
+          autoHide: Duration(seconds: 1),
+          title: 'Üzgünüm',
+          desc: 'Üzgünüm, çinko yapamadınız',
+        ).show();
+      }
+    } catch (e) {
+      print("birinci hatası: $e");
+    }
+  }
+
+  @action
+  Future<void> ikinciCinkoIlanEt(BuildContext context) async {
+    print("1,2  1 3  , 2 3");
+    try {
+      if (playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[27].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[23].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[27].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+        String anouncedInformation = await _firebaseDatabaseService
+            .setSecondWinner(roomId: roomId, userName: userName);
+        if (anouncedInformation == "Ok") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Tebrikler',
+            desc: 'Tebrikler, ikinci çinkoyu yaptınız',
+          ).show();
+        } else if (anouncedInformation == "Already Announced") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Üzgünüm',
+            desc: 'Üzgünüm, ikinci çinkoyu zaten yapıldı.',
+          ).show();
+        }
+      } else {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.INFO,
+          animType: AnimType.BOTTOMSLIDE,
+          autoHide: Duration(seconds: 1),
+          title: 'Üzgünüm',
+          desc: 'Üzgünüm, ikinci çinko yapamadınız',
+        ).show();
+      }
+    } catch (e) {
+      print("ikinci hatası: $e");
+    }
+  }
+
+  @action
+  Future<void> tomabalaIlanEt(BuildContext context) async {
+    try {
+      if (playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[27].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+        String anouncedInformation = await _firebaseDatabaseService.setBingo(
+            roomId: roomId, userName: userName);
+        if (anouncedInformation == "Ok") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Tebrikler',
+            desc: 'Tebrikler, bingoyu kazandınız',
+          ).show();
+        } else if (anouncedInformation == "Already Announced") {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.INFO,
+            animType: AnimType.BOTTOMSLIDE,
+            autoHide: Duration(seconds: 1),
+            title: 'Üzgünüm',
+            desc: 'Üzgünüm,  bingo zaten yapıldı.',
+          ).show();
+        }
+      } else {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.INFO,
+          animType: AnimType.BOTTOMSLIDE,
+          autoHide: Duration(seconds: 1),
+          title: 'Üzgünüm',
+          desc: 'Üzgünüm, bingo yapamadınız',
+        ).show();
+      }
+    } catch (e) {
+      print("bingo hatası: $e");
+    }
+  }
 }

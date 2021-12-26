@@ -14,54 +14,54 @@ class GameTableScreen extends StatelessWidget {
         return Scaffold(
           body: Column(
             children: [
-              Container(
-                height: MediaQuery.of(context).size.height - 300,
-                width: MediaQuery.of(context).size.width,
-                child: StreamBuilder<DocumentSnapshot>(
-                  stream: _viewModel.gameDocumentStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Something went wrong');
-                    }
+              StreamBuilder<DocumentSnapshot>(
+                stream: _viewModel.gameDocumentStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Something went wrong');
+                  }
 
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Row(
-                        children: [
-                          Container(
-                            height: 50,
-                            width: 50,
-                            child: CircularProgressIndicator(),
-                          ),
-                          SizedBox(width: 20),
-                          Text("Game loading", style: TextStyle(fontSize: 20)),
-                        ],
-                      );
-                    }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Row(
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 50,
+                          child: CircularProgressIndicator(),
+                        ),
+                        SizedBox(width: 20),
+                        Text("Game loading", style: TextStyle(fontSize: 20)),
+                      ],
+                    );
+                  }
 
-                    if (snapshot.hasData) {
-                      //print(snapshot.data!.data());
+                  if (snapshot.hasData) {
+                    //print(snapshot.data!.data());
 
-                      var data = snapshot.data!.get("allNumbersList");
+                    var data = snapshot.data!.get("allNumbersList");
 
-                      // print(a);
+                    // print(a);
 
-                      //_viewModel.allNumbersListDatabaseObservable = a;
+                    //_viewModel.allNumbersListDatabaseObservable = a;
 
-                      //print(_viewModel.allNumbersListDatabaseObservable);
-                      //print(_viewModel.allNumbersListTableObservable);
+                    //print(_viewModel.allNumbersListDatabaseObservable);
+                    //print(_viewModel.allNumbersListTableObservable);
 
-                      /*var database =
-                          _viewModel.allNumbersListDatabaseObservable!.toList();
-                      database = data;
-                      var table =
-                          _viewModel.allNumbersListTableObservable!.toList();
-                      table = List<dynamic>.generate(100, (i) => i + 1)
-                          .map((i) => i)
-                          .toList();*/
+                    /*var database =
+                        _viewModel.allNumbersListDatabaseObservable!.toList();
+                    database = data;
+                    var table =
+                        _viewModel.allNumbersListTableObservable!.toList();
+                    table = List<dynamic>.generate(100, (i) => i + 1)
+                        .map((i) => i)
+                        .toList();*/
 
-                      _viewModel.allNumbersListDatabase = data;
+                    _viewModel.allNumbersListDatabase = data;
 
-                      return GridView.builder(
+                    return Container(
+                      height: MediaQuery.of(context).size.height - 300,
+                      width: MediaQuery.of(context).size.width,
+                      child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 10,
                         ),
@@ -81,7 +81,8 @@ class GameTableScreen extends StatelessWidget {
                             width: 20,
                             color: //_viewModel.allNumbersListDatabase
                                 // .contains(_viewModel.allNumbersListTable[index])
-                                _viewModel.allNumbersListDatabase.contains(_viewModel.allNumbersListTable[index])
+                                _viewModel.allNumbersListDatabase.contains(
+                                        _viewModel.allNumbersListTable[index])
                                     ? Colors.red
                                     : Colors.green,
                             child: Center(
@@ -92,27 +93,26 @@ class GameTableScreen extends StatelessWidget {
                             ),
                           );
                         },
-                      );
-                    }
-
-                    return Row(
-                      children: [
-                        Container(
-                          height: 50,
-                          width: 50,
-                          child: CircularProgressIndicator(),
-                        ),
-                        SizedBox(width: 20),
-                        Text("Game is just about to start",
-                            style: TextStyle(fontSize: 20)),
-                      ],
+                      ),
                     );
-                  },
-                ),
+                  }
+
+                  return Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(width: 20),
+                      Text("Game is just about to start",
+                          style: TextStyle(fontSize: 20)),
+                    ],
+                  );
+                },
               ),
               ElevatedButton(
                 onPressed: () async {
-                  
                   await _viewModel.takeNumber(context: context);
                 },
                 child: Text("Take Number"),

@@ -5,22 +5,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class FirebaseDatabaseService {
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String> createRoom({String? userName}) async {
-    String roomId = Random().nextInt(10000000).toString();
-    DocumentReference documentReference =
-        _firestore.collection("rooms").doc(roomId);
-    await documentReference.set({
-      "roomCreator": userName,
-      "takenNumbersList": FieldValue.arrayUnion([]),
-      "isGameStarted": false,
-      "isfirstAnounced": false,
-      "firstWinner": "",
-      "isSecondAnounced": false,
-      "secondWinner": "",
-      "isThirdAnounced": false,
-      "thirdWinner": "",
-    });
-    return roomId;
+  String? roomId;
+
+  Future<bool> createRoom({String? userName}) async {
+    roomId = Random().nextInt(10000000).toString();
+    var value = await _firestore.collection("rooms").doc(roomId).get();
+    if (value.exists) {
+      return false;
+    } else {
+      await _firestore.collection("rooms").doc(roomId).set({
+        "roomCreator": userName,
+        "takenNumbersList": FieldValue.arrayUnion([]),
+        "isGameStarted": false,
+        "isFirstAnounced": false,
+        "firstWinner": "",
+        "isSecondAnounced": false,
+        "secondWinner": "",
+        "isThirdAnounced": false,
+        "thirdWinner": "",
+        "isGameFinished": false,
+      });
+      return true;
+    }
   }
 
   Future<bool> joinRoom({String? roomId, String? userName}) async {
@@ -122,7 +128,9 @@ class FirebaseDatabaseService {
   }
 
   Future<bool> setMyNumberTrue(
-      {String? roomId, String? userName,  Map<String, dynamic>? playerNumbersMap}) async {
+      {String? roomId,
+      String? userName,
+      Map<String, dynamic>? playerNumbersMap}) async {
     var value = await _firestore
         .collection("rooms")
         .doc(roomId!)
@@ -130,7 +138,6 @@ class FirebaseDatabaseService {
         .doc(userName)
         .get();
     if (value.exists) {
-      
       await _firestore
           .collection("rooms")
           .doc(roomId)
@@ -142,6 +149,91 @@ class FirebaseDatabaseService {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<String> setFirstWinner({
+    String? roomId,
+    String? userName,
+  }) async {
+    var value = await _firestore.collection("rooms").doc(roomId!).get();
+
+    if (value.exists) {
+      bool isfirstAnounced = value.data()!["isFirstAnounced"];
+      if (isfirstAnounced == false) {
+        try {
+          await _firestore.collection("rooms").doc(roomId).update({
+            "isFirstAnounced": true,
+            "firstWinner": userName,
+          });
+
+          return "Ok";
+        } catch (e) {
+          print("setFirstWinner" + e.toString());
+          return "Error";
+        }
+      } else {
+        return "Already Announced";
+      }
+    } else {
+      return "Error";
+    }
+  }
+
+  Future<String> setSecondWinner({
+    String? roomId,
+    String? userName,
+  }) async {
+    var value = await _firestore.collection("rooms").doc(roomId!).get();
+
+    if (value.exists) {
+      bool isSecondAnounced = value.data()!["isSecondAnounced"];
+      if (isSecondAnounced == false) {
+        try {
+          await _firestore.collection("rooms").doc(roomId).update({
+            "isSecondAnounced": true,
+            "secondWinner": userName,
+          });
+
+          return "Ok";
+        } catch (e) {
+          print("setSecondWinner" + e.toString());
+          return "Error";
+        }
+      } else {
+        return "Already Announced";
+      }
+    } else {
+      return "Error";
+    }
+  }
+
+  Future<String> setBingo({
+    String? roomId,
+    String? userName,
+  }) async {
+    var value = await _firestore.collection("rooms").doc(roomId!).get();
+
+    if (value.exists) {
+      bool isThirdAnounced = value.data()!["isThirdAnounced"];
+      if (isThirdAnounced == false) {
+        try {
+          await _firestore.collection("rooms").doc(roomId).update({
+            "isThirdAnounced": true,
+            "thirdWinner": userName,
+            "isGameFinished": true,
+          });
+
+          return "Ok";
+        } catch (e) {
+          print("setThirdWinner" + e.toString());
+          return "Error";
+        }
+      } else {
+        return "Already Announced";
+      }
+    } else {
+      return "Error";
     }
   }
 }

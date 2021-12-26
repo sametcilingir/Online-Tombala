@@ -9,58 +9,58 @@ class RoomJoinScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.green.withOpacity(0.5),
-        child: Center(
-          child: Container(
-            color: Colors.red,
-            height: 300,
-            width: 300,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text("Oda Numarasini Giriniz"),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: 400,
-                  child: Form(
+      appBar: AppBar(
+        elevation: 0,
+        leading: BackButton(
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+           /* Text(
+              'Oda numarası giriniz',
+              style: Theme.of(context).textTheme.headline2,
+            ),*/
+            Container(
+              width: 300,
+              child: Column(
+                children: [
+                  Form(
                     key: _viewModel.formKeyRoomId,
                     child: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: '54253453',
                         labelText: 'Oda Numarasi',
-                        prefixIcon: Icon(Icons.supervised_user_circle_outlined),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        border: OutlineInputBorder(),
                       ),
                       onSaved: (newValue) {
                         _viewModel.roomId = newValue!;
                       },
                     ),
                   ),
-                ),
-                ElevatedButton(
-                    onPressed: () async {
-                      _viewModel.formKeyRoomId.currentState!.save();
+                  SizedBox(
+                    height: 20,
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        _viewModel.formKeyRoomId.currentState!.save();
 
-                      _viewModel.context = context;
+                        _viewModel.context = context;
 
-                      bool createJointProcces = await _viewModel.joinRoom(context: context);
-                      if (createJointProcces) {
-                     /*   Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => WaitingScreen()));*/
-                                Navigator.of(context).popAndPushNamed( '/waiting_room');
-                      }
-                    },
-                    child: Text('Odaya gir')),
-              ],
+                        bool createJointProcces =
+                            await _viewModel.joinRoom(context: context);
+                        if (createJointProcces) {
+                          Navigator.of(context).popAndPushNamed('/waiting_room');
+                        }
+                      },
+                      child: Text('Odaya gir',style: Theme.of(context).textTheme.button,)),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

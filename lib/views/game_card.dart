@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/view_model/view_model.dart';
 
@@ -16,7 +17,29 @@ class _GameCardScreenState extends State<GameCardScreen> {
   Widget build(BuildContext context) {
     return Observer(builder: (_) {
       return Scaffold(
-          floatingActionButton: FloatingActionButton(onPressed: () async {}),
+          floatingActionButton: FloatingActionButton.extended(
+            label: (() {
+              if (!_viewModel.isFirstAnounced) {
+                return Text("Birinci Çinko İlan et");
+              } else if (!_viewModel.isSecondAnounced) {
+                return Text("İkinci Çinko İlan et");
+              } else if (!_viewModel.isThirdAnounced) {
+                return Text("Tombala İlan et");
+              } else {
+                return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
+              }
+            }()),
+            icon: Icon(Icons.add),
+            onPressed: () {
+              if (!_viewModel.isFirstAnounced) {
+                _viewModel.birinciCinkoIlanEt(context);
+              } else if (!_viewModel.isSecondAnounced) {
+                _viewModel.ikinciCinkoIlanEt(context);
+              } else if (!_viewModel.isThirdAnounced) {
+                _viewModel.tomabalaIlanEt(context);
+              } else {}
+            },
+          ),
           body: SingleChildScrollView(
             child: Column(
               children: [
@@ -56,6 +79,38 @@ class _GameCardScreenState extends State<GameCardScreen> {
 
                         _viewModel.takenNumbersListDatabase =
                             takenNumbersListData;
+
+                        var isFirstAnounced =
+                            snapshot.data!.get("isFirstAnounced");
+
+                        _viewModel.isFirstAnounced = isFirstAnounced;
+
+                        var isSecondAnounced =
+                            snapshot.data!.get("isSecondAnounced");
+
+                        _viewModel.isSecondAnounced = isSecondAnounced;
+
+                        var isThirdAnounced =
+                            snapshot.data!.get("isThirdAnounced");
+
+                        _viewModel.isThirdAnounced = isThirdAnounced;
+
+                        var firstWinner = snapshot.data!.get("firstWinner");
+
+                        _viewModel.firstWinner = firstWinner;
+
+                        var secondWinner = snapshot.data!.get("secondWinner");
+
+                        _viewModel.secondWinner = secondWinner;
+
+                        var thirdWinner = snapshot.data!.get("thirdWinner");
+
+                        _viewModel.thirdWinner = thirdWinner;
+
+                        var isGameFinished =
+                            snapshot.data!.get("isGameFinished");
+
+                        _viewModel.isGameFinished = isGameFinished;
 
                         return Observer(builder: (_) {
                           return Column(
@@ -141,8 +196,21 @@ class _GameCardScreenState extends State<GameCardScreen> {
                                 ),
                               ),
                               _viewModel.allNumbersListDatabase.isEmpty
-                                  ? Text("Oyun bitti")
+                                  ? Text("Oyun bitti..")
                                   : SizedBox(),
+                              _viewModel.isFirstAnounced
+                                  ? Text(
+                                      "İlk çinkoyu yapan kişi : ${_viewModel.firstWinner}")
+                                  : SizedBox(),
+                              _viewModel.isSecondAnounced
+                                  ? Text(
+                                      "İkinci çinkoyu yapan kişi : ${_viewModel.secondWinner}")
+                                  : SizedBox(),
+                              _viewModel.isThirdAnounced
+                                  ? Text(
+                                      "Bingo yapan kişi : ${_viewModel.thirdWinner}")
+                                  : SizedBox(),
+                                  
                             ],
                           );
                         });

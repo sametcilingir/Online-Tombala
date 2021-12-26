@@ -259,12 +259,116 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$isFirstAnouncedAtom = Atom(name: '_ViewModelBase.isFirstAnounced');
+
+  @override
+  bool get isFirstAnounced {
+    _$isFirstAnouncedAtom.reportRead();
+    return super.isFirstAnounced;
+  }
+
+  @override
+  set isFirstAnounced(bool value) {
+    _$isFirstAnouncedAtom.reportWrite(value, super.isFirstAnounced, () {
+      super.isFirstAnounced = value;
+    });
+  }
+
+  final _$isSecondAnouncedAtom = Atom(name: '_ViewModelBase.isSecondAnounced');
+
+  @override
+  bool get isSecondAnounced {
+    _$isSecondAnouncedAtom.reportRead();
+    return super.isSecondAnounced;
+  }
+
+  @override
+  set isSecondAnounced(bool value) {
+    _$isSecondAnouncedAtom.reportWrite(value, super.isSecondAnounced, () {
+      super.isSecondAnounced = value;
+    });
+  }
+
+  final _$isThirdAnouncedAtom = Atom(name: '_ViewModelBase.isThirdAnounced');
+
+  @override
+  bool get isThirdAnounced {
+    _$isThirdAnouncedAtom.reportRead();
+    return super.isThirdAnounced;
+  }
+
+  @override
+  set isThirdAnounced(bool value) {
+    _$isThirdAnouncedAtom.reportWrite(value, super.isThirdAnounced, () {
+      super.isThirdAnounced = value;
+    });
+  }
+
+  final _$firstWinnerAtom = Atom(name: '_ViewModelBase.firstWinner');
+
+  @override
+  String? get firstWinner {
+    _$firstWinnerAtom.reportRead();
+    return super.firstWinner;
+  }
+
+  @override
+  set firstWinner(String? value) {
+    _$firstWinnerAtom.reportWrite(value, super.firstWinner, () {
+      super.firstWinner = value;
+    });
+  }
+
+  final _$secondWinnerAtom = Atom(name: '_ViewModelBase.secondWinner');
+
+  @override
+  String? get secondWinner {
+    _$secondWinnerAtom.reportRead();
+    return super.secondWinner;
+  }
+
+  @override
+  set secondWinner(String? value) {
+    _$secondWinnerAtom.reportWrite(value, super.secondWinner, () {
+      super.secondWinner = value;
+    });
+  }
+
+  final _$thirdWinnerAtom = Atom(name: '_ViewModelBase.thirdWinner');
+
+  @override
+  String? get thirdWinner {
+    _$thirdWinnerAtom.reportRead();
+    return super.thirdWinner;
+  }
+
+  @override
+  set thirdWinner(String? value) {
+    _$thirdWinnerAtom.reportWrite(value, super.thirdWinner, () {
+      super.thirdWinner = value;
+    });
+  }
+
+  final _$isGameFinishedAtom = Atom(name: '_ViewModelBase.isGameFinished');
+
+  @override
+  bool get isGameFinished {
+    _$isGameFinishedAtom.reportRead();
+    return super.isGameFinished;
+  }
+
+  @override
+  set isGameFinished(bool value) {
+    _$isGameFinishedAtom.reportWrite(value, super.isGameFinished, () {
+      super.isGameFinished = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
-  Future<bool> createRoom({required BuildContext context}) {
-    return _$createRoomAsyncAction
-        .run(() => super.createRoom(context: context));
+  Future<bool> createRoom() {
+    return _$createRoomAsyncAction.run(() => super.createRoom());
   }
 
   final _$joinRoomAsyncAction = AsyncAction('_ViewModelBase.joinRoom');
@@ -304,6 +408,32 @@ mixin _$ViewModel on _ViewModelBase, Store {
   Future<bool> checkMyNumber(BuildContext context, int number) {
     return _$checkMyNumberAsyncAction
         .run(() => super.checkMyNumber(context, number));
+  }
+
+  final _$birinciCinkoIlanEtAsyncAction =
+      AsyncAction('_ViewModelBase.birinciCinkoIlanEt');
+
+  @override
+  Future<void> birinciCinkoIlanEt(BuildContext context) {
+    return _$birinciCinkoIlanEtAsyncAction
+        .run(() => super.birinciCinkoIlanEt(context));
+  }
+
+  final _$ikinciCinkoIlanEtAsyncAction =
+      AsyncAction('_ViewModelBase.ikinciCinkoIlanEt');
+
+  @override
+  Future<void> ikinciCinkoIlanEt(BuildContext context) {
+    return _$ikinciCinkoIlanEtAsyncAction
+        .run(() => super.ikinciCinkoIlanEt(context));
+  }
+
+  final _$tomabalaIlanEtAsyncAction =
+      AsyncAction('_ViewModelBase.tomabalaIlanEt');
+
+  @override
+  Future<void> tomabalaIlanEt(BuildContext context) {
+    return _$tomabalaIlanEtAsyncAction.run(() => super.tomabalaIlanEt(context));
   }
 
   final _$_ViewModelBaseActionController =
@@ -360,7 +490,14 @@ isMyNumberShown: ${isMyNumberShown},
 isMyNumberChecked: ${isMyNumberChecked},
 takenNumbersListDatabase: ${takenNumbersListDatabase},
 playerNumbersListDatabase: ${playerNumbersListDatabase},
-gameCreator: ${gameCreator}
+gameCreator: ${gameCreator},
+isFirstAnounced: ${isFirstAnounced},
+isSecondAnounced: ${isSecondAnounced},
+isThirdAnounced: ${isThirdAnounced},
+firstWinner: ${firstWinner},
+secondWinner: ${secondWinner},
+thirdWinner: ${thirdWinner},
+isGameFinished: ${isGameFinished}
     ''';
   }
 }

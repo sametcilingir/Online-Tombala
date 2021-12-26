@@ -93,7 +93,18 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           brightness: Brightness.dark,
         ),
-        darkTheme: ThemeData(brightness: Brightness.dark),
+        darkTheme: ThemeData(
+          
+          appBarTheme: AppBarTheme(
+            color: Color(0xff344d2f),
+          ),
+          scaffoldBackgroundColor: Color(0xff344d2f),
+          brightness: Brightness.dark,
+          colorScheme: ColorScheme.dark(
+            secondary: Color(0xfffac57d),
+            primary: Color(0xffa81817),
+          ),
+        ),
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
         title: 'Tombala',

@@ -132,6 +132,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$randomNumberAtom = Atom(name: '_ViewModelBase.randomNumber');
+
+  @override
+  int? get randomNumber {
+    _$randomNumberAtom.reportRead();
+    return super.randomNumber;
+  }
+
+  @override
+  set randomNumber(int? value) {
+    _$randomNumberAtom.reportWrite(value, super.randomNumber, () {
+      super.randomNumber = value;
+    });
+  }
+
   final _$randomNumbersForCardsAtom =
       Atom(name: '_ViewModelBase.randomNumbersForCards');
 
@@ -364,6 +379,36 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$playersNumberAtom = Atom(name: '_ViewModelBase.playersNumber');
+
+  @override
+  int get playersNumber {
+    _$playersNumberAtom.reportRead();
+    return super.playersNumber;
+  }
+
+  @override
+  set playersNumber(int value) {
+    _$playersNumberAtom.reportWrite(value, super.playersNumber, () {
+      super.playersNumber = value;
+    });
+  }
+
+  final _$roomCreatorAtom = Atom(name: '_ViewModelBase.roomCreator');
+
+  @override
+  String? get roomCreator {
+    _$roomCreatorAtom.reportRead();
+    return super.roomCreator;
+  }
+
+  @override
+  set roomCreator(String? value) {
+    _$roomCreatorAtom.reportWrite(value, super.roomCreator, () {
+      super.roomCreator = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
@@ -483,6 +528,7 @@ context: ${context},
 isGameStarted: ${isGameStarted},
 allNumbersListDatabase: ${allNumbersListDatabase},
 allNumbersListTable: ${allNumbersListTable},
+randomNumber: ${randomNumber},
 randomNumbersForCards: ${randomNumbersForCards},
 randomColor: ${randomColor},
 playerNumbersMap: ${playerNumbersMap},
@@ -497,7 +543,9 @@ isThirdAnounced: ${isThirdAnounced},
 firstWinner: ${firstWinner},
 secondWinner: ${secondWinner},
 thirdWinner: ${thirdWinner},
-isGameFinished: ${isGameFinished}
+isGameFinished: ${isGameFinished},
+playersNumber: ${playersNumber},
+roomCreator: ${roomCreator}
     ''';
   }
 }

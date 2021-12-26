@@ -73,24 +73,43 @@ class WaitingScreen extends StatelessWidget {
                             );
                           }
 
-                          return ListView(
-                            children: snapshot.data!.docs
-                                .map((DocumentSnapshot document) {
-                              Map<String, dynamic> data =
-                                  document.data()! as Map<String, dynamic>;
-                              return Align(
-                                alignment: Alignment.center,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    data['userName'],
-                                    style: TextStyle(
-                                      fontSize: 28,
-                                    ),
-                                  ),
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("Number of Player  " +
+                                  (_viewModel.playersNumber - 1).toString()),
+                              SizedBox(height: 20),
+                              Container(
+                                height: 430,
+                                width: 500,
+                                child: ListView(
+                                  children: snapshot.data!.docs
+                                      .map((DocumentSnapshot document) {
+                                    Map<String, dynamic> data = document.data()!
+                                        as Map<String, dynamic>;
+                                    _viewModel.playersNumber =
+                                        snapshot.data!.docs.length;
+                                    return data["userName"] !=
+                                            _viewModel.roomCreator
+                                        ? Align(
+                                            alignment: Alignment.center,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                data['userName'],
+                                                style: TextStyle(
+                                                  fontSize: 28,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox();
+                                  }).toList(),
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -130,14 +149,17 @@ class WaitingScreen extends StatelessWidget {
                       if (snapshot.hasData) {
                         Map<String, dynamic> data =
                             snapshot.data?.data() as Map<String, dynamic>;
+
+                        _viewModel.roomCreator = data["roomCreator"];
                         if (data['isGameStarted'] == true &&
-                            data['roomCreator'] != _viewModel.userName) {
+                            _viewModel.roomCreator != _viewModel.userName) {
                           _viewModel.createGameCard();
 
                           Future.delayed(Duration(microseconds: 500), () {
                             Navigator.popAndPushNamed(context, '/game_card');
                           });
-                        } else if (data['roomCreator'] == _viewModel.userName) {
+                        } else if (_viewModel.roomCreator ==
+                            _viewModel.userName) {
                           return ElevatedButton(
                             onPressed: () async {
                               bool isGameStarted = await _viewModel.startGame();

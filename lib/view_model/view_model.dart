@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:mobx/mobx.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/services/firebase_database.dart';
@@ -62,7 +63,6 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-
   @action
   Future<bool> joinRoom({required BuildContext context}) async {
     try {
@@ -71,22 +71,52 @@ abstract class _ViewModelBase with Store {
       if (isRoomExist) {
         return true;
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Oda katiliminda hata oluştu",
+        showToastWidget(
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Container(
+              margin: EdgeInsets.all(20),
+              child: Text(
+                'Oda katiliminda hata oluştu',
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
+          position: StyledToastPosition.top,
+          duration: Duration(seconds: 2),
+          context: context,
+          animation: StyledToastAnimation.slideFromTop,
+          reverseAnimation: StyledToastAnimation.slideToTop,
         );
         return false;
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Oda katiliminda hata oluştu",
+      showToastWidget(
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Container(
+            margin: EdgeInsets.all(20),
+            child: Text(
+              'Oda katiliminda hata oluştu',
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
         ),
+        position: StyledToastPosition.top,
+        duration: Duration(seconds: 2),
+        context: context,
+        animation: StyledToastAnimation.slideFromTop,
+        reverseAnimation: StyledToastAnimation.slideToTop,
       );
 
       print("Odaya katilimda hata oluştu: $e");
@@ -137,15 +167,16 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  //@observable
-  //ObservableList<dynamic>? takenNumber;
+  @observable
+  int? randomNumber;
+
 
   @action
   Future<bool> takeNumber({required BuildContext context}) async {
     try {
       if (allNumbersListTable.isNotEmpty) {
-        var randomNumber = (allNumbersListDatabase..shuffle()).first;
-        print("randomNumber: $randomNumber");
+         randomNumber = (allNumbersListDatabase..shuffle()).first;
+        //print("randomNumber: $randomNumber");
         await _firebaseDatabaseService.takeNumber(
             roomId: roomId, number: randomNumber);
 
@@ -155,23 +186,32 @@ abstract class _ViewModelBase with Store {
           animType: AnimType.SCALE,
           autoHide: Duration(seconds: 5),
           dialogBackgroundColor: Colors.green,
-          body: Column(
-            children: [
-              Text(
-                randomNumber.toString(),
-                style: TextStyle(fontSize: 42),
+          
+          body: Container(
+            height: 200,
+            width: 150,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    randomNumber.toString(),
+                    style: TextStyle(fontSize: 42),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Çekilen sayi',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
               ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Çekilen sayi',
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
+            ),
           ),
         ).show();
 
@@ -660,4 +700,10 @@ abstract class _ViewModelBase with Store {
       print("bingo hatası: $e");
     }
   }
+
+  @observable
+  int playersNumber = 1;
+
+  @observable
+  String? roomCreator;
 }

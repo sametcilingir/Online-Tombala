@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:tombala/locator.dart';
@@ -12,7 +13,25 @@ class WaitingScreen extends StatelessWidget {
     return Observer(builder: (_) {
       return Scaffold(
           appBar: AppBar(
-            title: Text("Room Key: ${_viewModel.roomId}"),
+            centerTitle: false,
+            actions: [
+              _viewModel.roomCreator == _viewModel.userName
+                  ? IconButton(
+                      onPressed: () async {
+                        await _viewModel.deleteGame();
+                        Navigator.of(context).popAndPushNamed("/home");
+                      },
+                      icon: Icon(Icons.close),
+                    )
+                  : SizedBox(),
+            ],
+            leading: _viewModel.roomId == null
+                ? BackButton(
+                    onPressed: () {
+                      Navigator.of(context).popAndPushNamed("/home");
+                    },
+                  )
+                : SizedBox(),
             elevation: 0,
             automaticallyImplyLeading: false,
           ),
@@ -22,8 +41,12 @@ class WaitingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Players", style: TextStyle(fontSize: 50)),
-                  SizedBox(height: 20),
+                  _viewModel.roomId != null
+                      ? Text("Oda Numarası: ${_viewModel.roomId}",
+                          style: TextStyle(fontSize: 35))
+                      : Text("Anasayfaya dön"),
+                  SizedBox(height: 50),
+
                   /* Text(
                         "Room Key: ${_viewModel.roomId}",
                         style: TextStyle(fontSize: 30),
@@ -43,56 +66,69 @@ class WaitingScreen extends StatelessWidget {
                         )),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: _viewModel.playersStream(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          if (snapshot.hasError) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("Something went wrong",
-                                    style: TextStyle(fontSize: 20)),
-                              ],
-                            );
-                          }
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: 50,
-                                  width: 50,
-                                  child: CircularProgressIndicator(),
-                                ),
-                                SizedBox(width: 50),
-                                Text("Game is waiting for players",
-                                    style: TextStyle(fontSize: 20)),
-                              ],
-                            );
-                          }
+                      child: Column(
+                        children: [
+                          Text("Oyuncular", style: TextStyle(fontSize: 30)),
+                          SizedBox(height: 20),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: _viewModel.playersStream(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Hata oluştu.",
+                                        style: TextStyle(fontSize: 20)),
+                                  ],
+                                );
+                              }
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                    SizedBox(width: 50),
+                                    Text("Oyuncular bekleniyor...",
+                                        style: TextStyle(fontSize: 20)),
+                                  ],
+                                );
+                              }
 
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text("Number of Player  " +
-                                  (_viewModel.playersNumber - 1).toString()),
-                              SizedBox(height: 20),
-                              Container(
-                                height: 430,
-                                width: 500,
-                                child: ListView(
-                                  children: snapshot.data!.docs
-                                      .map((DocumentSnapshot document) {
-                                    Map<String, dynamic> data = document.data()!
-                                        as Map<String, dynamic>;
-                                    _viewModel.playersNumber =
-                                        snapshot.data!.docs.length;
-                                    return data["userName"] !=
-                                            _viewModel.roomCreator
-                                        ? Align(
+                              if (snapshot.hasData &&
+                                  snapshot.data!.docs.isNotEmpty) {
+                                int playersNumber = snapshot.data!.docs.length;
+
+                                _viewModel.playersNumber = playersNumber;
+
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ///webde anlık deği
+                                    kIsWeb
+                                        ? SizedBox()
+                                        : Text("Oyuncu sayısı  " +
+                                            (_viewModel.playersNumber)
+                                                .toString()),
+                                    SizedBox(height: 20),
+                                    Container(
+                                      height: 430,
+                                      width: 500,
+                                      child: ListView(
+                                        children: snapshot.data!.docs
+                                            .map((DocumentSnapshot document) {
+                                          Map<String, dynamic> data = document
+                                              .data()! as Map<String, dynamic>;
+                                          _viewModel.playersNumber =
+                                              snapshot.data!.docs.length;
+                                          return Align(
                                             alignment: Alignment.center,
                                             child: Padding(
                                               padding:
@@ -104,14 +140,50 @@ class WaitingScreen extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
-                                          )
-                                        : SizedBox();
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else if (snapshot.hasData &&
+                                  snapshot.data!.docs.isEmpty) {
+                                return Center(
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(width: 50),
+                                      Text("Oyuncular bekleniyor...",
+                                          style: TextStyle(fontSize: 20)),
+                                    ],
+                                  ),
+                                );
+                              }
+
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Böyle bir oyun yok",
+                                      style: TextStyle(fontSize: 20)),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  ElevatedButton(
+                                      onPressed: () async {
+                                        Navigator.of(context)
+                                            .popAndPushNamed("/home");
+                                      },
+                                      child: Text(
+                                        'Ana sayfaya dön',
+                                        style:
+                                            Theme.of(context).textTheme.button,
+                                      )),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -120,11 +192,23 @@ class WaitingScreen extends StatelessWidget {
                     stream: _viewModel.gameDocumentStream(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        Row(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Something went wrong",
+                            Text("Böyle bir oyun yok",
                                 style: TextStyle(fontSize: 20)),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            ElevatedButton(
+                                onPressed: () async {
+                                  Navigator.of(context)
+                                      .popAndPushNamed("/home");
+                                },
+                                child: Text(
+                                  'Ana sayfaya dön',
+                                  style: Theme.of(context).textTheme.button,
+                                )),
                           ],
                         );
                       }
@@ -140,18 +224,26 @@ class WaitingScreen extends StatelessWidget {
                               child: CircularProgressIndicator(),
                             ),
                             SizedBox(width: 50),
-                            Text("Game is just about to start",
+                            Text("Oyun başlamaya hazırlanıyor...",
                                 style: TextStyle(fontSize: 20)),
                           ],
                         );
                       }
 
-                      if (snapshot.hasData) {
-                        Map<String, dynamic> data =
-                            snapshot.data?.data() as Map<String, dynamic>;
+                      if (snapshot.hasData && snapshot.data!.exists) {
+                        var roomCreator = snapshot.data!.get("roomCreator");
 
-                        _viewModel.roomCreator = data["roomCreator"];
-                        if (data['isGameStarted'] == true &&
+                        _viewModel.roomCreator = roomCreator;
+
+                        var isGameStarted = snapshot.data!.get("isGameStarted");
+
+                        _viewModel.isGameStarted = isGameStarted;
+
+                        /*    Map<String, dynamic> data =
+                            snapshot.data?.data() as Map<String, dynamic>;
+                        _viewModel.roomCreator = data["roomCreator"];*/
+
+                        if (_viewModel.isGameStarted == true &&
                             _viewModel.roomCreator != _viewModel.userName) {
                           _viewModel.createGameCard();
 
@@ -169,7 +261,7 @@ class WaitingScreen extends StatelessWidget {
                               }
                             },
                             child: Text(
-                              "Start Game",
+                              "Oyunu Başlat",
                               style: Theme.of(context).textTheme.button,
                             ),
                           );
@@ -190,13 +282,7 @@ class WaitingScreen extends StatelessWidget {
                         }
                       }
 
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Something went wrong",
-                              style: TextStyle(fontSize: 20)),
-                        ],
-                      );
+                      return SizedBox();
                     },
                   )
                 ],

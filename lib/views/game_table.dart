@@ -13,43 +13,10 @@ class GameTableScreen extends StatelessWidget {
     return Observer(
       builder: (_) {
         return Scaffold(
-          appBar: AppBar(
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            title: (() {
-              if (_viewModel.isFirstAnounced) {
-                return Text(
-                  "1. çinko yapan: ${_viewModel.firstWinner}",
-                  style: TextStyle(fontSize: 14),
-                );
-              } else if (_viewModel.isSecondAnounced) {
-                return Text(
-                  "2. çinko yapan: ${_viewModel.secondWinner}",
-                  style: TextStyle(fontSize: 14),
-                );
-              } else if (_viewModel.isThirdAnounced) {
-                return Text(
-                  "Bingo yapan: ${_viewModel.thirdWinner}",
-                  style: TextStyle(fontSize: 14),
-                );
-              }
-            }()),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Center(
-                  child: Text(
-                    '${_viewModel.randomNumber == null ? '' : "En son çekilen sayı:  ${_viewModel.randomNumber}"}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ),
-              ),
-            ],
-          ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
+            onPressed: () async {
               if (!_viewModel.isThirdAnounced) {
-                _viewModel.takeNumber(context: context);
+                await _viewModel.takeNumber(context: context);
               } else {
                 Navigator.of(context).popAndPushNamed("/");
               }
@@ -118,7 +85,9 @@ class GameTableScreen extends StatelessWidget {
 
                         _viewModel.allNumbersListDatabase = data;
 
-                        if (_viewModel.isFirstAnounced) {
+                        /* if (_viewModel.isFirstAnounced &&
+                            _viewModel.isFirstAnouncedChecked == false) {
+                          _viewModel.isFirstAnouncedChecked = true;
                           AwesomeDialog(
                             context: context,
                             dialogType: DialogType.NO_HEADER,
@@ -152,7 +121,10 @@ class GameTableScreen extends StatelessWidget {
                               ),
                             ),
                           ).show();
-                        } else if (_viewModel.isSecondAnounced) {
+                        }
+                        if (_viewModel.isSecondAnounced &&
+                            _viewModel.isSecondAnouncedChecked == false) {
+                          _viewModel.isSecondAnouncedChecked = true;
                           AwesomeDialog(
                             context: context,
                             dialogType: DialogType.NO_HEADER,
@@ -186,7 +158,10 @@ class GameTableScreen extends StatelessWidget {
                               ),
                             ),
                           ).show();
-                        } else if (_viewModel.isThirdAnounced) {
+                        }
+                        if (_viewModel.isThirdAnounced &&
+                            _viewModel.isThirdAnouncedChecked == false) {
+                          _viewModel.isThirdAnouncedChecked = true;
                           AwesomeDialog(
                             context: context,
                             dialogType: DialogType.NO_HEADER,
@@ -220,38 +195,116 @@ class GameTableScreen extends StatelessWidget {
                               ),
                             ),
                           ).show();
-                        }
+                        }*/
 
-                        return Container(
-                          height: MediaQuery.of(context).size.height - 80,
-                          width: MediaQuery.of(context).size.width,
-                          child: GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent:
-                                        MediaQuery.of(context).size.height / 8),
-                            itemCount: 99,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                height: 20,
-                                width: 20,
-                                color: //_viewModel.allNumbersListDatabase
-                                    // .contains(_viewModel.allNumbersListTable[index])
-                                    _viewModel.allNumbersListDatabase.contains(
-                                            _viewModel
-                                                .allNumbersListTable[index])
-                                        ? Colors.red
-                                        : Colors.green,
-                                child: Center(
-                                  child: Text(
-                                    "${index + 1}",
-                                    style:
-                                        Theme.of(context).textTheme.headline6,
-                                  ),
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 20),
+                              child: Container(
+                                height: 50,
+                                width: MediaQuery.of(context).size.width,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      (() {
+                                        if (_viewModel
+                                            .allNumbersListDatabase.isEmpty) {
+                                          return "Oyun Bitti";
+                                        } else if (_viewModel.isThirdAnounced) {
+                                          return "Bingo yapan: ${_viewModel.thirdWinner}";
+                                        } else if (_viewModel
+                                            .isSecondAnounced) {
+                                          return "2. çinko yapan: ${_viewModel.secondWinner}";
+                                        } else if (_viewModel.isFirstAnounced) {
+                                          return "1. çinko yapan: ${_viewModel.firstWinner}";
+                                        } else {
+                                          return "";
+                                        }
+                                      }()),
+                                    ),
+                                    Text(
+                                      "En son çekilen sayı:  ${_viewModel.randomNumber}",
+                                    )
+                                  ],
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                            Container(
+                              //color: Colors.amberAccent,
+                              height: MediaQuery.of(context).size.height - 70,
+                              width: MediaQuery.of(context).size.width,
+                              child: GridView.builder(
+                                padding: EdgeInsets.all(0),
+                                gridDelegate:
+                                    SliverGridDelegateWithMaxCrossAxisExtent(
+                                        maxCrossAxisExtent:
+                                            MediaQuery.of(context).size.height /
+                                                8),
+                                itemCount: 99,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    height: 20,
+                                    width: 20,
+                                    color: //_viewModel.allNumbersListDatabase
+                                        // .contains(_viewModel.allNumbersListTable[index])
+                                        _viewModel.allNumbersListDatabase
+                                                .contains(_viewModel
+                                                    .allNumbersListTable[index])
+                                            ? Colors.red
+                                            : Colors.green,
+                                    child: Center(
+                                      child: Text(
+                                        "${index + 1}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _viewModel.isFirstAnounced
+                                      ? Text(
+                                          "1. Çinko Yapan Oyuncu" +
+                                              _viewModel.firstWinner.toString(),
+                                        )
+                                      : SizedBox(),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  _viewModel.isSecondAnounced
+                                      ? Text(
+                                          "2. Çinko Yapan Oyuncu" +
+                                              _viewModel.secondWinner
+                                                  .toString(),
+                                        )
+                                      : SizedBox(),
+                                  _viewModel.isThirdAnounced
+                                      ? Text(
+                                          "Tombala Yapan Oyuncu" +
+                                              _viewModel.secondWinner
+                                                  .toString(),
+                                        )
+                                      : SizedBox(),
+                                ],
+                              ),
+                            ),
+                          ],
                         );
                       }
 

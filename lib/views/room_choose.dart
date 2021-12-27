@@ -36,13 +36,13 @@ class RoomChooseScreen extends StatelessWidget {
                      
                       bool createRoomProcces = await _viewModel.createRoom();
                       if (createRoomProcces) {
-                        bool joinRoomProcces =
-                            await _viewModel.joinRoom(context: context);
-                        if (joinRoomProcces) {
+                       // bool joinRoomProcces =
+                       //     await _viewModel.joinRoom(context: context);
+                       // if (joinRoomProcces) {
                           Navigator.of(context).pushNamed("/waiting_room");
-                        } else {
-                          print("hata");
-                        }
+                       // } else {
+                       //   print("hata");
+                       // }
                       } else {
                         print("hata");
                       }

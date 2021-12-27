@@ -33,9 +33,19 @@ class FirebaseDatabaseService {
     var value = await _firestore.collection("rooms").doc(roomId).get();
 
     if (value.exists) {
-      print(value.data()!["isGameStarted"]);
+      await _firestore
+          .collection("rooms")
+          .doc(roomId)
+          .collection("players")
+          .doc(userName)
+          .set({
+        "userName": userName,
+        "playerNumbersList": [],
+      });
+      return true;
+      //print(value.data()!["isGameStarted"]);
 
-      if (value.data()!["isGameStarted"] == false) {
+      /*  if (value.data()!["isGameStarted"] == false) {
         await _firestore
             .collection("rooms")
             .doc(roomId)
@@ -48,7 +58,7 @@ class FirebaseDatabaseService {
         return true;
       } else {
         return false;
-      }
+      }*/
     } else {
       return false;
     }
@@ -81,6 +91,17 @@ class FirebaseDatabaseService {
         "allNumbersList": allNumbersList,
       });
 
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> deleteGame({String? roomId}) async {
+    
+    var value = await _firestore.collection("rooms").doc(roomId!).get();
+    if (value.exists) {
+      await _firestore.collection("rooms").doc(roomId).delete();
       return true;
     } else {
       return false;

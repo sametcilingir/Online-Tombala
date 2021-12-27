@@ -144,12 +144,12 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  /*@action
+ /* @action
   Future<void> gameDocumentFuture() async {
     try {
       var a = await _firebaseDatabaseService.gameDocumentFuture(roomId: roomId);
-      var data = a.data!.get("allNumbersList");
-      allNumbersListDatabase = data;
+      //var data = a.data!.get("allNumbersList");
+      //allNumbersListDatabase = data;
     } catch (e) {
       print("gameDocumentFuture hata oluştu: $e");
     }
@@ -167,55 +167,69 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  @observable
-  int? randomNumber;
+  @action
+  Future<bool> deleteGame() async {
+    try {
+      await _firebaseDatabaseService.deleteGame(roomId: roomId);
+      return true;
+    } catch (e) {
+      print("Oyunu silmede hata oluştu: $e");
+      return false;
+    }
+  }
 
+  @observable
+  int? randomNumber = 0;
 
   @action
   Future<bool> takeNumber({required BuildContext context}) async {
     try {
       if (allNumbersListTable.isNotEmpty) {
-         randomNumber = (allNumbersListDatabase..shuffle()).first;
+        randomNumber = (allNumbersListDatabase..shuffle()).first;
         //print("randomNumber: $randomNumber");
-        await _firebaseDatabaseService.takeNumber(
-            roomId: roomId, number: randomNumber);
+        try {
+          await _firebaseDatabaseService.takeNumber(
+              roomId: roomId, number: randomNumber);
 
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.NO_HEADER,
-          animType: AnimType.SCALE,
-          autoHide: Duration(seconds: 5),
-          dialogBackgroundColor: Colors.green,
-          
-          body: Container(
-            height: 200,
-            width: 150,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    randomNumber.toString(),
-                    style: TextStyle(fontSize: 42),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Çekilen sayi',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.NO_HEADER,
+            animType: AnimType.SCALE,
+            autoHide: Duration(seconds: 5),
+            dialogBackgroundColor: Colors.green,
+            body: Container(
+              height: 200,
+              width: 150,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      randomNumber.toString(),
+                      style: TextStyle(fontSize: 42),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Çekilen sayi',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ).show();
+          ).show();
 
-        return true;
+          return true;
+        } catch (e) {
+          print("Taş ÇEkmede hata oluştu: $e");
+          return false;
+        }
       } else {
         AwesomeDialog(
           context: context,
@@ -427,6 +441,25 @@ abstract class _ViewModelBase with Store {
         g3.toString(): false,
       };
 
+      Color inactiveCardColor = Colors.white.withOpacity(0.5);
+
+      numbersColorMap = {
+        a1.toString(): inactiveCardColor,
+        a3.toString(): inactiveCardColor,
+        b1.toString(): inactiveCardColor,
+        b3.toString(): inactiveCardColor,
+        c1.toString(): inactiveCardColor,
+        c3.toString(): inactiveCardColor,
+        d1.toString(): inactiveCardColor,
+        d3.toString(): inactiveCardColor,
+        e1.toString(): inactiveCardColor,
+        e3.toString(): inactiveCardColor,
+        f1.toString(): inactiveCardColor,
+        f3.toString(): inactiveCardColor,
+        g1.toString(): inactiveCardColor,
+        g3.toString(): inactiveCardColor,
+      };
+
       await _firebaseDatabaseService.createGameCard(
         roomId: roomId,
         userName: userName,
@@ -454,18 +487,22 @@ abstract class _ViewModelBase with Store {
   @observable
   List<dynamic>? playerNumbersListDatabase = <dynamic>[];
 
+  @observable
+  Map<String, Color>? numbersColorMap;
   @action
   Future<bool> checkMyNumber(BuildContext context, int number) async {
     print("checkMyNumber: $number");
     print(takenNumbersListDatabase);
     if (takenNumbersListDatabase!.contains(number)) {
       playerNumbersMap!.update(number.toString(), (value) => value = true);
+      numbersColorMap!.update(number.toString(),
+          (value) => value = Color(Colors.greenAccent[400]!.value));
 
       print("değiştirilen map" + playerNumbersMap.toString());
 
       AwesomeDialog(
         context: context,
-        dialogType: DialogType.INFO,
+        dialogType: DialogType.SUCCES,
         animType: AnimType.BOTTOMSLIDE,
         autoHide: Duration(seconds: 1),
         title: 'Tebrikler',
@@ -484,9 +521,10 @@ abstract class _ViewModelBase with Store {
         return false;
       }
     } else {
+
       AwesomeDialog(
         context: context,
-        dialogType: DialogType.INFO,
+        dialogType: DialogType.ERROR,
         animType: AnimType.BOTTOMSLIDE,
         autoHide: Duration(seconds: 1),
         title: 'Üzgünüm',
@@ -496,14 +534,21 @@ abstract class _ViewModelBase with Store {
     }
   }
 
+  /* @observable
+  Color? setActiveColor = Colors.white.withOpacity(0.5);
+
   @action
-  getColor(index) {
+  Color? getColor(index) {
     if (playerNumbersMap![randomNumbersForCards[index].toString()] == true) {
-      return Colors.greenAccent[400];
+      setActiveColor = Colors.white.withOpacity(0.5);
+
+      return setActiveColor;
     } else {
-      return Colors.white.withOpacity(0.5);
+      setActiveColor = Colors.greenAccent[400];
+
+      return setActiveColor;
     }
-  }
+  }*/
 
   @observable
   String? gameCreator;
@@ -516,6 +561,15 @@ abstract class _ViewModelBase with Store {
 
   @observable
   bool isThirdAnounced = false;
+
+  @observable
+  bool isFirstAnouncedChecked = false;
+
+  @observable
+  bool isSecondAnouncedChecked = false;
+
+  @observable
+  bool isThirdAnouncedChecked = false;
 
   @observable
   String? firstWinner;
@@ -535,15 +589,15 @@ abstract class _ViewModelBase with Store {
               playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[24].toString()] == true ||
-          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[27].toString()] == true ||
-          playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+          playerNumbersMap![randomNumbersForCards[4].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[10].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[16].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[22].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[2].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[8].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[14].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[20].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[26].toString()] == true) {
         String anouncedInformation = await _firebaseDatabaseService
             .setFirstWinner(roomId: roomId, userName: userName);
         if (anouncedInformation == "Ok") {
@@ -572,7 +626,7 @@ abstract class _ViewModelBase with Store {
           animType: AnimType.BOTTOMSLIDE,
           autoHide: Duration(seconds: 1),
           title: 'Üzgünüm',
-          desc: 'Üzgünüm, çinko yapamadınız',
+          desc: 'Üzgünüm, 1. çinko yapamadınız',
         ).show();
       }
     } catch (e) {
@@ -582,36 +636,38 @@ abstract class _ViewModelBase with Store {
 
   @action
   Future<void> ikinciCinkoIlanEt(BuildContext context) async {
-    print("1,2  1 3  , 2 3");
+    //print("1,2  1 3  , 2 3");
+    print(playerNumbersMap);
+    print(randomNumbersForCards);
     try {
       if (playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[27].toString()] == true ||
+              playerNumbersMap![randomNumbersForCards[4].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[10].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[16].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[22].toString()] == true ||
           playerNumbersMap![randomNumbersForCards[0].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[6].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
               playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[23].toString()] == true ||
-          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[27].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
-              playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+              playerNumbersMap![randomNumbersForCards[2].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[8].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[14].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[20].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[26].toString()] == true ||
+          playerNumbersMap![randomNumbersForCards[4].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[10].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[16].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[22].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[2].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[8].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[14].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[20].toString()] == true &&
+              playerNumbersMap![randomNumbersForCards[26].toString()] == true) {
         String anouncedInformation = await _firebaseDatabaseService
             .setSecondWinner(roomId: roomId, userName: userName);
         if (anouncedInformation == "Ok") {
@@ -656,15 +712,15 @@ abstract class _ViewModelBase with Store {
           playerNumbersMap![randomNumbersForCards[12].toString()] == true &&
           playerNumbersMap![randomNumbersForCards[18].toString()] == true &&
           playerNumbersMap![randomNumbersForCards[24].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[3].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[9].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[15].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[27].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[5].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[11].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[17].toString()] == true &&
-          playerNumbersMap![randomNumbersForCards[23].toString()] == true) {
+          playerNumbersMap![randomNumbersForCards[4].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[10].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[16].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[22].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[2].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[8].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[14].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[20].toString()] == true &&
+          playerNumbersMap![randomNumbersForCards[26].toString()] == true) {
         String anouncedInformation = await _firebaseDatabaseService.setBingo(
             roomId: roomId, userName: userName);
         if (anouncedInformation == "Ok") {
@@ -702,7 +758,7 @@ abstract class _ViewModelBase with Store {
   }
 
   @observable
-  int playersNumber = 1;
+  int playersNumber = 0;
 
   @observable
   String? roomCreator;

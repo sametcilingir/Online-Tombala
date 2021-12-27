@@ -259,6 +259,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$numbersColorMapAtom = Atom(name: '_ViewModelBase.numbersColorMap');
+
+  @override
+  Map<String, Color>? get numbersColorMap {
+    _$numbersColorMapAtom.reportRead();
+    return super.numbersColorMap;
+  }
+
+  @override
+  set numbersColorMap(Map<String, Color>? value) {
+    _$numbersColorMapAtom.reportWrite(value, super.numbersColorMap, () {
+      super.numbersColorMap = value;
+    });
+  }
+
   final _$gameCreatorAtom = Atom(name: '_ViewModelBase.gameCreator');
 
   @override
@@ -316,6 +331,57 @@ mixin _$ViewModel on _ViewModelBase, Store {
   set isThirdAnounced(bool value) {
     _$isThirdAnouncedAtom.reportWrite(value, super.isThirdAnounced, () {
       super.isThirdAnounced = value;
+    });
+  }
+
+  final _$isFirstAnouncedCheckedAtom =
+      Atom(name: '_ViewModelBase.isFirstAnouncedChecked');
+
+  @override
+  bool get isFirstAnouncedChecked {
+    _$isFirstAnouncedCheckedAtom.reportRead();
+    return super.isFirstAnouncedChecked;
+  }
+
+  @override
+  set isFirstAnouncedChecked(bool value) {
+    _$isFirstAnouncedCheckedAtom
+        .reportWrite(value, super.isFirstAnouncedChecked, () {
+      super.isFirstAnouncedChecked = value;
+    });
+  }
+
+  final _$isSecondAnouncedCheckedAtom =
+      Atom(name: '_ViewModelBase.isSecondAnouncedChecked');
+
+  @override
+  bool get isSecondAnouncedChecked {
+    _$isSecondAnouncedCheckedAtom.reportRead();
+    return super.isSecondAnouncedChecked;
+  }
+
+  @override
+  set isSecondAnouncedChecked(bool value) {
+    _$isSecondAnouncedCheckedAtom
+        .reportWrite(value, super.isSecondAnouncedChecked, () {
+      super.isSecondAnouncedChecked = value;
+    });
+  }
+
+  final _$isThirdAnouncedCheckedAtom =
+      Atom(name: '_ViewModelBase.isThirdAnouncedChecked');
+
+  @override
+  bool get isThirdAnouncedChecked {
+    _$isThirdAnouncedCheckedAtom.reportRead();
+    return super.isThirdAnouncedChecked;
+  }
+
+  @override
+  set isThirdAnouncedChecked(bool value) {
+    _$isThirdAnouncedCheckedAtom
+        .reportWrite(value, super.isThirdAnouncedChecked, () {
+      super.isThirdAnouncedChecked = value;
     });
   }
 
@@ -430,6 +496,13 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return _$startGameAsyncAction.run(() => super.startGame());
   }
 
+  final _$deleteGameAsyncAction = AsyncAction('_ViewModelBase.deleteGame');
+
+  @override
+  Future<bool> deleteGame() {
+    return _$deleteGameAsyncAction.run(() => super.deleteGame());
+  }
+
   final _$takeNumberAsyncAction = AsyncAction('_ViewModelBase.takeNumber');
 
   @override
@@ -507,17 +580,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic getColor(dynamic index) {
-    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.getColor');
-    try {
-      return super.getColor(index);
-    } finally {
-      _$_ViewModelBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
 formKeyUserName: ${formKeyUserName},
@@ -536,10 +598,14 @@ isMyNumberShown: ${isMyNumberShown},
 isMyNumberChecked: ${isMyNumberChecked},
 takenNumbersListDatabase: ${takenNumbersListDatabase},
 playerNumbersListDatabase: ${playerNumbersListDatabase},
+numbersColorMap: ${numbersColorMap},
 gameCreator: ${gameCreator},
 isFirstAnounced: ${isFirstAnounced},
 isSecondAnounced: ${isSecondAnounced},
 isThirdAnounced: ${isThirdAnounced},
+isFirstAnouncedChecked: ${isFirstAnouncedChecked},
+isSecondAnouncedChecked: ${isSecondAnouncedChecked},
+isThirdAnouncedChecked: ${isThirdAnouncedChecked},
 firstWinner: ${firstWinner},
 secondWinner: ${secondWinner},
 thirdWinner: ${thirdWinner},

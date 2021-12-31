@@ -53,7 +53,7 @@ class WaitingScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 20),*/
                   Container(
-                    height: 500,
+                    height: 550,
                     width: 500,
                     margin: EdgeInsets.all(10),
                     decoration: new BoxDecoration(

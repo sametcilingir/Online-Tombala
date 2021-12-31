@@ -144,7 +144,7 @@ abstract class _ViewModelBase with Store {
     }
   }
 
- /* @action
+  /* @action
   Future<void> gameDocumentFuture() async {
     try {
       var a = await _firebaseDatabaseService.gameDocumentFuture(roomId: roomId);
@@ -521,7 +521,6 @@ abstract class _ViewModelBase with Store {
         return false;
       }
     } else {
-
       AwesomeDialog(
         context: context,
         dialogType: DialogType.ERROR,

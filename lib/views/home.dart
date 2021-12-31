@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                         key: _viewModel.formKeyUserName,
                         child: TextFormField(
                           decoration: InputDecoration(
-                            hintText: 'Çilgin Çocuk 37',
+                            hintText:"",
                             labelText: 'Kullanici Adi ',
                             border: OutlineInputBorder(),
                           ),

@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,40 @@ class _GameCardScreenState extends State<GameCardScreen> {
   Widget build(BuildContext context) {
     @override
     void initState() {
+      /*_viewModel.gameDocumentStream().forEach((e) => AwesomeDialog(
+            context: context,
+            dialogType: DialogType.NO_HEADER,
+            animType: AnimType.SCALE,
+            autoHide: Duration(seconds: 5),
+            dialogBackgroundColor: Colors.green,
+            body: Container(
+              height: 200,
+              width: 150,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      _viewModel.takenNumbersListDatabase!.last.toString(),
+                      style: TextStyle(fontSize: 42),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Çekilen sayi',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ).show());*/
+
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
@@ -27,36 +62,37 @@ class _GameCardScreenState extends State<GameCardScreen> {
     initState();
 
     return Scaffold(
-        floatingActionButton: FloatingActionButton.extended(
-          label: (() {
-            if (!_viewModel.isFirstAnounced) {
-              return Text("Birinci Çinko İlan et");
-            } else if (!_viewModel.isSecondAnounced) {
-              return Text("İkinci Çinko İlan et");
-            } else if (!_viewModel.isThirdAnounced) {
-              return Text("Tombala İlan et");
-            } else {
-              return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
-            }
-          }()),
-          icon: Icon(Icons.add),
-          onPressed: () {
-            if (!_viewModel.isFirstAnounced) {
-              _viewModel.birinciCinkoIlanEt(context);
-            } else if (!_viewModel.isSecondAnounced) {
-              _viewModel.ikinciCinkoIlanEt(context);
-            } else if (!_viewModel.isThirdAnounced) {
-              _viewModel.tomabalaIlanEt(context);
-            } else {
-              SystemChrome.setPreferredOrientations([
-                DeviceOrientation.portraitDown,
-                DeviceOrientation.portraitUp,
-              ]);
-              Navigator.of(context).popAndPushNamed("/home");
-            }
-          },
-        ),
-        body: Column(
+      floatingActionButton: FloatingActionButton.extended(
+        label: (() {
+          if (!_viewModel.isFirstAnounced) {
+            return Text("Birinci Çinko İlan et");
+          } else if (!_viewModel.isSecondAnounced) {
+            return Text("İkinci Çinko İlan et");
+          } else if (!_viewModel.isThirdAnounced) {
+            return Text("Tombala İlan et");
+          } else {
+            return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
+          }
+        }()),
+        icon: Icon(Icons.add),
+        onPressed: () {
+          if (!_viewModel.isFirstAnounced) {
+            _viewModel.birinciCinkoIlanEt(context);
+          } else if (!_viewModel.isSecondAnounced) {
+            _viewModel.ikinciCinkoIlanEt(context);
+          } else if (!_viewModel.isThirdAnounced) {
+            _viewModel.tomabalaIlanEt(context);
+          } else {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitDown,
+              DeviceOrientation.portraitUp,
+            ]);
+            Navigator.of(context).popAndPushNamed("/home");
+          }
+        },
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           children: [
             Container(
               height: MediaQuery.of(context).size.height,
@@ -89,10 +125,11 @@ class _GameCardScreenState extends State<GameCardScreen> {
 
                     _viewModel.allNumbersListDatabase = allNumbersListData;
 
-                    var takenNumbersListData =
+                    var takenNumbersListDatabase =
                         snapshot.data!.get("takenNumbersList");
 
-                    _viewModel.takenNumbersListDatabase = takenNumbersListData;
+                    _viewModel.takenNumbersListDatabase =
+                        takenNumbersListDatabase;
 
                     var isFirstAnounced = snapshot.data!.get("isFirstAnounced");
 
@@ -125,6 +162,49 @@ class _GameCardScreenState extends State<GameCardScreen> {
 
                     return Column(
                       children: [
+                        AppBar(
+                          actions: [
+                            Padding(
+                              padding: const EdgeInsets.all(20.0),
+                              child: Text(
+                                "Önceki çekilen sayı:  ${_viewModel.takenNumbersListDatabase!.elementAt(_viewModel.takenNumbersListDatabase!.length - 2)}",
+                              ),
+                            )
+                          ],
+                          leadingWidth: 300,
+                          leading: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _viewModel.isFirstAnounced
+                                  ? Text(
+                                      "1. Çinko Yapan Oyuncu  :  " +
+                                          _viewModel.firstWinner.toString(),
+                                    )
+                                  : SizedBox(),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              _viewModel.isSecondAnounced
+                                  ? Text(
+                                      "2. Çinko Yapan Oyuncu  :  " +
+                                          _viewModel.secondWinner.toString(),
+                                    )
+                                  : SizedBox(),
+                              _viewModel.isThirdAnounced
+                                  ? Text(
+                                      "Tombala Yapan Oyuncu  :  " +
+                                          _viewModel.secondWinner.toString(),
+                                    )
+                                  : SizedBox(),
+                            ],
+                          ),
+                          automaticallyImplyLeading: false,
+                          title: Text("Çekilen Sayı : " +
+                              _viewModel.takenNumbersListDatabase!.last
+                                  .toString()),
+                          centerTitle: true,
+                        ),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 500),
                           height: 350,
@@ -171,7 +251,6 @@ class _GameCardScreenState extends State<GameCardScreen> {
                                                         .randomNumbersForCards[
                                                     index]);
 
-                                          
                                             setState(() {});
 
                                             //_viewModel.setActiveColor =
@@ -246,7 +325,9 @@ class _GameCardScreenState extends State<GameCardScreen> {
               )),
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 
   Widget blankWidget(int index) {

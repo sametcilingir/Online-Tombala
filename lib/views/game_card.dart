@@ -97,8 +97,8 @@ class _GameCardScreenState extends State<GameCardScreen> {
             Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
-              child: SingleChildScrollView(
-                  child: StreamBuilder<DocumentSnapshot<Object?>>(
+              child: SingleChildScrollView(child: Text("")
+                  StreamBuilder<DocumentSnapshot<Object?>>(
                 stream: _viewModel.gameDocumentStream(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
@@ -323,6 +323,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                   return SizedBox();
                 },
               )),
+                  ),
             ),
           ],
         ),

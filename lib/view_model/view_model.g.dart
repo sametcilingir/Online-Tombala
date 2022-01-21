@@ -24,18 +24,33 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$formKeyRoomIdAtom = Atom(name: '_ViewModelBase.formKeyRoomId');
+  final _$formKeyJoinAtom = Atom(name: '_ViewModelBase.formKeyJoin');
 
   @override
-  GlobalKey<FormState> get formKeyRoomId {
-    _$formKeyRoomIdAtom.reportRead();
-    return super.formKeyRoomId;
+  GlobalKey<FormState> get formKeyJoin {
+    _$formKeyJoinAtom.reportRead();
+    return super.formKeyJoin;
   }
 
   @override
-  set formKeyRoomId(GlobalKey<FormState> value) {
-    _$formKeyRoomIdAtom.reportWrite(value, super.formKeyRoomId, () {
-      super.formKeyRoomId = value;
+  set formKeyJoin(GlobalKey<FormState> value) {
+    _$formKeyJoinAtom.reportWrite(value, super.formKeyJoin, () {
+      super.formKeyJoin = value;
+    });
+  }
+
+  final _$pageControllerAtom = Atom(name: '_ViewModelBase.pageController');
+
+  @override
+  PageController get pageController {
+    _$pageControllerAtom.reportRead();
+    return super.pageController;
+  }
+
+  @override
+  set pageController(PageController value) {
+    _$pageControllerAtom.reportWrite(value, super.pageController, () {
+      super.pageController = value;
     });
   }
 
@@ -54,113 +69,123 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$roomIdAtom = Atom(name: '_ViewModelBase.roomId');
+  final _$roomModelAtom = Atom(name: '_ViewModelBase.roomModel');
 
   @override
-  String? get roomId {
-    _$roomIdAtom.reportRead();
-    return super.roomId;
+  RoomModel get roomModel {
+    _$roomModelAtom.reportRead();
+    return super.roomModel;
   }
 
   @override
-  set roomId(String? value) {
-    _$roomIdAtom.reportWrite(value, super.roomId, () {
-      super.roomId = value;
+  set roomModel(RoomModel value) {
+    _$roomModelAtom.reportWrite(value, super.roomModel, () {
+      super.roomModel = value;
     });
   }
 
-  final _$contextAtom = Atom(name: '_ViewModelBase.context');
+  final _$playersListAtom = Atom(name: '_ViewModelBase.playersList');
 
   @override
-  BuildContext? get context {
-    _$contextAtom.reportRead();
-    return super.context;
+  ObservableList<PlayerModel>? get playersList {
+    _$playersListAtom.reportRead();
+    return super.playersList;
   }
 
   @override
-  set context(BuildContext? value) {
-    _$contextAtom.reportWrite(value, super.context, () {
-      super.context = value;
+  set playersList(ObservableList<PlayerModel>? value) {
+    _$playersListAtom.reportWrite(value, super.playersList, () {
+      super.playersList = value;
     });
   }
 
-  final _$isGameStartedAtom = Atom(name: '_ViewModelBase.isGameStarted');
+  final _$playerModelAtom = Atom(name: '_ViewModelBase.playerModel');
 
   @override
-  bool? get isGameStarted {
-    _$isGameStartedAtom.reportRead();
-    return super.isGameStarted;
+  PlayerModel get playerModel {
+    _$playerModelAtom.reportRead();
+    return super.playerModel;
   }
 
   @override
-  set isGameStarted(bool? value) {
-    _$isGameStartedAtom.reportWrite(value, super.isGameStarted, () {
-      super.isGameStarted = value;
+  set playerModel(PlayerModel value) {
+    _$playerModelAtom.reportWrite(value, super.playerModel, () {
+      super.playerModel = value;
     });
   }
 
-  final _$allNumbersListDatabaseAtom =
-      Atom(name: '_ViewModelBase.allNumbersListDatabase');
+  final _$roomCodeAtom = Atom(name: '_ViewModelBase.roomCode');
 
   @override
-  List<dynamic> get allNumbersListDatabase {
-    _$allNumbersListDatabaseAtom.reportRead();
-    return super.allNumbersListDatabase;
+  String? get roomCode {
+    _$roomCodeAtom.reportRead();
+    return super.roomCode;
   }
 
   @override
-  set allNumbersListDatabase(List<dynamic> value) {
-    _$allNumbersListDatabaseAtom
-        .reportWrite(value, super.allNumbersListDatabase, () {
-      super.allNumbersListDatabase = value;
+  set roomCode(String? value) {
+    _$roomCodeAtom.reportWrite(value, super.roomCode, () {
+      super.roomCode = value;
     });
   }
 
-  final _$allNumbersListTableAtom =
-      Atom(name: '_ViewModelBase.allNumbersListTable');
+  final _$numbersListAtom = Atom(name: '_ViewModelBase.numbersList');
 
   @override
-  List<dynamic> get allNumbersListTable {
-    _$allNumbersListTableAtom.reportRead();
-    return super.allNumbersListTable;
+  List<int> get numbersList {
+    _$numbersListAtom.reportRead();
+    return super.numbersList;
   }
 
   @override
-  set allNumbersListTable(List<dynamic> value) {
-    _$allNumbersListTableAtom.reportWrite(value, super.allNumbersListTable, () {
-      super.allNumbersListTable = value;
+  set numbersList(List<int> value) {
+    _$numbersListAtom.reportWrite(value, super.numbersList, () {
+      super.numbersList = value;
     });
   }
 
-  final _$randomNumberAtom = Atom(name: '_ViewModelBase.randomNumber');
+  final _$takenNumberAtom = Atom(name: '_ViewModelBase.takenNumber');
 
   @override
-  int? get randomNumber {
-    _$randomNumberAtom.reportRead();
-    return super.randomNumber;
+  int get takenNumber {
+    _$takenNumberAtom.reportRead();
+    return super.takenNumber;
   }
 
   @override
-  set randomNumber(int? value) {
-    _$randomNumberAtom.reportWrite(value, super.randomNumber, () {
-      super.randomNumber = value;
+  set takenNumber(int value) {
+    _$takenNumberAtom.reportWrite(value, super.takenNumber, () {
+      super.takenNumber = value;
     });
   }
 
-  final _$randomNumbersForCardsAtom =
-      Atom(name: '_ViewModelBase.randomNumbersForCards');
+  final _$takenNumbersAtom = Atom(name: '_ViewModelBase.takenNumbers');
 
   @override
-  List<int> get randomNumbersForCards {
-    _$randomNumbersForCardsAtom.reportRead();
-    return super.randomNumbersForCards;
+  List<int> get takenNumbers {
+    _$takenNumbersAtom.reportRead();
+    return super.takenNumbers;
   }
 
   @override
-  set randomNumbersForCards(List<int> value) {
-    _$randomNumbersForCardsAtom.reportWrite(value, super.randomNumbersForCards,
-        () {
-      super.randomNumbersForCards = value;
+  set takenNumbers(List<int> value) {
+    _$takenNumbersAtom.reportWrite(value, super.takenNumbers, () {
+      super.takenNumbers = value;
+    });
+  }
+
+  final _$cardNumbersAtom = Atom(name: '_ViewModelBase.cardNumbers');
+
+  @override
+  List<int> get cardNumbers {
+    _$cardNumbersAtom.reportRead();
+    return super.cardNumbers;
+  }
+
+  @override
+  set cardNumbers(List<int> value) {
+    _$cardNumbersAtom.reportWrite(value, super.cardNumbers, () {
+      super.cardNumbers = value;
     });
   }
 
@@ -179,299 +204,18 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$playerNumbersMapAtom = Atom(name: '_ViewModelBase.playerNumbersMap');
+  final _$isMyNumberTakenAtom = Atom(name: '_ViewModelBase.isMyNumberTaken');
 
   @override
-  Map<String, dynamic>? get playerNumbersMap {
-    _$playerNumbersMapAtom.reportRead();
-    return super.playerNumbersMap;
+  bool get isMyNumberTaken {
+    _$isMyNumberTakenAtom.reportRead();
+    return super.isMyNumberTaken;
   }
 
   @override
-  set playerNumbersMap(Map<String, dynamic>? value) {
-    _$playerNumbersMapAtom.reportWrite(value, super.playerNumbersMap, () {
-      super.playerNumbersMap = value;
-    });
-  }
-
-  final _$isMyNumberShownAtom = Atom(name: '_ViewModelBase.isMyNumberShown');
-
-  @override
-  bool get isMyNumberShown {
-    _$isMyNumberShownAtom.reportRead();
-    return super.isMyNumberShown;
-  }
-
-  @override
-  set isMyNumberShown(bool value) {
-    _$isMyNumberShownAtom.reportWrite(value, super.isMyNumberShown, () {
-      super.isMyNumberShown = value;
-    });
-  }
-
-  final _$isMyNumberCheckedAtom =
-      Atom(name: '_ViewModelBase.isMyNumberChecked');
-
-  @override
-  bool get isMyNumberChecked {
-    _$isMyNumberCheckedAtom.reportRead();
-    return super.isMyNumberChecked;
-  }
-
-  @override
-  set isMyNumberChecked(bool value) {
-    _$isMyNumberCheckedAtom.reportWrite(value, super.isMyNumberChecked, () {
-      super.isMyNumberChecked = value;
-    });
-  }
-
-  final _$takenNumbersListDatabaseAtom =
-      Atom(name: '_ViewModelBase.takenNumbersListDatabase');
-
-  @override
-  List<dynamic>? get takenNumbersListDatabase {
-    _$takenNumbersListDatabaseAtom.reportRead();
-    return super.takenNumbersListDatabase;
-  }
-
-  @override
-  set takenNumbersListDatabase(List<dynamic>? value) {
-    _$takenNumbersListDatabaseAtom
-        .reportWrite(value, super.takenNumbersListDatabase, () {
-      super.takenNumbersListDatabase = value;
-    });
-  }
-
-  final _$playerNumbersListDatabaseAtom =
-      Atom(name: '_ViewModelBase.playerNumbersListDatabase');
-
-  @override
-  List<dynamic>? get playerNumbersListDatabase {
-    _$playerNumbersListDatabaseAtom.reportRead();
-    return super.playerNumbersListDatabase;
-  }
-
-  @override
-  set playerNumbersListDatabase(List<dynamic>? value) {
-    _$playerNumbersListDatabaseAtom
-        .reportWrite(value, super.playerNumbersListDatabase, () {
-      super.playerNumbersListDatabase = value;
-    });
-  }
-
-  final _$numbersColorMapAtom = Atom(name: '_ViewModelBase.numbersColorMap');
-
-  @override
-  Map<String, Color>? get numbersColorMap {
-    _$numbersColorMapAtom.reportRead();
-    return super.numbersColorMap;
-  }
-
-  @override
-  set numbersColorMap(Map<String, Color>? value) {
-    _$numbersColorMapAtom.reportWrite(value, super.numbersColorMap, () {
-      super.numbersColorMap = value;
-    });
-  }
-
-  final _$gameCreatorAtom = Atom(name: '_ViewModelBase.gameCreator');
-
-  @override
-  String? get gameCreator {
-    _$gameCreatorAtom.reportRead();
-    return super.gameCreator;
-  }
-
-  @override
-  set gameCreator(String? value) {
-    _$gameCreatorAtom.reportWrite(value, super.gameCreator, () {
-      super.gameCreator = value;
-    });
-  }
-
-  final _$isFirstAnouncedAtom = Atom(name: '_ViewModelBase.isFirstAnounced');
-
-  @override
-  bool get isFirstAnounced {
-    _$isFirstAnouncedAtom.reportRead();
-    return super.isFirstAnounced;
-  }
-
-  @override
-  set isFirstAnounced(bool value) {
-    _$isFirstAnouncedAtom.reportWrite(value, super.isFirstAnounced, () {
-      super.isFirstAnounced = value;
-    });
-  }
-
-  final _$isSecondAnouncedAtom = Atom(name: '_ViewModelBase.isSecondAnounced');
-
-  @override
-  bool get isSecondAnounced {
-    _$isSecondAnouncedAtom.reportRead();
-    return super.isSecondAnounced;
-  }
-
-  @override
-  set isSecondAnounced(bool value) {
-    _$isSecondAnouncedAtom.reportWrite(value, super.isSecondAnounced, () {
-      super.isSecondAnounced = value;
-    });
-  }
-
-  final _$isThirdAnouncedAtom = Atom(name: '_ViewModelBase.isThirdAnounced');
-
-  @override
-  bool get isThirdAnounced {
-    _$isThirdAnouncedAtom.reportRead();
-    return super.isThirdAnounced;
-  }
-
-  @override
-  set isThirdAnounced(bool value) {
-    _$isThirdAnouncedAtom.reportWrite(value, super.isThirdAnounced, () {
-      super.isThirdAnounced = value;
-    });
-  }
-
-  final _$isFirstAnouncedCheckedAtom =
-      Atom(name: '_ViewModelBase.isFirstAnouncedChecked');
-
-  @override
-  bool get isFirstAnouncedChecked {
-    _$isFirstAnouncedCheckedAtom.reportRead();
-    return super.isFirstAnouncedChecked;
-  }
-
-  @override
-  set isFirstAnouncedChecked(bool value) {
-    _$isFirstAnouncedCheckedAtom
-        .reportWrite(value, super.isFirstAnouncedChecked, () {
-      super.isFirstAnouncedChecked = value;
-    });
-  }
-
-  final _$isSecondAnouncedCheckedAtom =
-      Atom(name: '_ViewModelBase.isSecondAnouncedChecked');
-
-  @override
-  bool get isSecondAnouncedChecked {
-    _$isSecondAnouncedCheckedAtom.reportRead();
-    return super.isSecondAnouncedChecked;
-  }
-
-  @override
-  set isSecondAnouncedChecked(bool value) {
-    _$isSecondAnouncedCheckedAtom
-        .reportWrite(value, super.isSecondAnouncedChecked, () {
-      super.isSecondAnouncedChecked = value;
-    });
-  }
-
-  final _$isThirdAnouncedCheckedAtom =
-      Atom(name: '_ViewModelBase.isThirdAnouncedChecked');
-
-  @override
-  bool get isThirdAnouncedChecked {
-    _$isThirdAnouncedCheckedAtom.reportRead();
-    return super.isThirdAnouncedChecked;
-  }
-
-  @override
-  set isThirdAnouncedChecked(bool value) {
-    _$isThirdAnouncedCheckedAtom
-        .reportWrite(value, super.isThirdAnouncedChecked, () {
-      super.isThirdAnouncedChecked = value;
-    });
-  }
-
-  final _$firstWinnerAtom = Atom(name: '_ViewModelBase.firstWinner');
-
-  @override
-  String? get firstWinner {
-    _$firstWinnerAtom.reportRead();
-    return super.firstWinner;
-  }
-
-  @override
-  set firstWinner(String? value) {
-    _$firstWinnerAtom.reportWrite(value, super.firstWinner, () {
-      super.firstWinner = value;
-    });
-  }
-
-  final _$secondWinnerAtom = Atom(name: '_ViewModelBase.secondWinner');
-
-  @override
-  String? get secondWinner {
-    _$secondWinnerAtom.reportRead();
-    return super.secondWinner;
-  }
-
-  @override
-  set secondWinner(String? value) {
-    _$secondWinnerAtom.reportWrite(value, super.secondWinner, () {
-      super.secondWinner = value;
-    });
-  }
-
-  final _$thirdWinnerAtom = Atom(name: '_ViewModelBase.thirdWinner');
-
-  @override
-  String? get thirdWinner {
-    _$thirdWinnerAtom.reportRead();
-    return super.thirdWinner;
-  }
-
-  @override
-  set thirdWinner(String? value) {
-    _$thirdWinnerAtom.reportWrite(value, super.thirdWinner, () {
-      super.thirdWinner = value;
-    });
-  }
-
-  final _$isGameFinishedAtom = Atom(name: '_ViewModelBase.isGameFinished');
-
-  @override
-  bool get isGameFinished {
-    _$isGameFinishedAtom.reportRead();
-    return super.isGameFinished;
-  }
-
-  @override
-  set isGameFinished(bool value) {
-    _$isGameFinishedAtom.reportWrite(value, super.isGameFinished, () {
-      super.isGameFinished = value;
-    });
-  }
-
-  final _$playersNumberAtom = Atom(name: '_ViewModelBase.playersNumber');
-
-  @override
-  int get playersNumber {
-    _$playersNumberAtom.reportRead();
-    return super.playersNumber;
-  }
-
-  @override
-  set playersNumber(int value) {
-    _$playersNumberAtom.reportWrite(value, super.playersNumber, () {
-      super.playersNumber = value;
-    });
-  }
-
-  final _$roomCreatorAtom = Atom(name: '_ViewModelBase.roomCreator');
-
-  @override
-  String? get roomCreator {
-    _$roomCreatorAtom.reportRead();
-    return super.roomCreator;
-  }
-
-  @override
-  set roomCreator(String? value) {
-    _$roomCreatorAtom.reportWrite(value, super.roomCreator, () {
-      super.roomCreator = value;
+  set isMyNumberTaken(bool value) {
+    _$isMyNumberTakenAtom.reportWrite(value, super.isMyNumberTaken, () {
+      super.isMyNumberTaken = value;
     });
   }
 
@@ -482,11 +226,20 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return _$createRoomAsyncAction.run(() => super.createRoom());
   }
 
+  final _$setPlayerStatusAsyncAction =
+      AsyncAction('_ViewModelBase.setPlayerStatus');
+
+  @override
+  Future<void> setPlayerStatus(bool playerStatus) {
+    return _$setPlayerStatusAsyncAction
+        .run(() => super.setPlayerStatus(playerStatus));
+  }
+
   final _$joinRoomAsyncAction = AsyncAction('_ViewModelBase.joinRoom');
 
   @override
-  Future<bool> joinRoom({required BuildContext context}) {
-    return _$joinRoomAsyncAction.run(() => super.joinRoom(context: context));
+  Future<bool> joinRoom() {
+    return _$joinRoomAsyncAction.run(() => super.joinRoom());
   }
 
   final _$startGameAsyncAction = AsyncAction('_ViewModelBase.startGame');
@@ -496,19 +249,11 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return _$startGameAsyncAction.run(() => super.startGame());
   }
 
-  final _$deleteGameAsyncAction = AsyncAction('_ViewModelBase.deleteGame');
-
-  @override
-  Future<bool> deleteGame() {
-    return _$deleteGameAsyncAction.run(() => super.deleteGame());
-  }
-
   final _$takeNumberAsyncAction = AsyncAction('_ViewModelBase.takeNumber');
 
   @override
-  Future<bool> takeNumber({required BuildContext context}) {
-    return _$takeNumberAsyncAction
-        .run(() => super.takeNumber(context: context));
+  Future<bool> takeNumber() {
+    return _$takeNumberAsyncAction.run(() => super.takeNumber());
   }
 
   final _$createGameCardAsyncAction =
@@ -523,42 +268,15 @@ mixin _$ViewModel on _ViewModelBase, Store {
       AsyncAction('_ViewModelBase.checkMyNumber');
 
   @override
-  Future<bool> checkMyNumber(BuildContext context, int number) {
-    return _$checkMyNumberAsyncAction
-        .run(() => super.checkMyNumber(context, number));
-  }
-
-  final _$birinciCinkoIlanEtAsyncAction =
-      AsyncAction('_ViewModelBase.birinciCinkoIlanEt');
-
-  @override
-  Future<void> birinciCinkoIlanEt(BuildContext context) {
-    return _$birinciCinkoIlanEtAsyncAction
-        .run(() => super.birinciCinkoIlanEt(context));
-  }
-
-  final _$ikinciCinkoIlanEtAsyncAction =
-      AsyncAction('_ViewModelBase.ikinciCinkoIlanEt');
-
-  @override
-  Future<void> ikinciCinkoIlanEt(BuildContext context) {
-    return _$ikinciCinkoIlanEtAsyncAction
-        .run(() => super.ikinciCinkoIlanEt(context));
-  }
-
-  final _$tomabalaIlanEtAsyncAction =
-      AsyncAction('_ViewModelBase.tomabalaIlanEt');
-
-  @override
-  Future<void> tomabalaIlanEt(BuildContext context) {
-    return _$tomabalaIlanEtAsyncAction.run(() => super.tomabalaIlanEt(context));
+  Future<bool> checkMyNumber(int number) {
+    return _$checkMyNumberAsyncAction.run(() => super.checkMyNumber(number));
   }
 
   final _$_ViewModelBaseActionController =
       ActionController(name: '_ViewModelBase');
 
   @override
-  Stream<QuerySnapshot<Object?>> playersStream() {
+  dynamic playersStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.playersStream');
     try {
@@ -569,11 +287,11 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  Stream<DocumentSnapshot<Object?>> gameDocumentStream() {
+  dynamic roomStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.gameDocumentStream');
+        name: '_ViewModelBase.roomStream');
     try {
-      return super.gameDocumentStream();
+      return super.roomStream();
     } finally {
       _$_ViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -583,35 +301,19 @@ mixin _$ViewModel on _ViewModelBase, Store {
   String toString() {
     return '''
 formKeyUserName: ${formKeyUserName},
-formKeyRoomId: ${formKeyRoomId},
+formKeyJoin: ${formKeyJoin},
+pageController: ${pageController},
 userName: ${userName},
-roomId: ${roomId},
-context: ${context},
-isGameStarted: ${isGameStarted},
-allNumbersListDatabase: ${allNumbersListDatabase},
-allNumbersListTable: ${allNumbersListTable},
-randomNumber: ${randomNumber},
-randomNumbersForCards: ${randomNumbersForCards},
+roomModel: ${roomModel},
+playersList: ${playersList},
+playerModel: ${playerModel},
+roomCode: ${roomCode},
+numbersList: ${numbersList},
+takenNumber: ${takenNumber},
+takenNumbers: ${takenNumbers},
+cardNumbers: ${cardNumbers},
 randomColor: ${randomColor},
-playerNumbersMap: ${playerNumbersMap},
-isMyNumberShown: ${isMyNumberShown},
-isMyNumberChecked: ${isMyNumberChecked},
-takenNumbersListDatabase: ${takenNumbersListDatabase},
-playerNumbersListDatabase: ${playerNumbersListDatabase},
-numbersColorMap: ${numbersColorMap},
-gameCreator: ${gameCreator},
-isFirstAnounced: ${isFirstAnounced},
-isSecondAnounced: ${isSecondAnounced},
-isThirdAnounced: ${isThirdAnounced},
-isFirstAnouncedChecked: ${isFirstAnouncedChecked},
-isSecondAnouncedChecked: ${isSecondAnouncedChecked},
-isThirdAnouncedChecked: ${isThirdAnouncedChecked},
-firstWinner: ${firstWinner},
-secondWinner: ${secondWinner},
-thirdWinner: ${thirdWinner},
-isGameFinished: ${isGameFinished},
-playersNumber: ${playersNumber},
-roomCreator: ${roomCreator}
+isMyNumberTaken: ${isMyNumberTaken}
     ''';
   }
 }

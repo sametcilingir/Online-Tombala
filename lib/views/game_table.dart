@@ -8,6 +8,8 @@ import 'package:tombala/view_model/view_model.dart';
 class GameTableScreen extends StatelessWidget {
   final ViewModel _viewModel = locator<ViewModel>();
 
+  GameTableScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -15,9 +17,54 @@ class GameTableScreen extends StatelessWidget {
         return Scaffold(
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () async {
-              if (!_viewModel.isThirdAnounced) {
-                await _viewModel.takeNumber(context: context);
+              if (_viewModel.roomModel.roomThirdWinner == null) {
+                bool isNumberTaken = await _viewModel.takeNumber();
+                if (isNumberTaken) {
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.NO_HEADER,
+                    animType: AnimType.SCALE,
+                    autoHide: Duration(seconds: 5),
+                    dialogBackgroundColor: Colors.green,
+                    body: Container(
+                      height: 200,
+                      width: 150,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              _viewModel.takenNumber.toString(),
+                              style: TextStyle(fontSize: 42),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'Çekilen sayi',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ).show();
+                } else {}
               } else {
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.INFO,
+                  animType: AnimType.BOTTOMSLIDE,
+                  title: 'Oyun Bitti',
+                  desc: 'Tekrar oynamak ister misiniz?',
+                  btnCancelOnPress: () {},
+                  btnOkOnPress: () {},
+                )..show();
+
                 Navigator.of(context).popAndPushNamed("/");
               }
             },
@@ -31,7 +78,7 @@ class GameTableScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  StreamBuilder<DocumentSnapshot>(
+                  /* StreamBuilder<DocumentSnapshot>(
                     stream: _viewModel.gameDocumentStream(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
@@ -310,7 +357,7 @@ class GameTableScreen extends StatelessWidget {
 
                       return SizedBox();
                     },
-                  ),
+                  ),*/
                 ],
               ),
             ),

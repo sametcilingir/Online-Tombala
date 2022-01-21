@@ -1,39 +1,61 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:tombala/locator.dart';
 import 'package:tombala/view_model/view_model.dart';
 
-class WaitingScreen extends StatelessWidget {
+class WaitingScreen extends StatefulWidget {
+  const WaitingScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WaitingScreen> createState() => _WaitingScreenState();
+}
+
+class _WaitingScreenState extends State<WaitingScreen> {
   final ViewModel _viewModel = locator<ViewModel>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _viewModel.playersStream();
+    _viewModel.roomStream();
+    /* if (_viewModel.roomModel.roomStatus == "started" &&
+        _viewModel.roomModel.roomCreator != _viewModel.userName) {
+      _viewModel.createGameCard();
+
+      Navigator.popAndPushNamed(context, '/game_card');
+    }else{
+      ///oyunu başlatıcak kişi diğer sayfaya yönlensin
+    }*/
+  }
 
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (_) {
       return Scaffold(
           appBar: AppBar(
-            centerTitle: false,
+            elevation: 0,
+            automaticallyImplyLeading: false,
             actions: [
-              _viewModel.roomCreator == _viewModel.userName
-                  ? IconButton(
-                      onPressed: () async {
-                        await _viewModel.deleteGame();
-                        Navigator.of(context).popAndPushNamed("/home");
-                      },
-                      icon: Icon(Icons.close),
+              _viewModel.roomModel.roomCreator == _viewModel.userName
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          //await _viewModel.deleteGame();
+                          //Navigator.of(context).popAndPushNamed("/home");
+                        },
+                        icon: Icon(Icons.close),
+                        label: Text("Oyunu Sil"),
+                      ),
                     )
                   : SizedBox(),
             ],
-            leading: _viewModel.roomId == null
-                ? BackButton(
-                    onPressed: () {
-                      Navigator.of(context).popAndPushNamed("/home");
-                    },
-                  )
-                : SizedBox(),
-            elevation: 0,
-            automaticallyImplyLeading: false,
+            leading: BackButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed("/home");
+              },
+            ),
           ),
           body: SingleChildScrollView(
             child: Center(
@@ -41,19 +63,13 @@ class WaitingScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _viewModel.roomId != null
-                      ? Text("Oda Numarası: ${_viewModel.roomId}",
-                          style: TextStyle(fontSize: 35))
-                      : Text("Anasayfaya dön"),
+                  Text(
+                    "Oda Numarası: ${_viewModel.roomModel.roomCode}",
+                    style: TextStyle(fontSize: 35),
+                  ),
                   SizedBox(height: 50),
-
-                  /* Text(
-                        "Room Key: ${_viewModel.roomId}",
-                        style: TextStyle(fontSize: 30),
-                      ),
-                      SizedBox(height: 20),*/
                   Container(
-                    height: 550,
+                    height: 450,
                     width: 500,
                     margin: EdgeInsets.all(10),
                     decoration: new BoxDecoration(
@@ -66,225 +82,106 @@ class WaitingScreen extends StatelessWidget {
                         )),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Text("Oyuncular", style: TextStyle(fontSize: 30)),
-                          SizedBox(height: 20),
-                          StreamBuilder<QuerySnapshot>(
-                            stream: _viewModel.playersStream(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("Hata oluştu.",
-                                        style: TextStyle(fontSize: 20)),
-                                  ],
-                                );
-                              }
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      width: 50,
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                    SizedBox(width: 50),
-                                    Text("Oyuncular bekleniyor...",
-                                        style: TextStyle(fontSize: 20)),
-                                  ],
-                                );
-                              }
-
-                              if (snapshot.hasData &&
-                                  snapshot.data!.docs.isNotEmpty) {
-                                int playersNumber = snapshot.data!.docs.length;
-
-                                _viewModel.playersNumber = playersNumber;
-
-                                return Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    ///webde anlık deği
-                                    kIsWeb
-                                        ? SizedBox()
-                                        : Text("Oyuncu sayısı  " +
-                                            (_viewModel.playersNumber)
-                                                .toString()),
-                                    SizedBox(height: 20),
-                                    Container(
-                                      height: 430,
-                                      width: 500,
-                                      child: ListView(
-                                        children: snapshot.data!.docs
-                                            .map((DocumentSnapshot document) {
-                                          Map<String, dynamic> data = document
-                                              .data()! as Map<String, dynamic>;
-                                          _viewModel.playersNumber =
-                                              snapshot.data!.docs.length;
-                                          return Align(
-                                            alignment: Alignment.center,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                data['userName'],
-                                                style: TextStyle(
-                                                  fontSize: 28,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              } else if (snapshot.hasData &&
-                                  snapshot.data!.docs.isEmpty) {
-                                return Center(
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(width: 50),
-                                      Text("Oyuncular bekleniyor...",
-                                          style: TextStyle(fontSize: 20)),
-                                    ],
-                                  ),
-                                );
-                              }
-
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("Böyle bir oyun yok",
-                                      style: TextStyle(fontSize: 20)),
-                                  SizedBox(
-                                    height: 20,
-                                  ),
-                                  ElevatedButton(
-                                      onPressed: () async {
-                                        Navigator.of(context)
-                                            .popAndPushNamed("/home");
-                                      },
-                                      child: Text(
-                                        'Ana sayfaya dön',
-                                        style:
-                                            Theme.of(context).textTheme.button,
-                                      )),
-                                ],
-                              );
-                            },
+                      child: Column(children: [
+                        Text("Oyuncular", style: TextStyle(fontSize: 30)),
+                        SizedBox(height: 20),
+                        ListView.builder(
+                          itemCount: _viewModel.playersList!.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(
+                                _viewModel.playersList![index].userName
+                                    .toString(),
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              subtitle: Text(
+                                _viewModel.playersList![index].userStatus ==
+                                        true
+                                    ? "Oyuncu Hazır"
+                                    : "Oyuncu Hazır Değil",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              trailing:
+                                  _viewModel.playersList![index].userStatus ==
+                                          true
+                                      ? Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        )
+                                      : Icon(
+                                          Icons.info,
+                                          color: Colors.red,
+                                        ),
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ]),
                     ),
                   ),
                   SizedBox(height: 20),
-                  StreamBuilder<DocumentSnapshot<Object?>>(
-                    stream: _viewModel.gameDocumentStream(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Böyle bir oyun yok",
-                                style: TextStyle(fontSize: 20)),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            ElevatedButton(
-                                onPressed: () async {
-                                  Navigator.of(context)
-                                      .popAndPushNamed("/home");
-                                },
-                                child: Text(
-                                  'Ana sayfaya dön',
-                                  style: Theme.of(context).textTheme.button,
-                                )),
-                          ],
-                        );
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 50,
-                              width: 50,
-                              child: CircularProgressIndicator(),
-                            ),
-                            SizedBox(width: 50),
-                            Text("Oyun başlamaya hazırlanıyor...",
-                                style: TextStyle(fontSize: 20)),
-                          ],
-                        );
-                      }
-
-                      if (snapshot.hasData && snapshot.data!.exists) {
-                        var roomCreator = snapshot.data!.get("roomCreator");
-
-                        _viewModel.roomCreator = roomCreator;
-
-                        var isGameStarted = snapshot.data!.get("isGameStarted");
-
-                        _viewModel.isGameStarted = isGameStarted;
-
-                        /*    Map<String, dynamic> data =
-                            snapshot.data?.data() as Map<String, dynamic>;
-                        _viewModel.roomCreator = data["roomCreator"];*/
-
-                        if (_viewModel.isGameStarted == true &&
-                            _viewModel.roomCreator != _viewModel.userName) {
-                          _viewModel.createGameCard();
-
-                          Future.delayed(Duration(microseconds: 500), () {
-                            Navigator.popAndPushNamed(context, '/game_card');
-                          });
-                        } else if (_viewModel.roomCreator ==
-                            _viewModel.userName) {
-                          return ElevatedButton(
-                            onPressed: () async {
-                              bool isGameStarted = await _viewModel.startGame();
-                              if (isGameStarted) {
-                                Navigator.of(context)
-                                    .popAndPushNamed('/game_table');
-                              }
-                            },
-                            child: Text(
-                              "Oyunu Başlat",
-                              style: Theme.of(context).textTheme.button,
-                            ),
-                          );
-                        } else {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                  _viewModel.roomModel.roomCreator == _viewModel.userName
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            bool isGameStarted = await _viewModel.startGame();
+                            if (isGameStarted) {
+                              Navigator.of(context)
+                                  .pushNamed('/game_table');
+                            }
+                          },
+                          child: Text(
+                            "Oyunu Başlat",
+                            style: Theme.of(context).textTheme.button,
+                          ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
                             children: [
                               Container(
-                                height: 50,
-                                width: 50,
+                                height: 25,
+                                width: 25,
                                 child: CircularProgressIndicator(),
                               ),
-                              SizedBox(width: 50),
-                              Text("Game starting soon",
-                                  style: TextStyle(fontSize: 20)),
+                              SizedBox(height: 10),
+                              Text("Oyunkurucunun başlatılması bekleniyor...",
+                                  style: TextStyle(fontSize: 16)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            width: 1,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
+                                      ),
+                                      onPressed: () async {
+                                        await _viewModel.setPlayerStatus(false);
+                                      },
+                                      child: Text(
+                                        'Hazır Değilim',
+                                        style:
+                                            Theme.of(context).textTheme.button,
+                                      )),
+                                  SizedBox(width: 20),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      await _viewModel.setPlayerStatus(true);
+                                    },
+                                    child: Text(
+                                      'Hazırım',
+                                      style: Theme.of(context).textTheme.button,
+                                    ),
+                                  ),
+                                ],
+                              )
                             ],
-                          );
-                        }
-                      }
-
-                      return SizedBox();
-                    },
-                  )
+                          ),
+                        ),
                 ],
               ),
             ),

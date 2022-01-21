@@ -1,11 +1,11 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:mobx/mobx.dart';
 import 'package:tombala/locator.dart';
-import 'package:tombala/services/firebase_database.dart';
+import 'package:tombala/model/player_model.dart';
+import 'package:tombala/model/room_model.dart';
+import 'package:tombala/services/firebase_database_service.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
 part 'view_model.g.dart';
@@ -20,154 +20,114 @@ abstract class _ViewModelBase with Store {
   GlobalKey<FormState> formKeyUserName = GlobalKey<FormState>();
 
   @observable
-  GlobalKey<FormState> formKeyRoomId = GlobalKey<FormState>();
+  GlobalKey<FormState> formKeyJoin = GlobalKey<FormState>();
+
+  @observable
+  PageController pageController = PageController(initialPage: 0);
 
   @observable
   String? userName;
 
   @observable
-  String? roomId;
-
-  @observable
-  BuildContext? context;
-
-  @observable
-  bool? isGameStarted = false;
-
-  //ObservableList<dynamic>? allNumbersListDatabaseObservable = ObservableList();
-
-  //@observable
-  //ObservableList<dynamic>? allNumbersListTableObservable = ObservableList();
-
-  @observable
-  List<dynamic> allNumbersListDatabase = <dynamic>[];
-
-  @observable
-  List<dynamic> allNumbersListTable =
-      List<dynamic>.generate(100, (i) => i + 1).map((i) => i).toList();
+  RoomModel roomModel = RoomModel();
 
   @action
   Future<bool> createRoom() async {
     try {
-      var isRoomCreated =
-          await _firebaseDatabaseService.createRoom(userName: userName);
-      if (isRoomCreated) {
-        roomId = _firebaseDatabaseService.roomId;
-        return true;
-      } else {
-        return false;
-      }
+      roomModel.roomCode = Random().nextInt(100000).toString();
+      roomModel.roomCreator = userName;
+      roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
+      return true;
     } catch (e) {
       print("Oda oluşturmada hata oluştu: $e");
       return false;
     }
   }
 
+  @observable
+  late ObservableList<PlayerModel>? playersList = ObservableList<PlayerModel>();
+
   @action
-  Future<bool> joinRoom({required BuildContext context}) async {
+  playersStream() {
     try {
-      bool isRoomExist = await _firebaseDatabaseService.joinRoom(
-          roomId: roomId, userName: userName);
-      if (isRoomExist) {
+      _firebaseDatabaseService.playersStream(roomModel).forEach((event) {
+        playersList = event.docs
+            .map((e) => PlayerModel.fromJson(e.data()))
+            .toList()
+            .asObservable();
+
+        playersList!.forEach((element) {
+          print(element.userName);
+        });
+      });
+    } catch (e) {
+      print("Oda kullanici bulma hata oluştu: $e");
+    }
+  }
+
+  @action
+  roomStream() {
+    try {
+      _firebaseDatabaseService.roomStream(roomModel).forEach((element) {
+        roomModel = RoomModel.fromJson(element.data());
+      });
+
+      //roomModel = RoomModel.fromJson(event.docChanges.first.doc.data());
+
+    } catch (e) {
+      print("Oda döküman hata oluştu: $e");
+    }
+  }
+
+  @observable
+  PlayerModel playerModel = PlayerModel();
+
+  @action
+  Future<void> setPlayerStatus(bool playerStatus) async {
+    try {
+      playerModel.userStatus = playerStatus;
+      await _firebaseDatabaseService.setPlayerStatus(roomModel, playerModel);
+    } catch (e) {
+      print("setPlayerStatus hata oluştu: $e");
+    }
+  }
+
+  @observable
+  String? roomCode;
+
+  @action
+  Future<bool> joinRoom() async {
+    try {
+      var playerModelAndRoomModel =
+          await _firebaseDatabaseService.joinRoom(roomCode!, userName!);
+      playerModel = playerModelAndRoomModel[0];
+      //roomModeli burada set ediyoruz
+      roomModel = playerModelAndRoomModel[1];
+      if (playerModel.userId != null) {
         return true;
       } else {
-        showToastWidget(
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Container(
-              margin: EdgeInsets.all(20),
-              child: Text(
-                'Oda katiliminda hata oluştu',
-                style: Theme.of(context).textTheme.bodyText1,
-              ),
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-          position: StyledToastPosition.top,
-          duration: Duration(seconds: 2),
-          context: context,
-          animation: StyledToastAnimation.slideFromTop,
-          reverseAnimation: StyledToastAnimation.slideToTop,
-        );
         return false;
       }
     } catch (e) {
-      showToastWidget(
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Container(
-            margin: EdgeInsets.all(20),
-            child: Text(
-              'Oda katiliminda hata oluştu',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-        position: StyledToastPosition.top,
-        duration: Duration(seconds: 2),
-        context: context,
-        animation: StyledToastAnimation.slideFromTop,
-        reverseAnimation: StyledToastAnimation.slideToTop,
-      );
-
       print("Odaya katilimda hata oluştu: $e");
       return false;
     }
   }
 
   @action
-  Stream<QuerySnapshot> playersStream() {
-    try {
-      return _firebaseDatabaseService.playersStream(roomId: roomId);
-    } catch (e) {
-      print("Oda kullanici bulma hata oluştu: $e");
-      return Stream<QuerySnapshot>.empty();
-    }
-  }
-
-  @action
-  Stream<DocumentSnapshot> gameDocumentStream() {
-    try {
-      return _firebaseDatabaseService.gameDocumentStream(roomId: roomId);
-    } catch (e) {
-      print("gameDocumentStream hata oluştu: $e");
-      return Stream<DocumentSnapshot>.empty();
-    }
-  }
-
-  /* @action
-  Future<void> gameDocumentFuture() async {
-    try {
-      var a = await _firebaseDatabaseService.gameDocumentFuture(roomId: roomId);
-      //var data = a.data!.get("allNumbersList");
-      //allNumbersListDatabase = data;
-    } catch (e) {
-      print("gameDocumentFuture hata oluştu: $e");
-    }
-  }*/
-
-  @action
   Future<bool> startGame() async {
     try {
-      await _firebaseDatabaseService.startGame(roomId: roomId);
+      roomModel.roomStatus = "started";
 
+      await _firebaseDatabaseService.startGame(roomModel);
       return true;
     } catch (e) {
-      print("Oyuna girmede hata oluştu: $e");
+      print("Oyun başlatmada hata oluştu: $e");
       return false;
     }
   }
 
-  @action
+  /* @action
   Future<bool> deleteGame() async {
     try {
       await _firebaseDatabaseService.deleteGame(roomId: roomId);
@@ -176,297 +136,76 @@ abstract class _ViewModelBase with Store {
       print("Oyunu silmede hata oluştu: $e");
       return false;
     }
-  }
+  }*/
 
   @observable
-  int? randomNumber = 0;
+  var numbersList = List<int>.generate(99, (i) => i + 1);
+  @observable
+  int takenNumber = 0;
+  @observable
+  List<int> takenNumbers = [];
 
   @action
-  Future<bool> takeNumber({required BuildContext context}) async {
+  Future<bool> takeNumber() async {
     try {
-      if (allNumbersListTable.isNotEmpty) {
-        randomNumber = (allNumbersListDatabase..shuffle()).first;
-        //print("randomNumber: $randomNumber");
-        try {
-          await _firebaseDatabaseService.takeNumber(
-              roomId: roomId, number: randomNumber);
+      takenNumber = (numbersList..shuffle()).first;
+      numbersList.remove(takenNumber);
+      takenNumbers.add(takenNumber);
+      await _firebaseDatabaseService.takeNumber(roomModel);
 
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.NO_HEADER,
-            animType: AnimType.SCALE,
-            autoHide: Duration(seconds: 5),
-            dialogBackgroundColor: Colors.green,
-            body: Container(
-              height: 200,
-              width: 150,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      randomNumber.toString(),
-                      style: TextStyle(fontSize: 42),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      'Çekilen sayi',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ).show();
-
-          return true;
-        } catch (e) {
-          print("Taş ÇEkmede hata oluştu: $e");
-          return false;
-        }
-      } else {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.INFO,
-          animType: AnimType.BOTTOMSLIDE,
-          title: 'Oyun Bitti',
-          desc: 'Tekrar oynamak ister misiniz?',
-          btnCancelOnPress: () {},
-          btnOkOnPress: () {},
-        )..show();
-
-        print("List bitti");
-        return false;
-      }
+      return true;
     } catch (e) {
-      print("Taş ÇEkmede hata oluştu: $e");
+      print("Taş çekmede hata oluştu: $e");
       return false;
     }
   }
 
   @observable
-  List<int> randomNumbersForCards = [];
+  List<int> cardNumbers = [];
 
   @observable
   Color randomColor = Colors.transparent;
 
-  @observable
-  Map<String, dynamic>? playerNumbersMap;
-
   @action
   Future<bool> createGameCard() async {
     try {
-      randomNumbersForCards.clear();
-      var a0 = [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-      ];
-      var a1 = (a0..shuffle()).first;
-      a0.remove(a1);
-      var a2 = (a0..shuffle()).first;
-      a0.remove(a2);
-      var a3 = (a0..shuffle()).first;
-      a0.remove(a3);
-      var a4 = (a0..shuffle()).first;
-
-      var b0 = [
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28,
-        29,
-        30,
-      ];
-      var b1 = (b0..shuffle()).first;
-      b0.remove(b1);
-      var b2 = (b0..shuffle()).first;
-      b0.remove(b2);
-      var b3 = (b0..shuffle()).first;
-      b0.remove(b3);
-      var b4 = (b0..shuffle()).first;
-
-      var c0 = [
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39,
-        40,
-        41,
-        42,
-        43,
-        44,
-        45,
-      ];
-      var c1 = (c0..shuffle()).first;
-      c0.remove(c1);
-      var c2 = (c0..shuffle()).first;
-      c0.remove(c2);
-      var c3 = (c0..shuffle()).first;
-      c0.remove(c3);
-      var c4 = (c0..shuffle()).first;
-
-      var d0 = [46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
-      var d1 = (d0..shuffle()).first;
-      d0.remove(d1);
-      var d2 = (d0..shuffle()).first;
-      d0.remove(d2);
-      var d3 = (d0..shuffle()).first;
-      d0.remove(d3);
-      var d4 = (d0..shuffle()).first;
-
-      var e0 = [
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67,
-        68,
-        69,
-        70,
-        71,
-        72,
-        73,
-        74,
-        75,
-      ];
-      var e1 = (e0..shuffle()).first;
-      e0.remove(e1);
-      var e2 = (e0..shuffle()).first;
-      e0.remove(e2);
-      var e3 = (e0..shuffle()).first;
-      e0.remove(e3);
-      var e4 = (e0..shuffle()).first;
-
-      var f0 = [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90];
-      var f1 = (f0..shuffle()).first;
-      f0.remove(f1);
-      var f2 = (f0..shuffle()).first;
-      f0.remove(f2);
-      var f3 = (f0..shuffle()).first;
-      f0.remove(f3);
-      var f4 = (f0..shuffle()).first;
-
-      var g0 = [91, 92, 93, 94, 95, 96, 97, 98, 99];
-      var g1 = (g0..shuffle()).first;
-      g0.remove(g1);
-      var g2 = (g0..shuffle()).first;
-      g0.remove(g2);
-      var g3 = (g0..shuffle()).first;
-
-      randomNumbersForCards.addAll(
-        [
-          a1,
-          a2,
-          a3,
-          a4,
-          b1,
-          b2,
-          b3,
-          b4,
-          c1,
-          c2,
-          c3,
-          c4,
-          d1,
-          d2,
-          d3,
-          d4,
-          e1,
-          e2,
-          e3,
-          e4,
-          f1,
-          f2,
-          f3,
-          f4,
-          g1,
-          g2,
-          g3,
-        ],
-      );
-
       randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
 
-      print(randomNumbersForCards);
+      cardNumbers.clear();
 
-      playerNumbersMap = {
-        a1.toString(): false,
-        a3.toString(): false,
-        b1.toString(): false,
-        b3.toString(): false,
-        c1.toString(): false,
-        c3.toString(): false,
-        d1.toString(): false,
-        d3.toString(): false,
-        e1.toString(): false,
-        e3.toString(): false,
-        f1.toString(): false,
-        f3.toString(): false,
-        g1.toString(): false,
-        g3.toString(): false,
-      };
+      final rangeOf1and15Numbers = List<int>.generate(15, (i) => i + 1);
+      final rangeOf16and30Numbers = List<int>.generate(15, (i) => i + 16);
+      final rangeOf31and45Numbers = List<int>.generate(15, (i) => i + 31);
+      final rangeOf46and60Numbers = List<int>.generate(15, (i) => i + 46);
+      final rangeOf61and75Numbers = List<int>.generate(15, (i) => i + 61);
+      final rangeOf76and90Numbers = List<int>.generate(15, (i) => i + 76);
+      final rangeOf91and99Numbers = List<int>.generate(9, (i) => i + 91);
 
-      Color inactiveCardColor = Colors.white.withOpacity(0.5);
-
-      numbersColorMap = {
-        a1.toString(): inactiveCardColor,
-        a3.toString(): inactiveCardColor,
-        b1.toString(): inactiveCardColor,
-        b3.toString(): inactiveCardColor,
-        c1.toString(): inactiveCardColor,
-        c3.toString(): inactiveCardColor,
-        d1.toString(): inactiveCardColor,
-        d3.toString(): inactiveCardColor,
-        e1.toString(): inactiveCardColor,
-        e3.toString(): inactiveCardColor,
-        f1.toString(): inactiveCardColor,
-        f3.toString(): inactiveCardColor,
-        g1.toString(): inactiveCardColor,
-        g3.toString(): inactiveCardColor,
-      };
-
-      await _firebaseDatabaseService.createGameCard(
-        roomId: roomId,
-        userName: userName,
-        playerRandomNumbersForCards: playerNumbersMap,
-      );
-
-      print(playerNumbersMap.toString());
+      for (var i = 0; i < 1; i++) {
+        var randomNumber = (rangeOf1and15Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber);
+        rangeOf1and15Numbers.remove(randomNumber);
+        var randomNumber2 = (rangeOf16and30Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber2);
+        rangeOf16and30Numbers.remove(randomNumber2);
+        var randomNumber3 = (rangeOf31and45Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber3);
+        rangeOf31and45Numbers.remove(randomNumber3);
+        var randomNumber4 = (rangeOf46and60Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber4);
+        rangeOf46and60Numbers.remove(randomNumber4);
+        var randomNumber5 = (rangeOf61and75Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber5);
+        rangeOf61and75Numbers.remove(randomNumber5);
+        var randomNumber6 = (rangeOf76and90Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber6);
+        rangeOf76and90Numbers.remove(randomNumber6);
+        var randomNumber7 = (rangeOf91and99Numbers..shuffle()).first;
+        cardNumbers.add(randomNumber7);
+        rangeOf91and99Numbers.remove(randomNumber7);
+      }
+      //numaraları sıralıyoruz
+      cardNumbers.sort();
 
       return true;
     } catch (e) {
@@ -476,59 +215,30 @@ abstract class _ViewModelBase with Store {
   }
 
   @observable
-  bool isMyNumberShown = false;
+  bool isMyNumberTaken = false;
 
-  @observable
-  bool isMyNumberChecked = false;
-
-  @observable
-  List<dynamic>? takenNumbersListDatabase = <dynamic>[];
-
-  @observable
-  List<dynamic>? playerNumbersListDatabase = <dynamic>[];
-
-  @observable
-  Map<String, Color>? numbersColorMap;
   @action
-  Future<bool> checkMyNumber(BuildContext context, int number) async {
-    print("checkMyNumber: $number");
-    print(takenNumbersListDatabase);
-    if (takenNumbersListDatabase!.contains(number)) {
-      playerNumbersMap!.update(number.toString(), (value) => value = true);
-      numbersColorMap!.update(number.toString(),
-          (value) => value = Color(Colors.greenAccent[400]!.value));
-
-      print("değiştirilen map" + playerNumbersMap.toString());
-
-      AwesomeDialog(
+  Future<bool> checkMyNumber(int number) async {
+    if (takenNumbers.contains(number)) {
+     /* AwesomeDialog(
         context: context,
         dialogType: DialogType.SUCCES,
         animType: AnimType.BOTTOMSLIDE,
         autoHide: Duration(seconds: 1),
         title: 'Tebrikler',
         desc: 'Tebrikler, sayınız doğru',
-      ).show();
+      ).show();*/
 
-      try {
-        await _firebaseDatabaseService.setMyNumberTrue(
-          roomId: roomId,
-          userName: userName,
-          playerNumbersMap: playerNumbersMap,
-        );
-        return true;
-      } catch (e) {
-        print("check my number hatası: $e");
-        return false;
-      }
+      return true;
     } else {
-      AwesomeDialog(
+     /* AwesomeDialog(
         context: context,
         dialogType: DialogType.ERROR,
         animType: AnimType.BOTTOMSLIDE,
         autoHide: Duration(seconds: 1),
         title: 'Üzgünüm',
         desc: 'Üzgünüm, sayınız yanlış',
-      ).show();
+      ).show();*/
       return false;
     }
   }
@@ -549,37 +259,9 @@ abstract class _ViewModelBase with Store {
     }
   }*/
 
-  @observable
-  String? gameCreator;
-
-  @observable
-  bool isFirstAnounced = false;
-
-  @observable
-  bool isSecondAnounced = false;
-
-  @observable
-  bool isThirdAnounced = false;
-
-  @observable
-  bool isFirstAnouncedChecked = false;
-
-  @observable
-  bool isSecondAnouncedChecked = false;
-
-  @observable
-  bool isThirdAnouncedChecked = false;
-
-  @observable
-  String? firstWinner;
-  @observable
-  String? secondWinner;
-  @observable
-  String? thirdWinner;
-
-  @observable
-  bool isGameFinished = false;
-
+//  Çinko kontrol etme yeri tam bir fuckfest
+//
+/*
   @action
   Future<void> birinciCinkoIlanEt(BuildContext context) async {
     try {
@@ -755,10 +437,5 @@ abstract class _ViewModelBase with Store {
       print("bingo hatası: $e");
     }
   }
-
-  @observable
-  int playersNumber = 0;
-
-  @observable
-  String? roomCreator;
+*/
 }

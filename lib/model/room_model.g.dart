@@ -15,7 +15,7 @@ RoomModel _$RoomModelFromJson(Map<String, dynamic> json) {
     roomFirstWinner: json['roomFirstWinner'] as String?,
     roomSecondWinner: json['roomSecondWinner'] as String?,
     roomThirdWinner: json['roomThirdWinner'] as String?,
-    roomTakenNumbers: json['roomTakenNumbers'] as int?,
+    roomTakenNumber: json['roomTakenNumber'] as int?,
   );
 }
 
@@ -27,5 +27,5 @@ Map<String, dynamic> _$RoomModelToJson(RoomModel instance) => <String, dynamic>{
       'roomFirstWinner': instance.roomFirstWinner,
       'roomSecondWinner': instance.roomSecondWinner,
       'roomThirdWinner': instance.roomThirdWinner,
-      'roomTakenNumbers': instance.roomTakenNumbers,
+      'roomTakenNumber': instance.roomTakenNumber,
     };

@@ -57,12 +57,18 @@ class _MyAppState extends State<MyApp> {
     if (_initialized) {
       return MaterialApp(
         theme: ThemeData(
-          appBarTheme:  AppBarTheme(
+          
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+            
+            backgroundColor: Colors.green[900],
+          ),
+          appBarTheme: AppBarTheme(
             color: Colors.green[900],
           ),
           scaffoldBackgroundColor: Colors.green[900],
           brightness: Brightness.dark,
           colorScheme: const ColorScheme.dark(
+            
             primary: Colors.redAccent,
           ),
         ),

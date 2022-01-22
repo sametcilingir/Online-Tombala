@@ -11,7 +11,7 @@ class RoomModel {
   String? roomFirstWinner;
   String? roomSecondWinner;
   String? roomThirdWinner;
-  int? roomTakenNumbers;
+  int? roomTakenNumber;
   //List? roomNumbersList;
 
   RoomModel({
@@ -22,7 +22,7 @@ class RoomModel {
     this.roomFirstWinner,
     this.roomSecondWinner,
     this.roomThirdWinner,
-    this.roomTakenNumbers,
+    this.roomTakenNumber,
     //this.roomNumbersList,
   });
 

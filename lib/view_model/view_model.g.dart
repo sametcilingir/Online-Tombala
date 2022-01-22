@@ -99,6 +99,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$takenNumbersMapAtom = Atom(name: '_ViewModelBase.takenNumbersMap');
+
+  @override
+  Map<int, bool> get takenNumbersMap {
+    _$takenNumbersMapAtom.reportRead();
+    return super.takenNumbersMap;
+  }
+
+  @override
+  set takenNumbersMap(Map<int, bool> value) {
+    _$takenNumbersMapAtom.reportWrite(value, super.takenNumbersMap, () {
+      super.takenNumbersMap = value;
+    });
+  }
+
   final _$playerModelAtom = Atom(name: '_ViewModelBase.playerModel');
 
   @override
@@ -159,33 +174,128 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$takenNumbersAtom = Atom(name: '_ViewModelBase.takenNumbers');
+  final _$takenNumbersListAtom = Atom(name: '_ViewModelBase.takenNumbersList');
 
   @override
-  List<int> get takenNumbers {
-    _$takenNumbersAtom.reportRead();
-    return super.takenNumbers;
+  List<int> get takenNumbersList {
+    _$takenNumbersListAtom.reportRead();
+    return super.takenNumbersList;
   }
 
   @override
-  set takenNumbers(List<int> value) {
-    _$takenNumbersAtom.reportWrite(value, super.takenNumbers, () {
-      super.takenNumbers = value;
+  set takenNumbersList(List<int> value) {
+    _$takenNumbersListAtom.reportWrite(value, super.takenNumbersList, () {
+      super.takenNumbersList = value;
     });
   }
 
-  final _$cardNumbersAtom = Atom(name: '_ViewModelBase.cardNumbers');
+  final _$takenNumbersListFromDatabaseAtom =
+      Atom(name: '_ViewModelBase.takenNumbersListFromDatabase');
 
   @override
-  List<int> get cardNumbers {
-    _$cardNumbersAtom.reportRead();
-    return super.cardNumbers;
+  List<int> get takenNumbersListFromDatabase {
+    _$takenNumbersListFromDatabaseAtom.reportRead();
+    return super.takenNumbersListFromDatabase;
   }
 
   @override
-  set cardNumbers(List<int> value) {
-    _$cardNumbersAtom.reportWrite(value, super.cardNumbers, () {
-      super.cardNumbers = value;
+  set takenNumbersListFromDatabase(List<int> value) {
+    _$takenNumbersListFromDatabaseAtom
+        .reportWrite(value, super.takenNumbersListFromDatabase, () {
+      super.takenNumbersListFromDatabase = value;
+    });
+  }
+
+  final _$isChatOpenAtom = Atom(name: '_ViewModelBase.isChatOpen');
+
+  @override
+  bool? get isChatOpen {
+    _$isChatOpenAtom.reportRead();
+    return super.isChatOpen;
+  }
+
+  @override
+  set isChatOpen(bool? value) {
+    _$isChatOpenAtom.reportWrite(value, super.isChatOpen, () {
+      super.isChatOpen = value;
+    });
+  }
+
+  final _$singleMessageAtom = Atom(name: '_ViewModelBase.singleMessage');
+
+  @override
+  String? get singleMessage {
+    _$singleMessageAtom.reportRead();
+    return super.singleMessage;
+  }
+
+  @override
+  set singleMessage(String? value) {
+    _$singleMessageAtom.reportWrite(value, super.singleMessage, () {
+      super.singleMessage = value;
+    });
+  }
+
+  final _$formKeyMessageWaitingAtom =
+      Atom(name: '_ViewModelBase.formKeyMessageWaiting');
+
+  @override
+  GlobalKey<FormState> get formKeyMessageWaiting {
+    _$formKeyMessageWaitingAtom.reportRead();
+    return super.formKeyMessageWaiting;
+  }
+
+  @override
+  set formKeyMessageWaiting(GlobalKey<FormState> value) {
+    _$formKeyMessageWaitingAtom.reportWrite(value, super.formKeyMessageWaiting,
+        () {
+      super.formKeyMessageWaiting = value;
+    });
+  }
+
+  final _$messageControllerAtom =
+      Atom(name: '_ViewModelBase.messageController');
+
+  @override
+  TextEditingController? get messageController {
+    _$messageControllerAtom.reportRead();
+    return super.messageController;
+  }
+
+  @override
+  set messageController(TextEditingController? value) {
+    _$messageControllerAtom.reportWrite(value, super.messageController, () {
+      super.messageController = value;
+    });
+  }
+
+  final _$messageListAtom = Atom(name: '_ViewModelBase.messageList');
+
+  @override
+  ObservableList<MessageModel>? get messageList {
+    _$messageListAtom.reportRead();
+    return super.messageList;
+  }
+
+  @override
+  set messageList(ObservableList<MessageModel>? value) {
+    _$messageListAtom.reportWrite(value, super.messageList, () {
+      super.messageList = value;
+    });
+  }
+
+  final _$cardNumbersListAtom = Atom(name: '_ViewModelBase.cardNumbersList');
+
+  @override
+  List<int> get cardNumbersList {
+    _$cardNumbersListAtom.reportRead();
+    return super.cardNumbersList;
+  }
+
+  @override
+  set cardNumbersList(List<int> value) {
+    _$cardNumbersListAtom.reportWrite(value, super.cardNumbersList, () {
+      super.cardNumbersList = value;
     });
   }
 
@@ -204,18 +314,54 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$isMyNumberTakenAtom = Atom(name: '_ViewModelBase.isMyNumberTaken');
+  final _$firstWinnerAnnouncementAtom =
+      Atom(name: '_ViewModelBase.firstWinnerAnnouncement');
 
   @override
-  bool get isMyNumberTaken {
-    _$isMyNumberTakenAtom.reportRead();
-    return super.isMyNumberTaken;
+  bool get firstWinnerAnnouncement {
+    _$firstWinnerAnnouncementAtom.reportRead();
+    return super.firstWinnerAnnouncement;
   }
 
   @override
-  set isMyNumberTaken(bool value) {
-    _$isMyNumberTakenAtom.reportWrite(value, super.isMyNumberTaken, () {
-      super.isMyNumberTaken = value;
+  set firstWinnerAnnouncement(bool value) {
+    _$firstWinnerAnnouncementAtom
+        .reportWrite(value, super.firstWinnerAnnouncement, () {
+      super.firstWinnerAnnouncement = value;
+    });
+  }
+
+  final _$secondWinnerAnnouncementAtom =
+      Atom(name: '_ViewModelBase.secondWinnerAnnouncement');
+
+  @override
+  bool get secondWinnerAnnouncement {
+    _$secondWinnerAnnouncementAtom.reportRead();
+    return super.secondWinnerAnnouncement;
+  }
+
+  @override
+  set secondWinnerAnnouncement(bool value) {
+    _$secondWinnerAnnouncementAtom
+        .reportWrite(value, super.secondWinnerAnnouncement, () {
+      super.secondWinnerAnnouncement = value;
+    });
+  }
+
+  final _$thirdWinnerAnnouncementAtom =
+      Atom(name: '_ViewModelBase.thirdWinnerAnnouncement');
+
+  @override
+  bool get thirdWinnerAnnouncement {
+    _$thirdWinnerAnnouncementAtom.reportRead();
+    return super.thirdWinnerAnnouncement;
+  }
+
+  @override
+  set thirdWinnerAnnouncement(bool value) {
+    _$thirdWinnerAnnouncementAtom
+        .reportWrite(value, super.thirdWinnerAnnouncement, () {
+      super.thirdWinnerAnnouncement = value;
     });
   }
 
@@ -256,20 +402,11 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return _$takeNumberAsyncAction.run(() => super.takeNumber());
   }
 
-  final _$createGameCardAsyncAction =
-      AsyncAction('_ViewModelBase.createGameCard');
+  final _$sendMessageAsyncAction = AsyncAction('_ViewModelBase.sendMessage');
 
   @override
-  Future<bool> createGameCard() {
-    return _$createGameCardAsyncAction.run(() => super.createGameCard());
-  }
-
-  final _$checkMyNumberAsyncAction =
-      AsyncAction('_ViewModelBase.checkMyNumber');
-
-  @override
-  Future<bool> checkMyNumber(int number) {
-    return _$checkMyNumberAsyncAction.run(() => super.checkMyNumber(number));
+  Future<bool> sendMessage() {
+    return _$sendMessageAsyncAction.run(() => super.sendMessage());
   }
 
   final _$_ViewModelBaseActionController =
@@ -298,6 +435,39 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
+  dynamic messageStream() {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.messageStream');
+    try {
+      return super.messageStream();
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  dynamic dispose() {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.dispose');
+    try {
+      return super.dispose();
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  dynamic createGameCard() {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.createGameCard');
+    try {
+      return super.createGameCard();
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 formKeyUserName: ${formKeyUserName},
@@ -306,14 +476,23 @@ pageController: ${pageController},
 userName: ${userName},
 roomModel: ${roomModel},
 playersList: ${playersList},
+takenNumbersMap: ${takenNumbersMap},
 playerModel: ${playerModel},
 roomCode: ${roomCode},
 numbersList: ${numbersList},
 takenNumber: ${takenNumber},
-takenNumbers: ${takenNumbers},
-cardNumbers: ${cardNumbers},
+takenNumbersList: ${takenNumbersList},
+takenNumbersListFromDatabase: ${takenNumbersListFromDatabase},
+isChatOpen: ${isChatOpen},
+singleMessage: ${singleMessage},
+formKeyMessageWaiting: ${formKeyMessageWaiting},
+messageController: ${messageController},
+messageList: ${messageList},
+cardNumbersList: ${cardNumbersList},
 randomColor: ${randomColor},
-isMyNumberTaken: ${isMyNumberTaken}
+firstWinnerAnnouncement: ${firstWinnerAnnouncement},
+secondWinnerAnnouncement: ${secondWinnerAnnouncement},
+thirdWinnerAnnouncement: ${thirdWinnerAnnouncement}
     ''';
   }
 }

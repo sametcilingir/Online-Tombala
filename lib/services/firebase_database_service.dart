@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tombala/model/message_model.dart';
 import 'package:tombala/model/player_model.dart';
 import 'package:tombala/model/room_model.dart';
 
@@ -85,7 +86,9 @@ class FirebaseDatabaseService {
   Future<void> takeNumber(RoomModel roomModel) async {
     await _firestore
         .collection("rooms")
-        .doc(roomModel.roomId,)
+        .doc(
+          roomModel.roomId,
+        )
         .update(roomModel.toJson());
   }
 
@@ -96,5 +99,32 @@ class FirebaseDatabaseService {
           roomModel.roomId,
         )
         .delete();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(
+      RoomModel roomModel) {
+    final messagesList = _firestore
+        .collection("rooms")
+        .doc(roomModel.roomId)
+        .collection("messages")
+        .orderBy("messageSentTime", descending: true)
+        .snapshots();
+
+    return messagesList;
+  }
+
+  Future<bool> sendMessage(
+      RoomModel roomModel, MessageModel messageModel) async {
+    var documentRef = _firestore
+        .collection("rooms")
+        .doc(roomModel.roomId)
+        .collection("messages")
+        .doc();
+
+    await documentRef.set(
+      messageModel.toJson(),
+    );
+   
+    return true;
   }
 }

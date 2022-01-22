@@ -51,11 +51,11 @@ class LoginFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Form(
-            key: _viewModel.formKeyUserName,
-            child: TextFormField(
+      child: Form(
+        key: _viewModel.formKeyUserName,
+        child: Column(
+          children: [
+            TextFormField(
               decoration: InputDecoration(
                 hintText: "",
                 labelText: 'Kullanici Adi ',
@@ -71,62 +71,64 @@ class LoginFormWidget extends StatelessWidget {
                 return null;
               },
             ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(
-                        width: 1, color: Theme.of(context).colorScheme.primary),
-                  ),
-                  onPressed: () async {
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                          width: 1,
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                    onPressed: () async {
+                      var val = _viewModel.formKeyUserName.currentState!
+                          .validate();
+                      if (val) {
+                        _viewModel.formKeyUserName.currentState!.save();
+
+                        final isRoomCreated = await _viewModel.createRoom();
+                        if (isRoomCreated) {
+                          Navigator.of(context).pushNamed("/waiting_room");
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Oda olusturulamadi'),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: Text(
+                      'Oda Oluştur',
+                      style: Theme.of(context).textTheme.button,
+                    )),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
                     var val =
                         _viewModel.formKeyUserName.currentState!.validate();
                     if (val) {
                       _viewModel.formKeyUserName.currentState!.save();
 
-                      final isRoomCreated = await _viewModel.createRoom();
-                      if (isRoomCreated) {
-                        Navigator.of(context).pushNamed("/waiting_room");
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Oda olusturulamadi'),
-                          ),
-                        );
-                      }
+                      _viewModel.pageController.animateToPage(
+                        1,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeIn,
+                      );
                     }
                   },
                   child: Text(
-                    'Oda Oluştur',
+                    'Odaya gir',
                     style: Theme.of(context).textTheme.button,
-                  )),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  var val = _viewModel.formKeyUserName.currentState!.validate();
-                  if (val) {
-                    _viewModel.formKeyUserName.currentState!.save();
-
-                    _viewModel.pageController.animateToPage(
-                      1,
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.easeIn,
-                    );
-                  }
-                },
-                child: Text(
-                  'Odaya gir',
-                  style: Theme.of(context).textTheme.button,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -147,11 +149,11 @@ class JoinFormWidget extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         width: 300,
-        child: Column(
-          children: [
-            Form(
-              key: _viewModel.formKeyJoin,
-              child: TextFormField(
+        child: Form(
+          key: _viewModel.formKeyJoin,
+          child: Column(
+            children: [
+              TextFormField(
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: '',
@@ -164,30 +166,31 @@ class JoinFormWidget extends StatelessWidget {
                   FocusManager.instance.primaryFocus?.unfocus();
                 },
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  _viewModel.formKeyJoin.currentState!.save();
+              SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    _viewModel.formKeyJoin.currentState!.save();
 
-                  bool createJointProcces = await _viewModel.joinRoom();
-                  if (createJointProcces) {
-                    Navigator.of(context).pushNamed('/waiting_room');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Oda girme islemi basarisiz'),
-                      ),
-                    );
-                  }
-                },
-                child: Text(
-                  'Odaya gir',
-                  style: Theme.of(context).textTheme.button,
-                )),
-          ],
+                    bool createJointProcces = await _viewModel.joinRoom();
+                    if (createJointProcces) {
+                      _viewModel.createGameCard();
+                      Navigator.of(context).pushNamed('/waiting_room');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Oda girme islemi basarisiz'),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    'Odaya gir',
+                    style: Theme.of(context).textTheme.button,
+                  )),
+            ],
+          ),
         ),
       ),
     );

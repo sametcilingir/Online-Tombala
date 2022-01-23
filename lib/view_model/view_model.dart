@@ -3,12 +3,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tombala/locator.dart';
-import 'package:tombala/model/message_model.dart';
-import 'package:tombala/model/player_model.dart';
-import 'package:tombala/model/room_model.dart';
-import 'package:tombala/services/firebase_database_service.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
+import '../locator.dart';
+import '../model/message_model.dart';
+import '../model/player_model.dart';
+import '../model/room_model.dart';
+import '../services/firebase_database_service.dart';
 
 part 'view_model.g.dart';
 
@@ -78,11 +77,12 @@ abstract class _ViewModelBase with Store {
 
   @observable
   Map<int, bool> takenNumbersMap = <int, bool>{};
-
+  @observable
+  ReactionDisposer? takenNumberReaction;
   @action
   roomStream() {
     try {
-      _firebaseDatabaseService.roomStream(roomModel).forEach((element) {
+      /* _firebaseDatabaseService.roomStream(roomModel).forEach((element) {
         roomModel = RoomModel.fromJson(element.data());
         print("tekrar sayısı üst");
 
@@ -91,7 +91,7 @@ abstract class _ViewModelBase with Store {
 
           takenNumber = roomModel.roomTakenNumber!;
           takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
-          
+
           //takenNumbersMap[takenNumber] = false;
           //print(takenNumbersMap);
           //takenNumbersMap.update(number.toString(), (value) => value = true);
@@ -100,16 +100,34 @@ abstract class _ViewModelBase with Store {
           print(
               "taken number from takenNumbersListFromDatabase: ${takenNumbersListFromDatabase}");
         }
-      });
+      });*/
 
-      /* _firebaseDatabaseService.roomStream(roomModel).listen((event) {
+      _firebaseDatabaseService.roomStream(roomModel).listen((event) {
         roomModel = RoomModel.fromJson(event.data());
-        print("tekrar sayısı");
+
+        print("tekrar sayısı üst");
+
+        if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
+          print("tekrar sayısı listeye dahil deği lise");
+
+          takenNumber = roomModel.roomTakenNumber!;
+          takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
+
+          //takenNumbersMap[takenNumber] = false;
+          //print(takenNumbersMap);
+          //takenNumbersMap.update(number.toString(), (value) => value = true);
+
+          print("taken number from database: ${takenNumber}");
+          print(
+              "taken number from takenNumbersListFromDatabase: ${takenNumbersListFromDatabase}");
+        }
+
+        /* print("tekrar sayısı");
         if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
           takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
           takenNumber = roomModel.roomTakenNumber!;
-        }
-      });*/
+        }*/
+      });
 
       //roomModel = RoomModel.fromJson(event.docChanges.first.doc.data());
 
@@ -217,10 +235,32 @@ abstract class _ViewModelBase with Store {
   GlobalKey<FormState> formKeyMessageWaiting = GlobalKey<FormState>();
 
   @observable
-  TextEditingController? messageController = TextEditingController();
+  TextEditingController? messageControllerWaiting = TextEditingController();
+
+  @observable
+  GlobalKey<FormState> formKeyMessageGameCard = GlobalKey<FormState>();
+
+  @observable
+  TextEditingController? messageControllerGameCard = TextEditingController();
+
+  @observable
+  GlobalKey<FormState> formKeyMessageGameTable = GlobalKey<FormState>();
+
+  @observable
+  TextEditingController? messageControllerGameTable = TextEditingController();
 
   @observable
   ObservableList<MessageModel>? messageList = ObservableList<MessageModel>();
+
+  @action
+  SnackBar snackbar(Color color, String message) {
+    return SnackBar(
+      dismissDirection: DismissDirection.horizontal,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: color,
+      content: Text(message),
+    );
+  }
 
   @action
   messageStream() {
@@ -241,7 +281,9 @@ abstract class _ViewModelBase with Store {
     try {
       MessageModel messageModel = MessageModel(
         messageText: singleMessage,
-        messageSenderName: playerModel.userName,
+        messageSenderName: playerModel.userName!.isEmpty
+            ? roomModel.roomCreator
+            : playerModel.userName,
         messageSentTime: Timestamp.now().toDate(),
       );
       await _firebaseDatabaseService.sendMessage(roomModel, messageModel);
@@ -252,7 +294,7 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  @action
+  /* @action
   dispose() {
     userName = null;
     roomModel = RoomModel();
@@ -262,7 +304,7 @@ abstract class _ViewModelBase with Store {
     takenNumbersList = [];
     messageList = ObservableList<MessageModel>();
     cardNumbersList = [];
-  }
+  }*/
 
   @observable
   List<int> cardNumbersList = [];
@@ -330,10 +372,144 @@ abstract class _ViewModelBase with Store {
   }
 
   @observable
-  bool firstWinnerAnnouncement = false;
-  @observable
-  bool secondWinnerAnnouncement = false;
-  @observable
-  bool thirdWinnerAnnouncement = false;
+  GlobalKey<ScaffoldMessengerState> gameCardScaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
+  @observable
+  GlobalKey<ScaffoldMessengerState> gameTableScaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  @observable
+  ReactionDisposer? firstWinnerReaction;
+  @observable
+  ReactionDisposer? secondWinnerReaction;
+  @observable
+  ReactionDisposer? thirdWinnerReaction;
+
+  @action
+  Future<bool> winnerControl(int i) async {
+    print(cardNumbersList);
+    print(takenNumbersMap);
+
+    if (i == 1 &&
+        roomModel.roomFirstWinner == "" &&
+        takenNumbersMap[cardNumbersList[0]]! &&
+        takenNumbersMap[cardNumbersList[3]]! &&
+        takenNumbersMap[cardNumbersList[6]]! &&
+        takenNumbersMap[cardNumbersList[9]]! &&
+        takenNumbersMap[cardNumbersList[12]]!) {
+      //first line
+      await setWinner(1);
+      return true;
+    } else if (i == 1 &&
+        roomModel.roomFirstWinner == "" &&
+        takenNumbersMap[cardNumbersList[1]]! &&
+        takenNumbersMap[cardNumbersList[4]]! &&
+        takenNumbersMap[cardNumbersList[7]]! &&
+        takenNumbersMap[cardNumbersList[10]]! &&
+        takenNumbersMap[cardNumbersList[13]]!) {
+      //second line
+      await setWinner(1);
+      return true;
+    } else if (i == 1 &&
+        roomModel.roomFirstWinner == "" &&
+        takenNumbersMap[cardNumbersList[2]]! &&
+        takenNumbersMap[cardNumbersList[5]]! &&
+        takenNumbersMap[cardNumbersList[8]]! &&
+        takenNumbersMap[cardNumbersList[11]]!) {
+      //third line
+      await setWinner(1);
+      return true;
+    } else if (i == 2 &&
+        roomModel.roomSecondWinner == "" &&
+        takenNumbersMap[cardNumbersList[0]]! &&
+        takenNumbersMap[cardNumbersList[3]]! &&
+        takenNumbersMap[cardNumbersList[6]]! &&
+        takenNumbersMap[cardNumbersList[9]]! &&
+        takenNumbersMap[cardNumbersList[12]]! &&
+        takenNumbersMap[cardNumbersList[1]]! &&
+        takenNumbersMap[cardNumbersList[4]]! &&
+        takenNumbersMap[cardNumbersList[7]]! &&
+        takenNumbersMap[cardNumbersList[10]]! &&
+        takenNumbersMap[cardNumbersList[13]]!) {
+      // first and second line
+      await setWinner(2);
+      return true;
+    } else if (i == 2 &&
+        roomModel.roomSecondWinner == "" &&
+        takenNumbersMap[cardNumbersList[0]]! &&
+        takenNumbersMap[cardNumbersList[3]]! &&
+        takenNumbersMap[cardNumbersList[6]]! &&
+        takenNumbersMap[cardNumbersList[9]]! &&
+        takenNumbersMap[cardNumbersList[12]]! &&
+        takenNumbersMap[cardNumbersList[2]]! &&
+        takenNumbersMap[cardNumbersList[5]]! &&
+        takenNumbersMap[cardNumbersList[8]]! &&
+        takenNumbersMap[cardNumbersList[11]]!) {
+      // first and third line
+      await setWinner(2);
+      return true;
+    } else if (i == 2 &&
+        roomModel.roomSecondWinner == "" &&
+        takenNumbersMap[cardNumbersList[1]]! &&
+        takenNumbersMap[cardNumbersList[4]]! &&
+        takenNumbersMap[cardNumbersList[7]]! &&
+        takenNumbersMap[cardNumbersList[10]]! &&
+        takenNumbersMap[cardNumbersList[13]]! &&
+        takenNumbersMap[cardNumbersList[2]]! &&
+        takenNumbersMap[cardNumbersList[5]]! &&
+        takenNumbersMap[cardNumbersList[8]]! &&
+        takenNumbersMap[cardNumbersList[11]]!) {
+      // second and third line
+      await setWinner(2);
+      return true;
+    } else if (i == 3 &&
+        roomModel.roomThirdWinner == "" &&
+        takenNumbersMap[cardNumbersList[0]]! &&
+        takenNumbersMap[cardNumbersList[3]]! &&
+        takenNumbersMap[cardNumbersList[6]]! &&
+        takenNumbersMap[cardNumbersList[9]]! &&
+        takenNumbersMap[cardNumbersList[12]]! &&
+        takenNumbersMap[cardNumbersList[1]]! &&
+        takenNumbersMap[cardNumbersList[4]]! &&
+        takenNumbersMap[cardNumbersList[7]]! &&
+        takenNumbersMap[cardNumbersList[10]]! &&
+        takenNumbersMap[cardNumbersList[13]]! &&
+        takenNumbersMap[cardNumbersList[2]]! &&
+        takenNumbersMap[cardNumbersList[5]]! &&
+        takenNumbersMap[cardNumbersList[8]]! &&
+        takenNumbersMap[cardNumbersList[11]]!) {
+      // triple line
+      await setWinner(3);
+      return true;
+    }
+    return false;
+  }
+
+  @action
+  Future<bool> setWinner(int i) async {
+    try {
+      switch (i) {
+        case 1:
+          roomModel.roomFirstWinner = userName;
+          break;
+
+        case 2:
+          roomModel.roomSecondWinner = userName;
+          break;
+
+        case 3:
+          roomModel.roomThirdWinner = userName;
+          break;
+        default:
+      }
+
+      await _firebaseDatabaseService.setWinner(roomModel);
+
+      return true;
+    } catch (e) {
+      print("setWinner hata oluştu: $e");
+      return false;
+    }
+  }
 }

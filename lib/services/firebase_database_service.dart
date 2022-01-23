@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tombala/model/message_model.dart';
-import 'package:tombala/model/player_model.dart';
-import 'package:tombala/model/room_model.dart';
+import '../model/message_model.dart';
+import '../model/player_model.dart';
+import '../model/room_model.dart';
 
 class FirebaseDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -104,9 +104,9 @@ class FirebaseDatabaseService {
   Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(
       RoomModel roomModel) {
     final messagesList = _firestore
-        .collection("rooms")
-        .doc(roomModel.roomId)
         .collection("messages")
+        .doc(roomModel.roomId)
+        .collection("chatMessages")
         .orderBy("messageSentTime", descending: true)
         .snapshots();
 
@@ -116,9 +116,9 @@ class FirebaseDatabaseService {
   Future<bool> sendMessage(
       RoomModel roomModel, MessageModel messageModel) async {
     var documentRef = _firestore
-        .collection("rooms")
-        .doc(roomModel.roomId)
         .collection("messages")
+        .doc(roomModel.roomId)
+        .collection("chatMessages")
         .doc();
 
     await documentRef.set(
@@ -126,5 +126,15 @@ class FirebaseDatabaseService {
     );
    
     return true;
+  }
+
+
+  Future<void> setWinner(RoomModel roomModel) async {
+    await _firestore
+        .collection("rooms")
+        .doc(
+          roomModel.roomId,
+        )
+        .update(roomModel.toJson());
   }
 }

@@ -1,21 +1,23 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tombala/locator.dart';
-import 'package:tombala/views/game_card.dart';
-import 'package:tombala/views/game_table.dart';
-import 'package:tombala/views/home.dart';
+import 'locator.dart';
+import 'view_model/view_model.dart';
+import 'views/game_card.dart';
+import 'views/game_table.dart';
+import 'views/home.dart';
 
-import 'package:tombala/views/waiting.dart';
+import 'views/waiting.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
 
-  SystemChrome.setPreferredOrientations(
+   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
-    runApp(const MyApp());
+    
   });
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -57,9 +59,7 @@ class _MyAppState extends State<MyApp> {
     if (_initialized) {
       return MaterialApp(
         theme: ThemeData(
-          
           floatingActionButtonTheme: FloatingActionButtonThemeData(
-            
             backgroundColor: Colors.green[900],
           ),
           appBarTheme: AppBarTheme(
@@ -68,7 +68,6 @@ class _MyAppState extends State<MyApp> {
           scaffoldBackgroundColor: Colors.green[900],
           brightness: Brightness.dark,
           colorScheme: const ColorScheme.dark(
-            
             primary: Colors.redAccent,
           ),
         ),
@@ -77,9 +76,9 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/home',
         routes: {
           '/home': (context) => HomeScreen(),
-          "/waiting_room": (context) => WaitingScreen(),
-          "/game_card": (context) => GameCardScreen(),
-          "/game_table": (context) => GameTableScreen(),
+          "/home/waiting_room": (context) => const WaitingScreen(),
+          "/home/game_card": (context) => const GameCardScreen(),
+          "/home/game_table": (context) => const GameTableScreen(),
         },
       );
     }

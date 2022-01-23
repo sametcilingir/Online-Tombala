@@ -114,6 +114,22 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$takenNumberReactionAtom =
+      Atom(name: '_ViewModelBase.takenNumberReaction');
+
+  @override
+  ReactionDisposer? get takenNumberReaction {
+    _$takenNumberReactionAtom.reportRead();
+    return super.takenNumberReaction;
+  }
+
+  @override
+  set takenNumberReaction(ReactionDisposer? value) {
+    _$takenNumberReactionAtom.reportWrite(value, super.takenNumberReaction, () {
+      super.takenNumberReaction = value;
+    });
+  }
+
   final _$playerModelAtom = Atom(name: '_ViewModelBase.playerModel');
 
   @override
@@ -253,19 +269,88 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$messageControllerAtom =
-      Atom(name: '_ViewModelBase.messageController');
+  final _$messageControllerWaitingAtom =
+      Atom(name: '_ViewModelBase.messageControllerWaiting');
 
   @override
-  TextEditingController? get messageController {
-    _$messageControllerAtom.reportRead();
-    return super.messageController;
+  TextEditingController? get messageControllerWaiting {
+    _$messageControllerWaitingAtom.reportRead();
+    return super.messageControllerWaiting;
   }
 
   @override
-  set messageController(TextEditingController? value) {
-    _$messageControllerAtom.reportWrite(value, super.messageController, () {
-      super.messageController = value;
+  set messageControllerWaiting(TextEditingController? value) {
+    _$messageControllerWaitingAtom
+        .reportWrite(value, super.messageControllerWaiting, () {
+      super.messageControllerWaiting = value;
+    });
+  }
+
+  final _$formKeyMessageGameCardAtom =
+      Atom(name: '_ViewModelBase.formKeyMessageGameCard');
+
+  @override
+  GlobalKey<FormState> get formKeyMessageGameCard {
+    _$formKeyMessageGameCardAtom.reportRead();
+    return super.formKeyMessageGameCard;
+  }
+
+  @override
+  set formKeyMessageGameCard(GlobalKey<FormState> value) {
+    _$formKeyMessageGameCardAtom
+        .reportWrite(value, super.formKeyMessageGameCard, () {
+      super.formKeyMessageGameCard = value;
+    });
+  }
+
+  final _$messageControllerGameCardAtom =
+      Atom(name: '_ViewModelBase.messageControllerGameCard');
+
+  @override
+  TextEditingController? get messageControllerGameCard {
+    _$messageControllerGameCardAtom.reportRead();
+    return super.messageControllerGameCard;
+  }
+
+  @override
+  set messageControllerGameCard(TextEditingController? value) {
+    _$messageControllerGameCardAtom
+        .reportWrite(value, super.messageControllerGameCard, () {
+      super.messageControllerGameCard = value;
+    });
+  }
+
+  final _$formKeyMessageGameTableAtom =
+      Atom(name: '_ViewModelBase.formKeyMessageGameTable');
+
+  @override
+  GlobalKey<FormState> get formKeyMessageGameTable {
+    _$formKeyMessageGameTableAtom.reportRead();
+    return super.formKeyMessageGameTable;
+  }
+
+  @override
+  set formKeyMessageGameTable(GlobalKey<FormState> value) {
+    _$formKeyMessageGameTableAtom
+        .reportWrite(value, super.formKeyMessageGameTable, () {
+      super.formKeyMessageGameTable = value;
+    });
+  }
+
+  final _$messageControllerGameTableAtom =
+      Atom(name: '_ViewModelBase.messageControllerGameTable');
+
+  @override
+  TextEditingController? get messageControllerGameTable {
+    _$messageControllerGameTableAtom.reportRead();
+    return super.messageControllerGameTable;
+  }
+
+  @override
+  set messageControllerGameTable(TextEditingController? value) {
+    _$messageControllerGameTableAtom
+        .reportWrite(value, super.messageControllerGameTable, () {
+      super.messageControllerGameTable = value;
     });
   }
 
@@ -314,54 +399,86 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$firstWinnerAnnouncementAtom =
-      Atom(name: '_ViewModelBase.firstWinnerAnnouncement');
+  final _$gameCardScaffoldMessengerKeyAtom =
+      Atom(name: '_ViewModelBase.gameCardScaffoldMessengerKey');
 
   @override
-  bool get firstWinnerAnnouncement {
-    _$firstWinnerAnnouncementAtom.reportRead();
-    return super.firstWinnerAnnouncement;
+  GlobalKey<ScaffoldMessengerState> get gameCardScaffoldMessengerKey {
+    _$gameCardScaffoldMessengerKeyAtom.reportRead();
+    return super.gameCardScaffoldMessengerKey;
   }
 
   @override
-  set firstWinnerAnnouncement(bool value) {
-    _$firstWinnerAnnouncementAtom
-        .reportWrite(value, super.firstWinnerAnnouncement, () {
-      super.firstWinnerAnnouncement = value;
+  set gameCardScaffoldMessengerKey(GlobalKey<ScaffoldMessengerState> value) {
+    _$gameCardScaffoldMessengerKeyAtom
+        .reportWrite(value, super.gameCardScaffoldMessengerKey, () {
+      super.gameCardScaffoldMessengerKey = value;
     });
   }
 
-  final _$secondWinnerAnnouncementAtom =
-      Atom(name: '_ViewModelBase.secondWinnerAnnouncement');
+  final _$gameTableScaffoldMessengerKeyAtom =
+      Atom(name: '_ViewModelBase.gameTableScaffoldMessengerKey');
 
   @override
-  bool get secondWinnerAnnouncement {
-    _$secondWinnerAnnouncementAtom.reportRead();
-    return super.secondWinnerAnnouncement;
+  GlobalKey<ScaffoldMessengerState> get gameTableScaffoldMessengerKey {
+    _$gameTableScaffoldMessengerKeyAtom.reportRead();
+    return super.gameTableScaffoldMessengerKey;
   }
 
   @override
-  set secondWinnerAnnouncement(bool value) {
-    _$secondWinnerAnnouncementAtom
-        .reportWrite(value, super.secondWinnerAnnouncement, () {
-      super.secondWinnerAnnouncement = value;
+  set gameTableScaffoldMessengerKey(GlobalKey<ScaffoldMessengerState> value) {
+    _$gameTableScaffoldMessengerKeyAtom
+        .reportWrite(value, super.gameTableScaffoldMessengerKey, () {
+      super.gameTableScaffoldMessengerKey = value;
     });
   }
 
-  final _$thirdWinnerAnnouncementAtom =
-      Atom(name: '_ViewModelBase.thirdWinnerAnnouncement');
+  final _$firstWinnerReactionAtom =
+      Atom(name: '_ViewModelBase.firstWinnerReaction');
 
   @override
-  bool get thirdWinnerAnnouncement {
-    _$thirdWinnerAnnouncementAtom.reportRead();
-    return super.thirdWinnerAnnouncement;
+  ReactionDisposer? get firstWinnerReaction {
+    _$firstWinnerReactionAtom.reportRead();
+    return super.firstWinnerReaction;
   }
 
   @override
-  set thirdWinnerAnnouncement(bool value) {
-    _$thirdWinnerAnnouncementAtom
-        .reportWrite(value, super.thirdWinnerAnnouncement, () {
-      super.thirdWinnerAnnouncement = value;
+  set firstWinnerReaction(ReactionDisposer? value) {
+    _$firstWinnerReactionAtom.reportWrite(value, super.firstWinnerReaction, () {
+      super.firstWinnerReaction = value;
+    });
+  }
+
+  final _$secondWinnerReactionAtom =
+      Atom(name: '_ViewModelBase.secondWinnerReaction');
+
+  @override
+  ReactionDisposer? get secondWinnerReaction {
+    _$secondWinnerReactionAtom.reportRead();
+    return super.secondWinnerReaction;
+  }
+
+  @override
+  set secondWinnerReaction(ReactionDisposer? value) {
+    _$secondWinnerReactionAtom.reportWrite(value, super.secondWinnerReaction,
+        () {
+      super.secondWinnerReaction = value;
+    });
+  }
+
+  final _$thirdWinnerReactionAtom =
+      Atom(name: '_ViewModelBase.thirdWinnerReaction');
+
+  @override
+  ReactionDisposer? get thirdWinnerReaction {
+    _$thirdWinnerReactionAtom.reportRead();
+    return super.thirdWinnerReaction;
+  }
+
+  @override
+  set thirdWinnerReaction(ReactionDisposer? value) {
+    _$thirdWinnerReactionAtom.reportWrite(value, super.thirdWinnerReaction, () {
+      super.thirdWinnerReaction = value;
     });
   }
 
@@ -409,6 +526,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return _$sendMessageAsyncAction.run(() => super.sendMessage());
   }
 
+  final _$winnerControlAsyncAction =
+      AsyncAction('_ViewModelBase.winnerControl');
+
+  @override
+  Future<bool> winnerControl(int i) {
+    return _$winnerControlAsyncAction.run(() => super.winnerControl(i));
+  }
+
+  final _$setWinnerAsyncAction = AsyncAction('_ViewModelBase.setWinner');
+
+  @override
+  Future<bool> setWinner(int i) {
+    return _$setWinnerAsyncAction.run(() => super.setWinner(i));
+  }
+
   final _$_ViewModelBaseActionController =
       ActionController(name: '_ViewModelBase');
 
@@ -435,22 +567,22 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic messageStream() {
+  SnackBar snackbar(Color color, String message) {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.messageStream');
+        name: '_ViewModelBase.snackbar');
     try {
-      return super.messageStream();
+      return super.snackbar(color, message);
     } finally {
       _$_ViewModelBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  dynamic dispose() {
+  dynamic messageStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.dispose');
+        name: '_ViewModelBase.messageStream');
     try {
-      return super.dispose();
+      return super.messageStream();
     } finally {
       _$_ViewModelBaseActionController.endAction(_$actionInfo);
     }
@@ -477,6 +609,7 @@ userName: ${userName},
 roomModel: ${roomModel},
 playersList: ${playersList},
 takenNumbersMap: ${takenNumbersMap},
+takenNumberReaction: ${takenNumberReaction},
 playerModel: ${playerModel},
 roomCode: ${roomCode},
 numbersList: ${numbersList},
@@ -486,13 +619,19 @@ takenNumbersListFromDatabase: ${takenNumbersListFromDatabase},
 isChatOpen: ${isChatOpen},
 singleMessage: ${singleMessage},
 formKeyMessageWaiting: ${formKeyMessageWaiting},
-messageController: ${messageController},
+messageControllerWaiting: ${messageControllerWaiting},
+formKeyMessageGameCard: ${formKeyMessageGameCard},
+messageControllerGameCard: ${messageControllerGameCard},
+formKeyMessageGameTable: ${formKeyMessageGameTable},
+messageControllerGameTable: ${messageControllerGameTable},
 messageList: ${messageList},
 cardNumbersList: ${cardNumbersList},
 randomColor: ${randomColor},
-firstWinnerAnnouncement: ${firstWinnerAnnouncement},
-secondWinnerAnnouncement: ${secondWinnerAnnouncement},
-thirdWinnerAnnouncement: ${thirdWinnerAnnouncement}
+gameCardScaffoldMessengerKey: ${gameCardScaffoldMessengerKey},
+gameTableScaffoldMessengerKey: ${gameTableScaffoldMessengerKey},
+firstWinnerReaction: ${firstWinnerReaction},
+secondWinnerReaction: ${secondWinnerReaction},
+thirdWinnerReaction: ${thirdWinnerReaction}
     ''';
   }
 }

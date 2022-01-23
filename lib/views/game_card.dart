@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tombala/locator.dart';
-import 'package:tombala/view_model/view_model.dart';
+import '../locator.dart';
+import '../view_model/view_model.dart';
 
 class GameCardScreen extends StatefulWidget {
   const GameCardScreen({Key? key}) : super(key: key);
@@ -20,197 +20,220 @@ class _GameCardScreenState extends State<GameCardScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    /* if (_viewModel.cardNumbersList.isEmpty) {
-      _viewModel.createGameCard();
-    }*/
-    /*_viewModel.gameDocumentStream().forEach((e) => AwesomeDialog(
-            context: context,
-            dialogType: DialogType.NO_HEADER,
-            animType: AnimType.SCALE,
-            autoHide: Duration(seconds: 5),
-            dialogBackgroundColor: Colors.green,
-            body: Container(
-              height: 200,
-              width: 150,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      _viewModel.takenNumbersListDatabase!.last.toString(),
-                      style: TextStyle(fontSize: 42),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      'Çekilen sayi',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ).show());*/
-    _viewModel.roomStream();
-    _viewModel.messageStream();
-
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
 
-    reaction(
-        (_) => _viewModel.takenNumber,
-        (v) => awsomeDialog(context, _viewModel.takenNumber.toString(),
-                "Çekilen Sayı", Colors.red[900]!)
-            .show());
+    _viewModel.roomStream();
+    _viewModel.messageStream();
 
-    if (!_viewModel.firstWinnerAnnouncement) {
-      reaction(
-          (_) => _viewModel.roomModel.roomFirstWinner,
-          (roomFirstWinner) => awsomeDialog(context, roomFirstWinner.toString(),
-                  "1. Çinko yapıldı", Colors.green)
-              .show());
-      _viewModel.firstWinnerAnnouncement = true;
-    }
-    if (!_viewModel.secondWinnerAnnouncement) {
-      reaction(
-          (_) => _viewModel.roomModel.roomSecondWinner,
-          (roomSecondWinner) => awsomeDialog(context,
-                  roomSecondWinner.toString(), "2. Çinko yapıldı", Colors.green)
-              .show());
-      _viewModel.secondWinnerAnnouncement = true;
-    }
-    if (!_viewModel.thirdWinnerAnnouncement) {
-      reaction(
-          (_) => _viewModel.roomModel.roomThirdWinner,
-          (roomThirdWinner) => awsomeDialog(context, roomThirdWinner.toString(),
-                  "3. Çinko yapıldı", Colors.green)
-              .show());
-      _viewModel.thirdWinnerAnnouncement = true;
-    }
+    _viewModel.takenNumberReaction = reaction(
+        (_) => _viewModel.takenNumber,
+        (v) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              _viewModel.snackbar(
+                  Colors.amber, "Çekilen Sayı: ${_viewModel.takenNumber}"),
+            ),
+        delay: 1000);
+
+    _viewModel.firstWinnerReaction = reaction(
+        (_) => _viewModel.roomModel.roomFirstWinner,
+        (firstWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              _viewModel.snackbar(
+                  Colors.green, "1. Çinko yapıldı: $firstWinner"),
+            ),
+        delay: 1000);
+
+    _viewModel.firstWinnerReaction = reaction(
+        (_) => _viewModel.roomModel.roomSecondWinner,
+        (secondWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              _viewModel.snackbar(
+                  Colors.green, "2. Çinko yapıldı: $secondWinner"),
+            ),
+        delay: 1000);
+
+    _viewModel.firstWinnerReaction = reaction(
+        (_) => _viewModel.roomModel.roomThirdWinner,
+        (thirdWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              _viewModel.snackbar(
+                  Colors.green, "Tombala yapıldı: $thirdWinner"),
+            ),
+        delay: 1000);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _viewModel.takenNumberReaction;
+    _viewModel.firstWinnerReaction;
+    _viewModel.secondWinnerReaction;
+    _viewModel.thirdWinnerReaction;
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // WidgetsBinding.instance!.addPostFrameCallback((_) {});
+    //WidgetsBinding.instance!.addPostFrameCallback((_) {});
 
     return Observer(
       builder: (_) {
-        return Scaffold(
-          floatingActionButton: FloatingActionButton.extended(
-            label: (() {
-              if (_viewModel.roomModel.roomFirstWinner!.isEmpty) {
-                return Text("Birinci Çinko İlan et");
-              } else if (_viewModel.roomModel.roomSecondWinner!.isEmpty) {
-                return Text("İkinci Çinko İlan et");
-              } else if (_viewModel.roomModel.roomThirdWinner!.isEmpty) {
-                return Text("Tombala İlan et");
-              } else {
-                return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
-              }
-            }()),
-            icon: Icon(Icons.add),
-            onPressed: () {
-              /*  SystemChrome.setPreferredOrientations([
-                  DeviceOrientation.portraitDown,
-                  DeviceOrientation.portraitUp,
-                ]);
-                Navigator.of(context).popAndPushNamed("/home");*/
-            },
-          ),
-          appBar: AppBar(
-            leadingWidth: 300,
-            leading: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _viewModel.roomModel.roomFirstWinner!.isNotEmpty
-                      ? Text("1. Çinko Yapan Oyuncu  :  " +
-                          _viewModel.roomModel.roomFirstWinner.toString())
-                      : SizedBox(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _viewModel.roomModel.roomSecondWinner!.isNotEmpty
-                      ? Text("2. Çinko Yapan Oyuncu  :  " +
-                          _viewModel.roomModel.roomSecondWinner.toString())
-                      : SizedBox(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _viewModel.roomModel.roomThirdWinner!.isNotEmpty
-                      ? Text("Tombala Yapan Oyuncu  :  " +
-                          _viewModel.roomModel.roomThirdWinner.toString())
-                      : SizedBox(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                ],
+        return ScaffoldMessenger(
+          key: _viewModel.gameCardScaffoldMessengerKey,
+          child: Scaffold(
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 50),
+              child: FloatingActionButton.extended(
+                backgroundColor: Colors.amber,
+                label: (() {
+                  if (_viewModel.roomModel.roomFirstWinner == "") {
+                    return Text("Birinci Çinko İlan et");
+                  } else if (_viewModel.roomModel.roomSecondWinner == "") {
+                    return Text("İkinci Çinko İlan et");
+                  } else if (_viewModel.roomModel.roomThirdWinner == "") {
+                    return Text("Tombala İlan et");
+                  } else {
+                    return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
+                  }
+                }()),
+                icon: Icon(Icons.check),
+                onPressed: () async {
+                  if (_viewModel.roomModel.roomFirstWinner == "") {
+                    bool isWin = await _viewModel.winnerControl(1);
+                    if (!isWin) {
+                      print("burdayız");
+                      _viewModel.gameCardScaffoldMessengerKey.currentState
+                          ?.showSnackBar(
+                        _viewModel.snackbar(Colors.red,
+                            "1.Çinko Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                      );
+                    }
+                  } else if (_viewModel.roomModel.roomSecondWinner == "") {
+                    bool isWin = await _viewModel.winnerControl(2);
+                    if (!isWin) {
+                      _viewModel.gameCardScaffoldMessengerKey.currentState
+                          ?.showSnackBar(
+                        _viewModel.snackbar(Colors.red,
+                            "2.Çinko Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                      );
+                    }
+                  } else if (_viewModel.roomModel.roomThirdWinner == "") {
+                    bool isWin = await _viewModel.winnerControl(3);
+                    if (!isWin) {
+                      _viewModel.gameCardScaffoldMessengerKey.currentState
+                          ?.showSnackBar(
+                        _viewModel.snackbar(Colors.red,
+                            "Tombala Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                      );
+                    }
+                  } else {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                },
               ),
             ),
-            title: Text(_viewModel.takenNumbersListFromDatabase.isNotEmpty
-                ? "Çekilen Sayı : " +
-                    _viewModel.takenNumbersListFromDatabase.last.toString()
-                : "Çekilen Sayı : "),
-            centerTitle: true,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  _viewModel.takenNumbersListFromDatabase.length < 2
-                      ? "Önceki çekilen sayı: "
-                      : "Önceki çekilen sayı:  ${_viewModel.takenNumbersListFromDatabase.elementAt(_viewModel.takenNumbersListFromDatabase.length - 2)}",
+            /* appBar: AppBar(
+              leadingWidth: 300,
+              leading: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _viewModel.roomModel.roomFirstWinner!.isNotEmpty
+                        ? Text("1. Çinko Yapan Oyuncu  :  " +
+                            _viewModel.roomModel.roomFirstWinner.toString())
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _viewModel.roomModel.roomSecondWinner!.isNotEmpty
+                        ? Text("2. Çinko Yapan Oyuncu  :  " +
+                            _viewModel.roomModel.roomSecondWinner.toString())
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _viewModel.roomModel.roomThirdWinner!.isNotEmpty
+                        ? Text("Tombala Yapan Oyuncu  :  " +
+                            _viewModel.roomModel.roomThirdWinner.toString())
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                  ],
                 ),
-              )
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 500),
-                          height: 350,
-                          width: MediaQuery.of(context).size.width,
-                          child: GridView.builder(
-                            //listeyi canlı tutar
-                            addAutomaticKeepAlives: true,
-                            addRepaintBoundaries: true,
+              ),
+              /* title: Text(_viewModel.takenNumbersListFromDatabase.isNotEmpty
+                  ? "Çekilen Sayı : " +
+                      _viewModel.takenNumbersListFromDatabase.last.toString()
+                  : "Çekilen Sayı : "),
+              centerTitle: true,*/
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    _viewModel.takenNumbersListFromDatabase.length < 2
+                        ? "Önceki çekilen sayı: "
+                        : "Önceki çekilen sayı:  ${_viewModel.takenNumbersListFromDatabase.elementAt(_viewModel.takenNumbersListFromDatabase.length - 2)}",
+                  ),
+                )
+              ],
+            ),*/
+            body: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        //color: Colors.amber,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        width: MediaQuery.of(context).size.width,
+                        child: GridView.builder(
+                          //listeyi canlı tutar
+                          addAutomaticKeepAlives: true,
+                          addRepaintBoundaries: true,
 
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 27,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              mainAxisExtent:
-                                  MediaQuery.of(context).size.width / 9,
-                            ),
-                            itemBuilder: (context, index) => index
-                                    .floor()
-                                    .isEven
-                                ? Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 27,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisExtent:
+                                MediaQuery.of(context).size.width / 10.5,
+                          ),
+                          itemBuilder: (context, index) => index.floor().isEven
+                              ? Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: _viewModel.randomColor,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: Ink(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
                                         border: Border.all(
-                                          color: _viewModel.randomColor,
-                                        ),
+                                            color: _viewModel.randomColor),
                                         borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                    child: Material(
+                                            Radius.circular(20)),
+                                      ),
                                       child: InkWell(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
                                         focusColor: Colors.green[100],
                                         splashColor: Colors.green[100],
                                         hoverColor: Colors.green[100],
@@ -225,71 +248,232 @@ class _GameCardScreenState extends State<GameCardScreen> {
                                                 _viewModel.cardNumbersList[
                                                     index ~/ 2],
                                                 (value) => true);
+
                                             setState(() {});
                                             print("Bu sayı çekilmiş");
                                           }
                                         },
-                                        child: Ink(
-                                          decoration: BoxDecoration(
-                                              color: _viewModel.takenNumbersMap[
-                                                      _viewModel
-                                                              .cardNumbersList[
-                                                          index ~/ 2]]!
-                                                  ? Colors.green[800]
-                                                  : Colors.white,
-                                              border: Border.all(),
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  bottomLeft:
-                                                      Radius.circular(10))),
-                                          child: Center(
-                                            child: Text(
-                                              _viewModel
-                                                  .cardNumbersList[index ~/ 2]
-                                                  .toString(),
-                                              style: TextStyle(
-                                                color: _viewModel.randomColor,
-                                                fontSize: 28,
-                                                fontWeight: FontWeight.bold,
+                                        child: Center(
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Container(
+                                                height: 60,
+                                                width: 60,
+                                                decoration: BoxDecoration(
+                                                  color: _viewModel
+                                                              .takenNumbersMap[
+                                                          _viewModel
+                                                                  .cardNumbersList[
+                                                              index ~/ 2]]!
+                                                      ? Colors.green.shade100
+                                                          .withOpacity(0.3)
+                                                      : Colors.transparent,
+                                                  border: Border.all(
+                                                    width: 4,
+                                                    color: _viewModel
+                                                                .takenNumbersMap[
+                                                            _viewModel
+                                                                    .cardNumbersList[
+                                                                index ~/ 2]]!
+                                                        ? Colors.green.shade200
+                                                        : Colors.transparent,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(40)),
+                                                ),
                                               ),
-                                            ),
+                                              Text(
+                                                _viewModel
+                                                    .cardNumbersList[index ~/ 2]
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  color: _viewModel.randomColor,
+                                                  fontSize: 28,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                  )
-                                : blankWidget(index),
-                          ),
+                                  ),
+                                )
+                              : blankWidget(index),
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        _viewModel.roomModel.roomFirstWinner!.isNotEmpty
-                            ? Text(
-                                "İlk çinkoyu yapan kişi : ${_viewModel.roomModel.roomFirstWinner}")
-                            : SizedBox(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        _viewModel.roomModel.roomSecondWinner!.isNotEmpty
-                            ? Text(
-                                "İkinci çinkoyu yapan kişi : ${_viewModel.roomModel.roomSecondWinner}")
-                            : SizedBox(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        _viewModel.roomModel.roomThirdWinner!.isNotEmpty
-                            ? Text(
-                                "Bingo yapan kişi : ${_viewModel.roomModel.roomThirdWinner}")
-                            : SizedBox(),
-                        SizedBox(
-                          height: 10,
-                        ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _viewModel.roomModel.roomFirstWinner!.isNotEmpty
+                          ? Text(
+                              "İlk çinkoyu yapan kişi : ${_viewModel.roomModel.roomFirstWinner}")
+                          : SizedBox(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _viewModel.roomModel.roomSecondWinner!.isNotEmpty
+                          ? Text(
+                              "İkinci çinkoyu yapan kişi : ${_viewModel.roomModel.roomSecondWinner}")
+                          : SizedBox(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      _viewModel.roomModel.roomThirdWinner!.isNotEmpty
+                          ? Text(
+                              "Bingo yapan kişi : ${_viewModel.roomModel.roomThirdWinner}")
+                          : SizedBox(),
+                      SizedBox(
+                        height: 10,
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
+            ),
+            bottomSheet: AnimatedContainer(
+              alignment: Alignment.bottomCenter,
+              color: Colors.black54,
+              height: _viewModel.isChatOpen! ? 350 : 50,
+              width: MediaQuery.of(context).size.width,
+              duration: Duration(milliseconds: 500),
+              child: _viewModel.isChatOpen!
+                  ? SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              _viewModel.isChatOpen = false;
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Container(
+                            height: 210,
+                            color: Colors.black12,
+                            child: ListView.builder(
+                              itemCount: _viewModel.messageList!.length,
+
+                              ///bu kod çok önemli
+                              addAutomaticKeepAlives: true,
+                              //shrinkWrap: true,
+                              reverse: true,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (context, index) => Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(
+                                    _viewModel.messageList![index].messageText
+                                        .toString(),
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  subtitle: Text(
+                                    _viewModel
+                                        .messageList![index].messageSenderName
+                                        .toString(),
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 70,
+                              width: MediaQuery.of(context).size.width,
+                              child: Form(
+                                key: _viewModel.formKeyMessageGameCard,
+                                child: TextFormField(
+                                  controller:
+                                      _viewModel.messageControllerGameCard,
+                                  decoration: InputDecoration(
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    hintText: "Mesaj ",
+                                    fillColor: Colors.green,
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.green,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    suffix: ElevatedButton(
+                                      onPressed: () async {
+                                        var val = _viewModel
+                                            .formKeyMessageGameCard
+                                            .currentState!
+                                            .validate();
+                                        if (val &&
+                                            _viewModel
+                                                .singleMessage!.isNotEmpty) {
+                                          _viewModel.formKeyMessageGameCard
+                                              .currentState!
+                                              .save();
+
+                                          bool isMassageSent =
+                                              await _viewModel.sendMessage();
+
+                                          if (isMassageSent) {
+                                            _viewModel.singleMessage = "";
+                                            _viewModel
+                                                .messageControllerGameCard!
+                                                .clear();
+                                          }
+                                        }
+                                      },
+                                      child: Text("Gönder"),
+                                    ),
+                                  ),
+                                  validator: (val) {
+                                    if (val!.isEmpty) {
+                                      //return "Boş olamaz";
+                                    } else if (val.length.isNaN) {
+                                      //return "Boş olamaz";
+                                    } else {
+                                      //return 'Hatasız';
+                                    }
+                                  },
+                                  onChanged: (value) {
+                                    _viewModel.singleMessage = value;
+                                  },
+                                  /* onSaved: (newValue) {
+                                  _viewModel.singleMessage = newValue;
+                                },*/
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Chat",
+                            style: TextStyle(fontSize: 16, color: Colors.green),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _viewModel.isChatOpen = true;
+                            },
+                            icon: Icon(
+                              Icons.arrow_drop_up,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
             ),
           ),
         );
@@ -297,49 +481,14 @@ class _GameCardScreenState extends State<GameCardScreen> {
     );
   }
 
-  AwesomeDialog awsomeDialog(
-      BuildContext context, String title, String content, Color color) {
-    return AwesomeDialog(
-      context: context,
-      dialogType: DialogType.NO_HEADER,
-      animType: AnimType.SCALE,
-      autoHide: Duration(seconds: 1),
-      dialogBackgroundColor: color,
-      body: Container(
-        height: 200,
-        width: 150,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: TextStyle(fontSize: 42),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                content,
-                style: TextStyle(fontSize: 20),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget blankWidget(int index) {
     return Container(
-        height: 50,
-        width: 50,
-        decoration: BoxDecoration(
+      height: 40,
+      width: 40,
+      decoration: BoxDecoration(
           color: _viewModel.randomColor,
-        ));
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.all(Radius.circular(20))),
+    );
   }
 }

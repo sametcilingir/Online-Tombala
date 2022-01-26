@@ -145,21 +145,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$roomCodeAtom = Atom(name: '_ViewModelBase.roomCode');
-
-  @override
-  String? get roomCode {
-    _$roomCodeAtom.reportRead();
-    return super.roomCode;
-  }
-
-  @override
-  set roomCode(String? value) {
-    _$roomCodeAtom.reportWrite(value, super.roomCode, () {
-      super.roomCode = value;
-    });
-  }
-
   final _$numbersListAtom = Atom(name: '_ViewModelBase.numbersList');
 
   @override
@@ -482,6 +467,23 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$isGameAutoTakeNumberAtom =
+      Atom(name: '_ViewModelBase.isGameAutoTakeNumber');
+
+  @override
+  bool get isGameAutoTakeNumber {
+    _$isGameAutoTakeNumberAtom.reportRead();
+    return super.isGameAutoTakeNumber;
+  }
+
+  @override
+  set isGameAutoTakeNumber(bool value) {
+    _$isGameAutoTakeNumberAtom.reportWrite(value, super.isGameAutoTakeNumber,
+        () {
+      super.isGameAutoTakeNumber = value;
+    });
+  }
+
   final _$createRoomAsyncAction = AsyncAction('_ViewModelBase.createRoom');
 
   @override
@@ -539,6 +541,13 @@ mixin _$ViewModel on _ViewModelBase, Store {
   @override
   Future<bool> setWinner(int i) {
     return _$setWinnerAsyncAction.run(() => super.setWinner(i));
+  }
+
+  final _$deleteGameAsyncAction = AsyncAction('_ViewModelBase.deleteGame');
+
+  @override
+  Future<bool> deleteGame() {
+    return _$deleteGameAsyncAction.run(() => super.deleteGame());
   }
 
   final _$_ViewModelBaseActionController =
@@ -611,7 +620,6 @@ playersList: ${playersList},
 takenNumbersMap: ${takenNumbersMap},
 takenNumberReaction: ${takenNumberReaction},
 playerModel: ${playerModel},
-roomCode: ${roomCode},
 numbersList: ${numbersList},
 takenNumber: ${takenNumber},
 takenNumbersList: ${takenNumbersList},
@@ -631,7 +639,8 @@ gameCardScaffoldMessengerKey: ${gameCardScaffoldMessengerKey},
 gameTableScaffoldMessengerKey: ${gameTableScaffoldMessengerKey},
 firstWinnerReaction: ${firstWinnerReaction},
 secondWinnerReaction: ${secondWinnerReaction},
-thirdWinnerReaction: ${thirdWinnerReaction}
+thirdWinnerReaction: ${thirdWinnerReaction},
+isGameAutoTakeNumber: ${isGameAutoTakeNumber}
     ''';
   }
 }

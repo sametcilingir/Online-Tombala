@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../model/message_model.dart';
-import '../model/player_model.dart';
-import '../model/room_model.dart';
+import '../../components/models/message/message_model.dart';
+import '../../components/models/player/player_model.dart';
+import '../../components/models/room/room_model.dart';
 
 class FirebaseDatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

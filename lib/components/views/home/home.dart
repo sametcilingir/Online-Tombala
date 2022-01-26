@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../locator.dart';
-import '../view_model/view_model.dart';
+import '../../view_models/view_model.dart';
+import '../../../utils/locator/locator.dart';
 
 class HomeScreen extends StatelessWidget {
-  final ViewModel _viewModel = locator<ViewModel>();
-
-  HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final ViewModel _viewModel = locator<ViewModel>();
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0,

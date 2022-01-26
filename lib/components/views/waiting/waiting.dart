@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import '../locator.dart';
-import '../view_model/view_model.dart';
+import '../../view_models/view_model.dart';
+import '../../../utils/locator/locator.dart';
 
 class WaitingScreen extends StatefulWidget {
   const WaitingScreen({Key? key}) : super(key: key);

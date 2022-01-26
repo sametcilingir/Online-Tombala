@@ -1,10 +1,9 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import '../locator.dart';
-import '../view_model/view_model.dart';
+import '../../view_models/view_model.dart';
+import '../../../utils/locator/locator.dart';
 
 class GameCardScreen extends StatefulWidget {
   const GameCardScreen({Key? key}) : super(key: key);

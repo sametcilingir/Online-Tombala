@@ -3,11 +3,12 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import '../locator.dart';
-import '../model/message_model.dart';
-import '../model/player_model.dart';
-import '../model/room_model.dart';
-import '../services/firebase_database_service.dart';
+import '../models/message/message_model.dart';
+import '../models/player/player_model.dart';
+import '../models/room/room_model.dart';
+import '../../utils/services/firebase_database_service.dart';
+
+import '../../utils/locator/locator.dart';
 
 part 'view_model.g.dart';
 

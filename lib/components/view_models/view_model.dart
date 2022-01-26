@@ -48,7 +48,18 @@ abstract class _ViewModelBase with Store {
       roomModel.roomCreator = userName;
 
       roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
-      return true;
+
+      var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
+          roomModel.roomCode!, roomModel.roomCreator!);
+      playerModel = playerModelAndRoomModel[0];
+      //roomModeli burda oluşturduğumuz için  almaya gerek yok
+      //roomModel = playerModelAndRoomModel[1];
+
+      if (playerModel.userId != null) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (e) {
       print("Oda oluşturmada hata oluştu: $e");
       return false;
@@ -154,14 +165,11 @@ abstract class _ViewModelBase with Store {
     }
   }
 
-  @observable
-  String? roomCode = "";
-
   @action
   Future<bool> joinRoom() async {
     try {
-      var playerModelAndRoomModel =
-          await _firebaseDatabaseService.joinRoom(roomCode!, userName!);
+      var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
+          roomModel.roomCode!, userName!);
       playerModel = playerModelAndRoomModel[0];
       //roomModeli burada set ediyoruz
       roomModel = playerModelAndRoomModel[1];
@@ -181,7 +189,7 @@ abstract class _ViewModelBase with Store {
     try {
       roomModel.roomStatus = "started";
 
-      await _firebaseDatabaseService.startGame(roomModel);
+      await _firebaseDatabaseService.updateGame(roomModel);
       return true;
     } catch (e) {
       print("Oyun başlatmada hata oluştu: $e");
@@ -217,7 +225,7 @@ abstract class _ViewModelBase with Store {
       numbersList.remove(takenNumber);
       takenNumbersList.add(takenNumber);
       roomModel.roomTakenNumber = takenNumber;
-      await _firebaseDatabaseService.takeNumber(roomModel);
+      await _firebaseDatabaseService.updateGame(roomModel);
 
       return true;
     } catch (e) {
@@ -363,11 +371,7 @@ abstract class _ViewModelBase with Store {
     print("cardNumbersList: $cardNumbersList");
     //numaraları sıralıyoruz
     cardNumbersList.sort();
-    takenNumbersMap = Map<int, bool>.fromIterable(
-      cardNumbersList,
-      key: (e) => e,
-      value: (e) => false,
-    );
+    takenNumbersMap = {for (var e in cardNumbersList) e: false};
     print("takenNumbersMap: $takenNumbersMap");
     print("sıralı: $cardNumbersList");
   }
@@ -505,11 +509,26 @@ abstract class _ViewModelBase with Store {
         default:
       }
 
-      await _firebaseDatabaseService.setWinner(roomModel);
+      await _firebaseDatabaseService.updateGame(roomModel);
 
       return true;
     } catch (e) {
       print("setWinner hata oluştu: $e");
+      return false;
+    }
+  }
+
+  @observable
+  bool isGameAutoTakeNumber = false;
+
+  @action
+  Future<bool> deleteGame() async {
+    try {
+      await _firebaseDatabaseService.deleteGame(roomModel);
+
+      return true;
+    } catch (e) {
+      print("delete game hata oluştu: $e");
       return false;
     }
   }

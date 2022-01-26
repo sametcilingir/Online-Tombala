@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
+import 'package:tombala/utils/constants/string_constants.dart';
+import 'package:tombala/utils/routes/routes.dart';
 import '../../view_models/view_model.dart';
 import '../../../utils/locator/locator.dart';
 
@@ -19,29 +23,36 @@ class _GameCardScreenState extends State<GameCardScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    SystemChrome.setPreferredOrientations([
+    /*  SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
-    ]);
+    ]);*/
 
     _viewModel.roomStream();
     _viewModel.messageStream();
 
-    _viewModel.takenNumberReaction = reaction(
-        (_) => _viewModel.takenNumber,
-        (v) =>
-            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
-              _viewModel.snackbar(
-                  Colors.amber, "Çekilen Sayı: ${_viewModel.takenNumber}"),
-            ),
-        delay: 1000);
+    if (_viewModel.roomModel.roomId == null) {
+      reaction(
+          (_) => _viewModel.roomModel.roomId,
+          (string) => string == "null"
+              ? Navigator.of(context).pushNamed(Routes.home)
+              : null);
+    }
+
+    _viewModel.takenNumberReaction =
+        reaction((_) => _viewModel.takenNumber, (v) {
+      _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+        _viewModel.snackbar(Colors.amber,
+            "${StringConstants.takenNumber} ${_viewModel.takenNumber}"),
+      );
+    }, delay: 1000);
 
     _viewModel.firstWinnerReaction = reaction(
         (_) => _viewModel.roomModel.roomFirstWinner,
         (firstWinner) =>
             _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
               _viewModel.snackbar(
-                  Colors.green, "1. Çinko yapıldı: $firstWinner"),
+                  Colors.green, "${StringConstants.theWinner1} : $firstWinner"),
             ),
         delay: 1000);
 
@@ -49,8 +60,8 @@ class _GameCardScreenState extends State<GameCardScreen> {
         (_) => _viewModel.roomModel.roomSecondWinner,
         (secondWinner) =>
             _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
-              _viewModel.snackbar(
-                  Colors.green, "2. Çinko yapıldı: $secondWinner"),
+              _viewModel.snackbar(Colors.green,
+                  "${StringConstants.theWinner2} : $secondWinner"),
             ),
         delay: 1000);
 
@@ -59,9 +70,19 @@ class _GameCardScreenState extends State<GameCardScreen> {
         (thirdWinner) =>
             _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
               _viewModel.snackbar(
-                  Colors.green, "Tombala yapıldı: $thirdWinner"),
+                  Colors.green, "${StringConstants.theWinner3} : $thirdWinner"),
             ),
         delay: 1000);
+
+//auto taş çekme yeri
+    if (_viewModel.roomModel.roomCreator == _viewModel.userName &&
+        _viewModel.isGameAutoTakeNumber &&
+        _viewModel.numbersList.isNotEmpty) {
+      Timer.periodic(
+        const Duration(seconds: 10),
+        (Timer t) => _viewModel.takeNumber(),
+      );
+    }
   }
 
   @override
@@ -93,13 +114,13 @@ class _GameCardScreenState extends State<GameCardScreen> {
                 backgroundColor: Colors.amber,
                 label: (() {
                   if (_viewModel.roomModel.roomFirstWinner == "") {
-                    return Text("Birinci Çinko İlan et");
+                    return Text(StringConstants.setWinner1);
                   } else if (_viewModel.roomModel.roomSecondWinner == "") {
-                    return Text("İkinci Çinko İlan et");
+                    return Text(StringConstants.setWinner2);
                   } else if (_viewModel.roomModel.roomThirdWinner == "") {
-                    return Text("Tombala İlan et");
+                    return Text(StringConstants.setWinner3);
                   } else {
-                    return Text("Oyun Bitti, Yeniden Oynamak İster misin?");
+                    return Text(StringConstants.wantToPlay);
                   }
                 }()),
                 icon: Icon(Icons.check),
@@ -107,11 +128,10 @@ class _GameCardScreenState extends State<GameCardScreen> {
                   if (_viewModel.roomModel.roomFirstWinner == "") {
                     bool isWin = await _viewModel.winnerControl(1);
                     if (!isWin) {
-                      print("burdayız");
                       _viewModel.gameCardScaffoldMessengerKey.currentState
                           ?.showSnackBar(
-                        _viewModel.snackbar(Colors.red,
-                            "1.Çinko Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                        _viewModel.snackbar(
+                            Colors.red, StringConstants.controlYourNumbers),
                       );
                     }
                   } else if (_viewModel.roomModel.roomSecondWinner == "") {
@@ -119,8 +139,8 @@ class _GameCardScreenState extends State<GameCardScreen> {
                     if (!isWin) {
                       _viewModel.gameCardScaffoldMessengerKey.currentState
                           ?.showSnackBar(
-                        _viewModel.snackbar(Colors.red,
-                            "2.Çinko Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                        _viewModel.snackbar(
+                            Colors.red, StringConstants.controlYourNumbers),
                       );
                     }
                   } else if (_viewModel.roomModel.roomThirdWinner == "") {
@@ -128,8 +148,8 @@ class _GameCardScreenState extends State<GameCardScreen> {
                     if (!isWin) {
                       _viewModel.gameCardScaffoldMessengerKey.currentState
                           ?.showSnackBar(
-                        _viewModel.snackbar(Colors.red,
-                            "Tombala Yapılamadı, lütfen taşlarınızı kontrol ediniz."),
+                        _viewModel.snackbar(
+                            Colors.red, StringConstants.controlYourNumbers),
                       );
                     }
                   } else {
@@ -185,157 +205,104 @@ class _GameCardScreenState extends State<GameCardScreen> {
                 )
               ],
             ),*/
-            body: Padding(
-              padding: const EdgeInsets.all(40.0),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        //color: Colors.amber,
-                        height: MediaQuery.of(context).size.height * 0.6,
-                        width: MediaQuery.of(context).size.width,
-                        child: GridView.builder(
-                          //listeyi canlı tutar
-                          addAutomaticKeepAlives: true,
-                          addRepaintBoundaries: true,
+            body: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    gameCardWidget(context),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => gameTableWidget(_viewModel),
+                        );
+                      },
+                      child: Text(StringConstants.showGameTable),
+                    ),
+                    !_viewModel.isGameAutoTakeNumber
+                        ? OutlinedButton(
+                            onPressed: () async {
+                              if (_viewModel
+                                  .roomModel.roomThirdWinner!.isEmpty) {
+                                await _viewModel.takeNumber();
 
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 27,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisExtent:
-                                MediaQuery.of(context).size.width / 10.5,
-                          ),
-                          itemBuilder: (context, index) => index.floor().isEven
-                              ? Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: _viewModel.randomColor,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(20))),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: Ink(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: _viewModel.randomColor),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20)),
-                                      ),
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20)),
-                                        focusColor: Colors.green[100],
-                                        splashColor: Colors.green[100],
-                                        hoverColor: Colors.green[100],
-                                        highlightColor: Colors.green[100],
-                                        onTap: () {
-                                          if (_viewModel
-                                              .takenNumbersListFromDatabase
-                                              .contains(
-                                                  _viewModel.cardNumbersList[
-                                                      index ~/ 2])) {
-                                            _viewModel.takenNumbersMap.update(
-                                                _viewModel.cardNumbersList[
-                                                    index ~/ 2],
-                                                (value) => true);
-
-                                            setState(() {});
-                                            print("Bu sayı çekilmiş");
-                                          }
-                                        },
-                                        child: Center(
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Container(
-                                                height: 60,
-                                                width: 60,
-                                                decoration: BoxDecoration(
-                                                  color: _viewModel
-                                                              .takenNumbersMap[
-                                                          _viewModel
-                                                                  .cardNumbersList[
-                                                              index ~/ 2]]!
-                                                      ? Colors.green.shade100
-                                                          .withOpacity(0.3)
-                                                      : Colors.transparent,
-                                                  border: Border.all(
-                                                    width: 4,
-                                                    color: _viewModel
-                                                                .takenNumbersMap[
-                                                            _viewModel
-                                                                    .cardNumbersList[
-                                                                index ~/ 2]]!
-                                                        ? Colors.green.shade200
-                                                        : Colors.transparent,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(40)),
-                                                ),
-                                              ),
-                                              Text(
-                                                _viewModel
-                                                    .cardNumbersList[index ~/ 2]
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  color: _viewModel.randomColor,
-                                                  fontSize: 28,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : blankWidget(index),
+                                /*  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.NO_HEADER,
+                    animType: AnimType.SCALE,
+                    autoHide: Duration(seconds: 5),
+                    dialogBackgroundColor: Colors.green,
+                    body: Container(
+                      height: 200,
+                      width: 150,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              _viewModel.takenNumber.toString(),
+                              style: TextStyle(fontSize: 42),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'Çekilen sayi',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _viewModel.roomModel.roomFirstWinner!.isNotEmpty
-                          ? Text(
-                              "İlk çinkoyu yapan kişi : ${_viewModel.roomModel.roomFirstWinner}")
-                          : SizedBox(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _viewModel.roomModel.roomSecondWinner!.isNotEmpty
-                          ? Text(
-                              "İkinci çinkoyu yapan kişi : ${_viewModel.roomModel.roomSecondWinner}")
-                          : SizedBox(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _viewModel.roomModel.roomThirdWinner!.isNotEmpty
-                          ? Text(
-                              "Bingo yapan kişi : ${_viewModel.roomModel.roomThirdWinner}")
-                          : SizedBox(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
+                    ),
+                  ).show();*/
+                              } else {
+                                //Navigator.of(context).popUntil((route) => route.isFirst);
+
+                              }
+                            },
+                            child: Text("Taş Çek"),
+                          )
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _viewModel.roomModel.roomFirstWinner!.isNotEmpty
+                        ? Text(
+                            "${StringConstants.theWinner1} : ${_viewModel.roomModel.roomFirstWinner}")
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _viewModel.roomModel.roomSecondWinner!.isNotEmpty
+                        ? Text(
+                            "${StringConstants.theWinner2} : ${_viewModel.roomModel.roomSecondWinner}")
+                        : SizedBox(),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    _viewModel.roomModel.roomThirdWinner!.isNotEmpty
+                        ? Text(
+                            "${StringConstants.theWinner3} : ${_viewModel.roomModel.roomThirdWinner}")
+                        : SizedBox(),
+                    SizedBox(
+                      height: 200,
+                    ),
+                  ],
                 ),
               ),
             ),
             bottomSheet: AnimatedContainer(
               alignment: Alignment.bottomCenter,
               color: Colors.black54,
-              height: _viewModel.isChatOpen! ? 350 : 50,
+              height: _viewModel.isChatOpen! ? 550 : 50,
               width: MediaQuery.of(context).size.width,
               duration: Duration(milliseconds: 500),
               child: _viewModel.isChatOpen!
@@ -354,7 +321,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                             ),
                           ),
                           Container(
-                            height: 210,
+                            height: 400,
                             color: Colors.black12,
                             child: ListView.builder(
                               itemCount: _viewModel.messageList!.length,
@@ -395,7 +362,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                                   decoration: InputDecoration(
                                     floatingLabelBehavior:
                                         FloatingLabelBehavior.always,
-                                    hintText: "Mesaj ",
+                                    hintText: StringConstants.message,
                                     fillColor: Colors.green,
                                     border: OutlineInputBorder(
                                       borderSide: BorderSide(
@@ -427,7 +394,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                                           }
                                         }
                                       },
-                                      child: Text("Gönder"),
+                                      child: Text(StringConstants.send),
                                     ),
                                   ),
                                   validator: (val) {
@@ -458,7 +425,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Chat",
+                            StringConstants.chat,
                             style: TextStyle(fontSize: 16, color: Colors.green),
                           ),
                           IconButton(
@@ -480,14 +447,146 @@ class _GameCardScreenState extends State<GameCardScreen> {
     );
   }
 
+  Widget gameCardWidget(BuildContext context) {
+    return Container(
+      width: 400,
+      child: GridView.builder(
+        //listeyi canlı tutar
+        addAutomaticKeepAlives: true,
+        addRepaintBoundaries: true,
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        itemCount: 27,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisSpacing: 5,
+          mainAxisSpacing: 5,
+          crossAxisCount: 3,
+          childAspectRatio: 1.7,
+        ),
+        itemBuilder: (context, index) => index.floor().isEven
+            ? Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _viewModel.randomColor,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: _viewModel.randomColor),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      focusColor: Colors.green[100],
+                      splashColor: Colors.green[100],
+                      hoverColor: Colors.green[100],
+                      highlightColor: Colors.green[100],
+                      onTap: () {
+                        if (_viewModel.takenNumbersListFromDatabase
+                            .contains(_viewModel.cardNumbersList[index ~/ 2])) {
+                          _viewModel.takenNumbersMap.update(
+                              _viewModel.cardNumbersList[index ~/ 2],
+                              (value) => true);
+
+                          setState(() {});
+                        }
+                      },
+                      child: Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                color: _viewModel.takenNumbersMap[
+                                        _viewModel.cardNumbersList[index ~/ 2]]!
+                                    ? Colors.green.shade100.withOpacity(0.3)
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  width: 4,
+                                  color: _viewModel.takenNumbersMap[_viewModel
+                                          .cardNumbersList[index ~/ 2]]!
+                                      ? Colors.green.shade200
+                                      : Colors.transparent,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(40)),
+                              ),
+                            ),
+                            Text(
+                              _viewModel.cardNumbersList[index ~/ 2].toString(),
+                              style: TextStyle(
+                                color: _viewModel.randomColor,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : blankWidget(index),
+      ),
+    );
+  }
+
   Widget blankWidget(int index) {
     return Container(
-      height: 40,
-      width: 40,
       decoration: BoxDecoration(
           color: _viewModel.randomColor,
           border: Border.all(color: Colors.white),
           borderRadius: BorderRadius.all(Radius.circular(20))),
+    );
+  }
+
+  Widget gameTableWidget(ViewModel viewModel) {
+    return GridView.builder(
+      padding: EdgeInsets.all(0),
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: MediaQuery.of(context).size.height / 8),
+      itemCount: 99,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(3.0),
+          child: Container(
+            height: 20,
+            width: 20,
+            decoration: BoxDecoration(
+              color: //_viewModel.allNumbersListDatabase
+                  // .contains(_viewModel.allNumbersListTable[index])
+
+                  (() {
+                if (_viewModel.roomModel.roomCreator == _viewModel.userName) {
+                 return _viewModel.takenNumbersList.contains(index + 1)
+                      ? Colors.green
+                      : Colors.red;
+                } else {
+                 return _viewModel.takenNumbersListFromDatabase.contains(index + 1)
+                      ? Colors.green
+                      : Colors.red;
+                }
+              }()),
+              border: Border.all(
+                color: Colors.white,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: Center(
+              child: Text("${index + 1}",
+                  style: Theme.of(context).textTheme.headline5),
+            ),
+          ),
+        );
+      },
     );
   }
 }

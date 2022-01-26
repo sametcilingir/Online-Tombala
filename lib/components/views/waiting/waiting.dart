@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
+import 'package:tombala/utils/constants/string_constants.dart';
+import 'package:tombala/utils/routes/routes.dart';
 import '../../view_models/view_model.dart';
 import '../../../utils/locator/locator.dart';
 
@@ -18,16 +20,29 @@ class _WaitingScreenState extends State<WaitingScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _viewModel.createGameCard();
+
     _viewModel.roomStream();
     _viewModel.playersStream();
     _viewModel.messageStream();
 
+    if (_viewModel.roomModel.roomId == null) {
+      
+      reaction(
+          (_) => _viewModel.roomModel.roomId,
+          (string) => string == "null"
+              ? Navigator.of(context).pushNamed(Routes.home)
+              : null);
+    }
+
     if (_viewModel.roomModel.roomCreator != _viewModel.userName) {
       //burdaki navigatipn her şeyi değiştiriyor
+      //reaktion dispose ekle
       reaction(
           (_) => _viewModel.roomModel.roomStatus,
           (string) => string == "started"
-              ? Navigator.pushNamed(context, '/home/game_card')
+              ? Navigator.pushNamed(context, Routes.gameCard)
               : null);
     }
   }
@@ -51,11 +66,12 @@ class _WaitingScreenState extends State<WaitingScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: OutlinedButton.icon(
                               onPressed: () async {
-                                //await _viewModel.deleteGame();
-                                //Navigator.of(context).popAndPushNamed("/home");
+                                await _viewModel.deleteGame();
+                                Navigator.of(context)
+                                    .popAndPushNamed(Routes.home);
                               },
                               icon: Icon(Icons.close),
-                              label: Text("Oyunu Sil"),
+                              label: Text(StringConstants.deleteGame),
                             ),
                           )
                         : SizedBox(),
@@ -67,7 +83,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   ),
                 ),
                 Text(
-                  "Oyun kodu: ${_viewModel.roomModel.roomCode}",
+                  "${StringConstants.gameCode}: ${_viewModel.roomModel.roomCode}",
                   style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 20),
@@ -86,7 +102,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(children: [
-                      Text("Oyuncular", style: TextStyle(fontSize: 35)),
+                      Text(StringConstants.players,
+                          style: TextStyle(fontSize: 35)),
                       SizedBox(height: 20),
                       SingleChildScrollView(
                         child: Container(
@@ -107,8 +124,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                 subtitle: Text(
                                   _viewModel.playersList![index].userStatus ==
                                           true
-                                      ? "Oyuncu Hazır"
-                                      : "Oyuncu Hazır Değil",
+                                      ? StringConstants.playersReady
+                                      : StringConstants.playersNotReady,
                                   style: TextStyle(fontSize: 15),
                                 ),
                                 trailing:
@@ -132,66 +149,93 @@ class _WaitingScreenState extends State<WaitingScreen> {
                 ),
                 SizedBox(height: 20),
                 _viewModel.roomModel.roomCreator == _viewModel.userName
-                    ? ElevatedButton(
-                        onPressed: () async {
-                          bool isGameStarted = await _viewModel.startGame();
-                          if (isGameStarted) {
-                            Navigator.of(context).pushNamed('/home/game_table');
-                          }
-                        },
-                        child: Text(
-                          "Oyunu Başlat",
-                          style: Theme.of(context).textTheme.button,
-                        ),
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                StringConstants.autoTakeNumber,
+                              ),
+                              Switch(
+                                  value: _viewModel.isGameAutoTakeNumber,
+                                  onChanged: (value) {
+                                    _viewModel.isGameAutoTakeNumber = value;
+                                  }),
+                            ],
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              bool isGameStarted = await _viewModel.startGame();
+                              if (isGameStarted) {
+                                //Navigator.of(context).pushNamed('/home/game_table');
+                                Navigator.pushNamed(context, Routes.gameCard);
+                              }
+                            },
+                            child: Text(
+                              StringConstants.startGame,
+                              style: Theme.of(context).textTheme.button,
+                            ),
+                          ),
+                        ],
                       )
-                    : Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
+                    : SizedBox(),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                          ? Container(
                               height: 25,
                               width: 25,
                               child: CircularProgressIndicator(),
+                            )
+                          : SizedBox(),
+                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                          ? SizedBox(height: 20)
+                          : SizedBox(),
+                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                          ? Text(
+                              "${_viewModel.roomModel.roomCreator} ${StringConstants.waitingToStart}",
+                              style: TextStyle(fontSize: 16))
+                          : SizedBox(),
+                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                          ? SizedBox(height: 20)
+                          : SizedBox(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    width: 1,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                              ),
+                              onPressed: () async {
+                                await _viewModel.setPlayerStatus(false);
+                              },
+                              child: Text(
+                                StringConstants.notReady,
+                                style: Theme.of(context).textTheme.button,
+                              )),
+                          SizedBox(width: 20),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await _viewModel.setPlayerStatus(true);
+                            },
+                            child: Text(
+                              StringConstants.ready,
+                              style: Theme.of(context).textTheme.button,
                             ),
-                            SizedBox(height: 20),
-                            Text(
-                                "${_viewModel.roomModel.roomCreator} başlatması bekleniyor...",
-                                style: TextStyle(fontSize: 16)),
-                            SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                          width: 1,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary),
-                                    ),
-                                    onPressed: () async {
-                                      await _viewModel.setPlayerStatus(false);
-                                    },
-                                    child: Text(
-                                      'Hazır Değilim',
-                                      style: Theme.of(context).textTheme.button,
-                                    )),
-                                SizedBox(width: 20),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    await _viewModel.setPlayerStatus(true);
-                                  },
-                                  child: Text(
-                                    'Hazırım',
-                                    style: Theme.of(context).textTheme.button,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                    ],
+                  ),
+                ),
                 SizedBox(
                   height: 100,
                 ),
@@ -260,7 +304,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                               decoration: InputDecoration(
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
-                                hintText: "Mesaj ",
+                                hintText: StringConstants.message,
                                 fillColor: Colors.green,
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -289,7 +333,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                       }
                                     }
                                   },
-                                  child: Text("Gönder"),
+                                  child: Text(StringConstants.send),
                                 ),
                               ),
                               validator: (val) {
@@ -320,7 +364,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Chat",
+                        StringConstants.chat,
                         style: TextStyle(fontSize: 16, color: Colors.green),
                       ),
                       IconButton(

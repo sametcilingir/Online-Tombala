@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../components/models/message/message_model.dart';
 import '../../components/models/player/player_model.dart';
 import '../../components/models/room/room_model.dart';
+import 'database_service.dart';
 
-class FirebaseDatabaseService {
+class FirebaseDatabaseService implements DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   //  "takenNumbersList": FieldValue.arrayUnion([]),
@@ -76,37 +78,25 @@ class FirebaseDatabaseService {
     }
   }
 
-  Future<void> startGame(RoomModel roomModel) async {
+  Future<void> updateGame(RoomModel roomModel) async {
     await _firestore
         .collection("rooms")
         .doc(roomModel.roomId)
         .update(roomModel.toJson());
   }
 
-  Future<void> takeNumber(RoomModel roomModel) async {
-    await _firestore
-        .collection("rooms")
-        .doc(
-          roomModel.roomId,
-        )
-        .update(roomModel.toJson());
-  }
+
 
   Future<void> deleteGame(RoomModel roomModel) async {
-    await _firestore
-        .collection("rooms")
-        .doc(
-          roomModel.roomId,
-        )
-        .delete();
+    await _firestore.collection("rooms").doc(roomModel.roomId).delete();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(
       RoomModel roomModel) {
     final messagesList = _firestore
-        .collection("messages")
+        .collection("rooms")
         .doc(roomModel.roomId)
-        .collection("chatMessages")
+        .collection("messages")
         .orderBy("messageSentTime", descending: true)
         .snapshots();
 
@@ -116,25 +106,17 @@ class FirebaseDatabaseService {
   Future<bool> sendMessage(
       RoomModel roomModel, MessageModel messageModel) async {
     var documentRef = _firestore
-        .collection("messages")
+        .collection("rooms")
         .doc(roomModel.roomId)
-        .collection("chatMessages")
+        .collection("messages")
         .doc();
 
     await documentRef.set(
       messageModel.toJson(),
     );
-   
+
     return true;
   }
 
 
-  Future<void> setWinner(RoomModel roomModel) async {
-    await _firestore
-        .collection("rooms")
-        .doc(
-          roomModel.roomId,
-        )
-        .update(roomModel.toJson());
-  }
 }

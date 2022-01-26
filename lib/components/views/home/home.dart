@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tombala/utils/constants/string_constants.dart';
+import 'package:tombala/utils/routes/routes.dart';
 import '../../view_models/view_model.dart';
 import '../../../utils/locator/locator.dart';
 
@@ -13,7 +15,7 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           elevation: 0,
           title: Text(
-            'Tombala',
+            'Online Tomabala',
             style: Theme.of(context).textTheme.headline5,
           ),
           centerTitle: true,
@@ -55,7 +57,7 @@ class LoginFormWidget extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              color: Colors.amber,
+              color: Colors.transparent,
               height: 300,
             ),
             SizedBox(
@@ -64,7 +66,7 @@ class LoginFormWidget extends StatelessWidget {
             TextFormField(
               decoration: InputDecoration(
                 hintText: "",
-                labelText: 'Kullanici Adi ',
+                labelText: StringConstants.textFieldUserName,
                 border: OutlineInputBorder(),
               ),
               onSaved: (newValue) {
@@ -72,7 +74,7 @@ class LoginFormWidget extends StatelessWidget {
               },
               validator: (value) {
                 if (value == "") {
-                  return 'Kullanici Adi bos olamaz';
+                  return StringConstants.textFieldError;
                 }
                 return null;
               },
@@ -84,24 +86,22 @@ class LoginFormWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                          width: 1,
-                          color: Theme.of(context).colorScheme.primary),
-                    ),
+                            
                     onPressed: () async {
                       var val =
                           _viewModel.formKeyUserName.currentState!.validate();
                       if (val) {
                         _viewModel.formKeyUserName.currentState!.save();
 
-                        final isRoomCreated = await _viewModel.createRoom();
+                        bool isRoomCreated = await _viewModel.createRoom();
+
                         if (isRoomCreated) {
-                          Navigator.of(context).pushNamed("/home/waiting_room");
+                          //_viewModel.createGameCard();
+                          Navigator.of(context).pushNamed(Routes.waitingRoom);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Oda olusturulamadi'),
+                              content: Text(StringConstants.cantCreateRoom),
                             ),
                           );
                         }
@@ -127,7 +127,7 @@ class LoginFormWidget extends StatelessWidget {
                     }
                   },
                   child: Text(
-                    'Odaya gir',
+                    StringConstants.joinRoom,
                     style: Theme.of(context).textTheme.button,
                   ),
                 ),
@@ -170,7 +170,7 @@ class JoinFormWidget extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    color: Colors.amber,
+                    color: Colors.transparent,
                     height: 300,
                   ),
                   SizedBox(
@@ -180,11 +180,11 @@ class JoinFormWidget extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: '',
-                      labelText: 'Oda Numarasi',
+                      labelText: StringConstants.gameCode,
                       border: OutlineInputBorder(),
                     ),
                     onSaved: (newValue) {
-                      _viewModel.roomCode = newValue!;
+                      _viewModel.roomModel.roomCode = newValue!;
                       //kavyeyi kapatıyor
                       FocusManager.instance.primaryFocus?.unfocus();
                     },
@@ -196,20 +196,20 @@ class JoinFormWidget extends StatelessWidget {
                       onPressed: () async {
                         _viewModel.formKeyJoin.currentState!.save();
 
-                        bool createJointProcces = await _viewModel.joinRoom();
-                        if (createJointProcces) {
-                          _viewModel.createGameCard();
-                          Navigator.of(context).pushNamed('/home/waiting_room');
+                        final isJoined = await _viewModel.joinRoom();
+                        if (isJoined) {
+                          //_viewModel.createGameCard();
+                          Navigator.of(context).pushNamed(Routes.waitingRoom);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Oda girme islemi basarisiz'),
+                              content: Text(StringConstants.cantJoinRoom),
                             ),
                           );
                         }
                       },
                       child: Text(
-                        'Odaya gir',
+                        StringConstants.joinRoom,
                         style: Theme.of(context).textTheme.button,
                       )),
                   TextButton(
@@ -221,7 +221,7 @@ class JoinFormWidget extends StatelessWidget {
                       );
                     },
                     child: Text(
-                      'Geri',
+                      StringConstants.back,
                       style: Theme.of(context).textTheme.button,
                     ),
                   ),

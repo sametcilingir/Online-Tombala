@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tombala/components/views/game_card/game_card.dart';
-import 'package:tombala/components/views/home/home.dart';
-import 'package:tombala/components/views/waiting/waiting.dart';
+import '../../components/views/game_card/game_card.dart';
+import '../../components/views/home/home.dart';
+import '../../components/views/waiting/waiting.dart';
 
 class Routes {
   static const String home = '/home';

@@ -1,31 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:tombala/utils/constants/string_constants.dart';
-import 'package:tombala/utils/routes/routes.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:tombala/components/widgets/snack_bar.dart';
+import '../../../utils/routes/routes.dart';
 import '../../view_models/view_model.dart';
 import '../../../utils/locator/locator.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final ViewModel _viewModel = locator<ViewModel>();
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final ViewModel _viewModel = locator<ViewModel>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+   
     return Scaffold(
         appBar: AppBar(
+          leading: Observer(builder: (_) {
+            return TextButton(
+              child: Text(_viewModel.isENLocal ? "TR" : "EN"),
+              onPressed: () {
+                _viewModel.isENLocal = !_viewModel.isENLocal;
+              },
+            );
+          }),
           elevation: 0,
           title: Text(
             'Online Tomabala',
             style: Theme.of(context).textTheme.headline5,
           ),
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: Icon(
+                  _viewModel.isDarkModel ? Icons.dark_mode : Icons.light_mode),
+              onPressed: () {
+                _viewModel.isDarkModel = !_viewModel.isDarkModel;
+              },
+            ),
+          ],
         ),
         body: Center(
           child: Container(
             width: 400,
             child: PageView(
               allowImplicitScrolling: true,
-              controller: _viewModel.pageController,
+              controller: _viewModel.homePageController,
               //allowImplicitScrolling: false,
               physics: const NeverScrollableScrollPhysics(),
               children: [
@@ -66,15 +96,15 @@ class LoginFormWidget extends StatelessWidget {
             TextFormField(
               decoration: InputDecoration(
                 hintText: "",
-                labelText: StringConstants.textFieldUserName,
+                labelText: AppLocalizations.of(context)!.textFieldUserName,
                 border: OutlineInputBorder(),
               ),
               onSaved: (newValue) {
-                _viewModel.userName = newValue!;
+                _viewModel.playerModel.userName = newValue!;
               },
               validator: (value) {
                 if (value == "") {
-                  return StringConstants.textFieldError;
+                  return AppLocalizations.of(context)!.textFieldError;
                 }
                 return null;
               },
@@ -86,7 +116,6 @@ class LoginFormWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 OutlinedButton(
-                            
                     onPressed: () async {
                       var val =
                           _viewModel.formKeyUserName.currentState!.validate();
@@ -100,15 +129,16 @@ class LoginFormWidget extends StatelessWidget {
                           Navigator.of(context).pushNamed(Routes.waitingRoom);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(StringConstants.cantCreateRoom),
-                            ),
-                          );
+                              SnackBarWidget(
+                                      color: Colors.red,
+                                      message: AppLocalizations.of(context)!
+                                          .cantCreateRoom)
+                                  .snackBar);
                         }
                       }
                     },
                     child: Text(
-                      'Oda Oluştur',
+                      AppLocalizations.of(context)!.createRoom,
                       style: Theme.of(context).textTheme.button,
                     )),
                 SizedBox(height: 20),
@@ -119,7 +149,7 @@ class LoginFormWidget extends StatelessWidget {
                     if (val) {
                       _viewModel.formKeyUserName.currentState!.save();
 
-                      _viewModel.pageController.animateToPage(
+                      _viewModel.homePageController.animateToPage(
                         1,
                         duration: Duration(milliseconds: 500),
                         curve: Curves.easeIn,
@@ -127,7 +157,7 @@ class LoginFormWidget extends StatelessWidget {
                     }
                   },
                   child: Text(
-                    StringConstants.joinRoom,
+                    AppLocalizations.of(context)!.joinRoom,
                     style: Theme.of(context).textTheme.button,
                   ),
                 ),
@@ -153,7 +183,7 @@ class JoinFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () => Future.sync(() {
-        _viewModel.pageController.animateToPage(
+        _viewModel.homePageController.animateToPage(
           0,
           duration: Duration(milliseconds: 500),
           curve: Curves.easeIn,
@@ -180,7 +210,7 @@ class JoinFormWidget extends StatelessWidget {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: '',
-                      labelText: StringConstants.gameCode,
+                      labelText: AppLocalizations.of(context)!.gameCode,
                       border: OutlineInputBorder(),
                     ),
                     onSaved: (newValue) {
@@ -201,27 +231,27 @@ class JoinFormWidget extends StatelessWidget {
                           //_viewModel.createGameCard();
                           Navigator.of(context).pushNamed(Routes.waitingRoom);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(StringConstants.cantJoinRoom),
-                            ),
-                          );
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBarWidget(
+                            color: Colors.red,
+                            message: AppLocalizations.of(context)!.cantJoinRoom,
+                          ).snackBar);
                         }
                       },
                       child: Text(
-                        StringConstants.joinRoom,
+                        AppLocalizations.of(context)!.joinRoom,
                         style: Theme.of(context).textTheme.button,
                       )),
                   TextButton(
                     onPressed: () {
-                      _viewModel.pageController.animateToPage(
+                      _viewModel.homePageController.animateToPage(
                         0,
                         duration: Duration(milliseconds: 500),
                         curve: Curves.easeIn,
                       );
                     },
                     child: Text(
-                      StringConstants.back,
+                      AppLocalizations.of(context)!.back,
                       style: Theme.of(context).textTheme.button,
                     ),
                   ),

@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:tombala/utils/routes/routes.dart';
+import '../routes/routes.dart';
 
 import '../../components/view_models/view_model.dart';
 import '../../components/views/game_card/game_card.dart';

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tombala/components/models/message/message_model.dart';
-import 'package:tombala/components/models/player/player_model.dart';
-import 'package:tombala/components/models/room/room_model.dart';
+import '../../components/models/message/message_model.dart';
+import '../../components/models/player/player_model.dart';
+import '../../components/models/room/room_model.dart';
 
 abstract class DatabaseService {
   Future<String?> createRoom(RoomModel roomModel);

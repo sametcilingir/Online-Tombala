@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tombala/utils/constants/string_constants.dart';
-import 'package:tombala/utils/routes/routes.dart';
+import '../../../utils/routes/routes.dart';
 import '../../view_models/view_model.dart';
 import '../../../utils/locator/locator.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WaitingScreen extends StatefulWidget {
   const WaitingScreen({Key? key}) : super(key: key);
@@ -28,7 +28,6 @@ class _WaitingScreenState extends State<WaitingScreen> {
     _viewModel.messageStream();
 
     if (_viewModel.roomModel.roomId == null) {
-      
       reaction(
           (_) => _viewModel.roomModel.roomId,
           (string) => string == "null"
@@ -36,7 +35,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
               : null);
     }
 
-    if (_viewModel.roomModel.roomCreator != _viewModel.userName) {
+    if (_viewModel.roomModel.roomCreator != _viewModel.playerModel.userName) {
       //burdaki navigatipn her şeyi değiştiriyor
       //reaktion dispose ekle
       reaction(
@@ -61,7 +60,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   actions: [
-                    _viewModel.roomModel.roomCreator == _viewModel.userName
+                    _viewModel.roomModel.roomCreator ==
+                            _viewModel.playerModel.userName
                         ? Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: OutlinedButton.icon(
@@ -71,7 +71,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                     .popAndPushNamed(Routes.home);
                               },
                               icon: Icon(Icons.close),
-                              label: Text(StringConstants.deleteGame),
+                              label: Text(
+                                  AppLocalizations.of(context)!.deleteGame),
                             ),
                           )
                         : SizedBox(),
@@ -83,7 +84,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   ),
                 ),
                 Text(
-                  "${StringConstants.gameCode}: ${_viewModel.roomModel.roomCode}",
+                  "${AppLocalizations.of(context)!.gameCode}: ${_viewModel.roomModel.roomCode}",
                   style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 20),
@@ -102,7 +103,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(children: [
-                      Text(StringConstants.players,
+                      Text(AppLocalizations.of(context)!.players,
                           style: TextStyle(fontSize: 35)),
                       SizedBox(height: 20),
                       SingleChildScrollView(
@@ -124,8 +125,10 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                 subtitle: Text(
                                   _viewModel.playersList![index].userStatus ==
                                           true
-                                      ? StringConstants.playersReady
-                                      : StringConstants.playersNotReady,
+                                      ? AppLocalizations.of(context)!
+                                          .playersReady
+                                      : AppLocalizations.of(context)!
+                                          .playersNotReady,
                                   style: TextStyle(fontSize: 15),
                                 ),
                                 trailing:
@@ -148,7 +151,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                _viewModel.roomModel.roomCreator == _viewModel.userName
+                _viewModel.roomModel.roomCreator ==
+                        _viewModel.playerModel.userName
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -156,7 +160,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                StringConstants.autoTakeNumber,
+                                AppLocalizations.of(context)!.autoTakeNumber,
                               ),
                               Switch(
                                   value: _viewModel.isGameAutoTakeNumber,
@@ -165,19 +169,38 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                   }),
                             ],
                           ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              bool isGameStarted = await _viewModel.startGame();
-                              if (isGameStarted) {
-                                //Navigator.of(context).pushNamed('/home/game_table');
-                                Navigator.pushNamed(context, Routes.gameCard);
-                              }
-                            },
-                            child: Text(
-                              StringConstants.startGame,
-                              style: Theme.of(context).textTheme.button,
-                            ),
-                          ),
+                          _viewModel.roomModel.roomStatus != "started"
+                              ? ElevatedButton(
+                                  onPressed: () async {
+                                    bool isGameStarted =
+                                        await _viewModel.startGame();
+                                    if (isGameStarted) {
+                                      //Navigator.of(context).pushNamed('/home/game_table');
+                                      Navigator.pushNamed(
+                                          context, Routes.gameCard);
+                                    }
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context)!.startGame,
+                                    style: Theme.of(context).textTheme.button,
+                                  ),
+                                )
+                              : Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(AppLocalizations.of(context)!
+                                          .isAlreadyStarted),
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text(
+                                              AppLocalizations.of(context)!
+                                                  .back)),
+                                    ],
+                                  ),
+                                ),
                         ],
                       )
                     : SizedBox(),
@@ -186,22 +209,26 @@ class _WaitingScreenState extends State<WaitingScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                      _viewModel.roomModel.roomCreator !=
+                              _viewModel.playerModel.userName
                           ? Container(
                               height: 25,
                               width: 25,
                               child: CircularProgressIndicator(),
                             )
                           : SizedBox(),
-                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                      _viewModel.roomModel.roomCreator !=
+                              _viewModel.playerModel.userName
                           ? SizedBox(height: 20)
                           : SizedBox(),
-                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                      _viewModel.roomModel.roomCreator !=
+                              _viewModel.playerModel.userName
                           ? Text(
-                              "${_viewModel.roomModel.roomCreator} ${StringConstants.waitingToStart}",
+                              "${_viewModel.roomModel.roomCreator} ${AppLocalizations.of(context)!.waitingToStart}",
                               style: TextStyle(fontSize: 16))
                           : SizedBox(),
-                      _viewModel.roomModel.roomCreator != _viewModel.userName
+                      _viewModel.roomModel.roomCreator !=
+                              _viewModel.playerModel.userName
                           ? SizedBox(height: 20)
                           : SizedBox(),
                       Row(
@@ -218,7 +245,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                 await _viewModel.setPlayerStatus(false);
                               },
                               child: Text(
-                                StringConstants.notReady,
+                                AppLocalizations.of(context)!.notReady,
                                 style: Theme.of(context).textTheme.button,
                               )),
                           SizedBox(width: 20),
@@ -227,7 +254,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                               await _viewModel.setPlayerStatus(true);
                             },
                             child: Text(
-                              StringConstants.ready,
+                              AppLocalizations.of(context)!.ready,
                               style: Theme.of(context).textTheme.button,
                             ),
                           ),
@@ -304,7 +331,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                               decoration: InputDecoration(
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
-                                hintText: StringConstants.message,
+                                hintText: AppLocalizations.of(context)!.message,
                                 fillColor: Colors.green,
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
@@ -318,7 +345,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                         .formKeyMessageWaiting.currentState!
                                         .validate();
                                     if (val &&
-                                        _viewModel.singleMessage!.isNotEmpty) {
+                                        _viewModel.messageModel.messageText!
+                                            .isNotEmpty) {
                                       _viewModel
                                           .formKeyMessageWaiting.currentState!
                                           .save();
@@ -327,13 +355,15 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                           await _viewModel.sendMessage();
 
                                       if (isMassageSent) {
-                                        _viewModel.singleMessage = "";
+                                        _viewModel.messageModel.messageText =
+                                            "";
                                         _viewModel.messageControllerWaiting!
                                             .clear();
                                       }
                                     }
                                   },
-                                  child: Text(StringConstants.send),
+                                  child:
+                                      Text(AppLocalizations.of(context)!.send),
                                 ),
                               ),
                               validator: (val) {
@@ -346,7 +376,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                                 }
                               },
                               onChanged: (value) {
-                                _viewModel.singleMessage = value;
+                                _viewModel.messageModel.messageText = value;
                               },
                               /* onSaved: (newValue) {
                                   _viewModel.singleMessage = newValue;
@@ -364,7 +394,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        StringConstants.chat,
+                        AppLocalizations.of(context)!.chat,
                         style: TextStyle(fontSize: 16, color: Colors.green),
                       ),
                       IconButton(

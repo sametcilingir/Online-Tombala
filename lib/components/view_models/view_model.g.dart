@@ -9,6 +9,65 @@ part of 'view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ViewModel on _ViewModelBase, Store {
+  Computed<ThemeData>? _$appThemeComputed;
+
+  @override
+  ThemeData get appTheme =>
+      (_$appThemeComputed ??= Computed<ThemeData>(() => super.appTheme,
+              name: '_ViewModelBase.appTheme'))
+          .value;
+  Computed<Locale>? _$localeComputed;
+
+  @override
+  Locale get locale => (_$localeComputed ??=
+          Computed<Locale>(() => super.locale, name: '_ViewModelBase.locale'))
+      .value;
+
+  final _$isDarkModelAtom = Atom(name: '_ViewModelBase.isDarkModel');
+
+  @override
+  bool get isDarkModel {
+    _$isDarkModelAtom.reportRead();
+    return super.isDarkModel;
+  }
+
+  @override
+  set isDarkModel(bool value) {
+    _$isDarkModelAtom.reportWrite(value, super.isDarkModel, () {
+      super.isDarkModel = value;
+    });
+  }
+
+  final _$isENLocalAtom = Atom(name: '_ViewModelBase.isENLocal');
+
+  @override
+  bool get isENLocal {
+    _$isENLocalAtom.reportRead();
+    return super.isENLocal;
+  }
+
+  @override
+  set isENLocal(bool value) {
+    _$isENLocalAtom.reportWrite(value, super.isENLocal, () {
+      super.isENLocal = value;
+    });
+  }
+
+  final _$viewStateAtom = Atom(name: '_ViewModelBase.viewState');
+
+  @override
+  ViewState get viewState {
+    _$viewStateAtom.reportRead();
+    return super.viewState;
+  }
+
+  @override
+  set viewState(ViewState value) {
+    _$viewStateAtom.reportWrite(value, super.viewState, () {
+      super.viewState = value;
+    });
+  }
+
   final _$formKeyUserNameAtom = Atom(name: '_ViewModelBase.formKeyUserName');
 
   @override
@@ -39,33 +98,19 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$pageControllerAtom = Atom(name: '_ViewModelBase.pageController');
+  final _$homePageControllerAtom =
+      Atom(name: '_ViewModelBase.homePageController');
 
   @override
-  PageController get pageController {
-    _$pageControllerAtom.reportRead();
-    return super.pageController;
+  PageController get homePageController {
+    _$homePageControllerAtom.reportRead();
+    return super.homePageController;
   }
 
   @override
-  set pageController(PageController value) {
-    _$pageControllerAtom.reportWrite(value, super.pageController, () {
-      super.pageController = value;
-    });
-  }
-
-  final _$userNameAtom = Atom(name: '_ViewModelBase.userName');
-
-  @override
-  String? get userName {
-    _$userNameAtom.reportRead();
-    return super.userName;
-  }
-
-  @override
-  set userName(String? value) {
-    _$userNameAtom.reportWrite(value, super.userName, () {
-      super.userName = value;
+  set homePageController(PageController value) {
+    _$homePageControllerAtom.reportWrite(value, super.homePageController, () {
+      super.homePageController = value;
     });
   }
 
@@ -81,6 +126,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
   set roomModel(RoomModel value) {
     _$roomModelAtom.reportWrite(value, super.roomModel, () {
       super.roomModel = value;
+    });
+  }
+
+  final _$playerModelAtom = Atom(name: '_ViewModelBase.playerModel');
+
+  @override
+  PlayerModel get playerModel {
+    _$playerModelAtom.reportRead();
+    return super.playerModel;
+  }
+
+  @override
+  set playerModel(PlayerModel value) {
+    _$playerModelAtom.reportWrite(value, super.playerModel, () {
+      super.playerModel = value;
     });
   }
 
@@ -130,33 +190,18 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$playerModelAtom = Atom(name: '_ViewModelBase.playerModel');
+  final _$allNumbersListAtom = Atom(name: '_ViewModelBase.allNumbersList');
 
   @override
-  PlayerModel get playerModel {
-    _$playerModelAtom.reportRead();
-    return super.playerModel;
+  List<int> get allNumbersList {
+    _$allNumbersListAtom.reportRead();
+    return super.allNumbersList;
   }
 
   @override
-  set playerModel(PlayerModel value) {
-    _$playerModelAtom.reportWrite(value, super.playerModel, () {
-      super.playerModel = value;
-    });
-  }
-
-  final _$numbersListAtom = Atom(name: '_ViewModelBase.numbersList');
-
-  @override
-  List<int> get numbersList {
-    _$numbersListAtom.reportRead();
-    return super.numbersList;
-  }
-
-  @override
-  set numbersList(List<int> value) {
-    _$numbersListAtom.reportWrite(value, super.numbersList, () {
-      super.numbersList = value;
+  set allNumbersList(List<int> value) {
+    _$allNumbersListAtom.reportWrite(value, super.allNumbersList, () {
+      super.allNumbersList = value;
     });
   }
 
@@ -219,21 +264,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
   set isChatOpen(bool? value) {
     _$isChatOpenAtom.reportWrite(value, super.isChatOpen, () {
       super.isChatOpen = value;
-    });
-  }
-
-  final _$singleMessageAtom = Atom(name: '_ViewModelBase.singleMessage');
-
-  @override
-  String? get singleMessage {
-    _$singleMessageAtom.reportRead();
-    return super.singleMessage;
-  }
-
-  @override
-  set singleMessage(String? value) {
-    _$singleMessageAtom.reportWrite(value, super.singleMessage, () {
-      super.singleMessage = value;
     });
   }
 
@@ -305,40 +335,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$formKeyMessageGameTableAtom =
-      Atom(name: '_ViewModelBase.formKeyMessageGameTable');
-
-  @override
-  GlobalKey<FormState> get formKeyMessageGameTable {
-    _$formKeyMessageGameTableAtom.reportRead();
-    return super.formKeyMessageGameTable;
-  }
-
-  @override
-  set formKeyMessageGameTable(GlobalKey<FormState> value) {
-    _$formKeyMessageGameTableAtom
-        .reportWrite(value, super.formKeyMessageGameTable, () {
-      super.formKeyMessageGameTable = value;
-    });
-  }
-
-  final _$messageControllerGameTableAtom =
-      Atom(name: '_ViewModelBase.messageControllerGameTable');
-
-  @override
-  TextEditingController? get messageControllerGameTable {
-    _$messageControllerGameTableAtom.reportRead();
-    return super.messageControllerGameTable;
-  }
-
-  @override
-  set messageControllerGameTable(TextEditingController? value) {
-    _$messageControllerGameTableAtom
-        .reportWrite(value, super.messageControllerGameTable, () {
-      super.messageControllerGameTable = value;
-    });
-  }
-
   final _$messageListAtom = Atom(name: '_ViewModelBase.messageList');
 
   @override
@@ -351,6 +347,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
   set messageList(ObservableList<MessageModel>? value) {
     _$messageListAtom.reportWrite(value, super.messageList, () {
       super.messageList = value;
+    });
+  }
+
+  final _$messageModelAtom = Atom(name: '_ViewModelBase.messageModel');
+
+  @override
+  MessageModel get messageModel {
+    _$messageModelAtom.reportRead();
+    return super.messageModel;
+  }
+
+  @override
+  set messageModel(MessageModel value) {
+    _$messageModelAtom.reportWrite(value, super.messageModel, () {
+      super.messageModel = value;
     });
   }
 
@@ -384,6 +395,125 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$rangeOf1and15NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf1and15Numbers');
+
+  @override
+  List<int>? get rangeOf1and15Numbers {
+    _$rangeOf1and15NumbersAtom.reportRead();
+    return super.rangeOf1and15Numbers;
+  }
+
+  @override
+  set rangeOf1and15Numbers(List<int>? value) {
+    _$rangeOf1and15NumbersAtom.reportWrite(value, super.rangeOf1and15Numbers,
+        () {
+      super.rangeOf1and15Numbers = value;
+    });
+  }
+
+  final _$rangeOf16and30NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf16and30Numbers');
+
+  @override
+  List<int>? get rangeOf16and30Numbers {
+    _$rangeOf16and30NumbersAtom.reportRead();
+    return super.rangeOf16and30Numbers;
+  }
+
+  @override
+  set rangeOf16and30Numbers(List<int>? value) {
+    _$rangeOf16and30NumbersAtom.reportWrite(value, super.rangeOf16and30Numbers,
+        () {
+      super.rangeOf16and30Numbers = value;
+    });
+  }
+
+  final _$rangeOf31and45NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf31and45Numbers');
+
+  @override
+  List<int>? get rangeOf31and45Numbers {
+    _$rangeOf31and45NumbersAtom.reportRead();
+    return super.rangeOf31and45Numbers;
+  }
+
+  @override
+  set rangeOf31and45Numbers(List<int>? value) {
+    _$rangeOf31and45NumbersAtom.reportWrite(value, super.rangeOf31and45Numbers,
+        () {
+      super.rangeOf31and45Numbers = value;
+    });
+  }
+
+  final _$rangeOf46and60NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf46and60Numbers');
+
+  @override
+  List<int>? get rangeOf46and60Numbers {
+    _$rangeOf46and60NumbersAtom.reportRead();
+    return super.rangeOf46and60Numbers;
+  }
+
+  @override
+  set rangeOf46and60Numbers(List<int>? value) {
+    _$rangeOf46and60NumbersAtom.reportWrite(value, super.rangeOf46and60Numbers,
+        () {
+      super.rangeOf46and60Numbers = value;
+    });
+  }
+
+  final _$rangeOf61and75NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf61and75Numbers');
+
+  @override
+  List<int>? get rangeOf61and75Numbers {
+    _$rangeOf61and75NumbersAtom.reportRead();
+    return super.rangeOf61and75Numbers;
+  }
+
+  @override
+  set rangeOf61and75Numbers(List<int>? value) {
+    _$rangeOf61and75NumbersAtom.reportWrite(value, super.rangeOf61and75Numbers,
+        () {
+      super.rangeOf61and75Numbers = value;
+    });
+  }
+
+  final _$rangeOf76and90NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf76and90Numbers');
+
+  @override
+  List<int>? get rangeOf76and90Numbers {
+    _$rangeOf76and90NumbersAtom.reportRead();
+    return super.rangeOf76and90Numbers;
+  }
+
+  @override
+  set rangeOf76and90Numbers(List<int>? value) {
+    _$rangeOf76and90NumbersAtom.reportWrite(value, super.rangeOf76and90Numbers,
+        () {
+      super.rangeOf76and90Numbers = value;
+    });
+  }
+
+  final _$rangeOf91and99NumbersAtom =
+      Atom(name: '_ViewModelBase.rangeOf91and99Numbers');
+
+  @override
+  List<int>? get rangeOf91and99Numbers {
+    _$rangeOf91and99NumbersAtom.reportRead();
+    return super.rangeOf91and99Numbers;
+  }
+
+  @override
+  set rangeOf91and99Numbers(List<int>? value) {
+    _$rangeOf91and99NumbersAtom.reportWrite(value, super.rangeOf91and99Numbers,
+        () {
+      super.rangeOf91and99Numbers = value;
+    });
+  }
+
   final _$gameCardScaffoldMessengerKeyAtom =
       Atom(name: '_ViewModelBase.gameCardScaffoldMessengerKey');
 
@@ -398,23 +528,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
     _$gameCardScaffoldMessengerKeyAtom
         .reportWrite(value, super.gameCardScaffoldMessengerKey, () {
       super.gameCardScaffoldMessengerKey = value;
-    });
-  }
-
-  final _$gameTableScaffoldMessengerKeyAtom =
-      Atom(name: '_ViewModelBase.gameTableScaffoldMessengerKey');
-
-  @override
-  GlobalKey<ScaffoldMessengerState> get gameTableScaffoldMessengerKey {
-    _$gameTableScaffoldMessengerKeyAtom.reportRead();
-    return super.gameTableScaffoldMessengerKey;
-  }
-
-  @override
-  set gameTableScaffoldMessengerKey(GlobalKey<ScaffoldMessengerState> value) {
-    _$gameTableScaffoldMessengerKeyAtom
-        .reportWrite(value, super.gameTableScaffoldMessengerKey, () {
-      super.gameTableScaffoldMessengerKey = value;
     });
   }
 
@@ -576,17 +689,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  SnackBar snackbar(Color color, String message) {
-    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
-        name: '_ViewModelBase.snackbar');
-    try {
-      return super.snackbar(color, message);
-    } finally {
-      _$_ViewModelBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   dynamic messageStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.messageStream');
@@ -609,38 +711,57 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
+  dynamic reInit() {
+    final _$actionInfo = _$_ViewModelBaseActionController.startAction(
+        name: '_ViewModelBase.reInit');
+    try {
+      return super.reInit();
+    } finally {
+      _$_ViewModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
+isDarkModel: ${isDarkModel},
+isENLocal: ${isENLocal},
+viewState: ${viewState},
 formKeyUserName: ${formKeyUserName},
 formKeyJoin: ${formKeyJoin},
-pageController: ${pageController},
-userName: ${userName},
+homePageController: ${homePageController},
 roomModel: ${roomModel},
+playerModel: ${playerModel},
 playersList: ${playersList},
 takenNumbersMap: ${takenNumbersMap},
 takenNumberReaction: ${takenNumberReaction},
-playerModel: ${playerModel},
-numbersList: ${numbersList},
+allNumbersList: ${allNumbersList},
 takenNumber: ${takenNumber},
 takenNumbersList: ${takenNumbersList},
 takenNumbersListFromDatabase: ${takenNumbersListFromDatabase},
 isChatOpen: ${isChatOpen},
-singleMessage: ${singleMessage},
 formKeyMessageWaiting: ${formKeyMessageWaiting},
 messageControllerWaiting: ${messageControllerWaiting},
 formKeyMessageGameCard: ${formKeyMessageGameCard},
 messageControllerGameCard: ${messageControllerGameCard},
-formKeyMessageGameTable: ${formKeyMessageGameTable},
-messageControllerGameTable: ${messageControllerGameTable},
 messageList: ${messageList},
+messageModel: ${messageModel},
 cardNumbersList: ${cardNumbersList},
 randomColor: ${randomColor},
+rangeOf1and15Numbers: ${rangeOf1and15Numbers},
+rangeOf16and30Numbers: ${rangeOf16and30Numbers},
+rangeOf31and45Numbers: ${rangeOf31and45Numbers},
+rangeOf46and60Numbers: ${rangeOf46and60Numbers},
+rangeOf61and75Numbers: ${rangeOf61and75Numbers},
+rangeOf76and90Numbers: ${rangeOf76and90Numbers},
+rangeOf91and99Numbers: ${rangeOf91and99Numbers},
 gameCardScaffoldMessengerKey: ${gameCardScaffoldMessengerKey},
-gameTableScaffoldMessengerKey: ${gameTableScaffoldMessengerKey},
 firstWinnerReaction: ${firstWinnerReaction},
 secondWinnerReaction: ${secondWinnerReaction},
 thirdWinnerReaction: ${thirdWinnerReaction},
-isGameAutoTakeNumber: ${isGameAutoTakeNumber}
+isGameAutoTakeNumber: ${isGameAutoTakeNumber},
+appTheme: ${appTheme},
+locale: ${locale}
     ''';
   }
 }

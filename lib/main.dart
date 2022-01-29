@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:tombala/utils/routes/routes.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'components/view_models/view_model.dart';
+import 'utils/routes/routes.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'firebase_options.dart';
 import 'utils/locator/locator.dart';
@@ -24,13 +26,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final ViewModel _viewModel = locator<ViewModel>();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        theme: FlexThemeData.dark(scheme: FlexScheme.blueWhale),
+    return Observer(builder: (_) {
+      return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: _viewModel.locale,
+        theme: _viewModel.appTheme,
         debugShowCheckedModeBanner: false,
-        title: 'Online Tombala',
+        title: "Online Tombala",
         initialRoute: Routes.home,
-        routes: Routes.routes);
+        routes: Routes.routes,
+      );
+    });
   }
 }

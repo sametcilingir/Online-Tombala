@@ -22,7 +22,7 @@ class MessageModel {
 }
 
 DateTime? getDateFromTimeStamp(Timestamp? timeStamp) {
-  return timeStamp != null ? timeStamp.toDate() : null;
+  return timeStamp?.toDate();
 }
 
 Timestamp? getTimeStampFromDate(DateTime? dateTime) {

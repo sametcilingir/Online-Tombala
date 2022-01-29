@@ -1,16 +1,19 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import '../models/message/message_model.dart';
 import '../models/player/player_model.dart';
 import '../models/room/room_model.dart';
 import '../../utils/services/firebase_database_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../utils/locator/locator.dart';
 
 part 'view_model.g.dart';
+
+enum ViewState { Idle, Busy }
 
 class ViewModel = _ViewModelBase with _$ViewModel;
 
@@ -19,16 +22,32 @@ abstract class _ViewModelBase with Store {
       locator<FirebaseDatabaseService>();
 
   @observable
+  bool isDarkModel = true;
+
+  @computed
+  ThemeData get appTheme => isDarkModel
+      ? FlexThemeData.dark(scheme: FlexScheme.aquaBlue)
+      : FlexThemeData.light(scheme: FlexScheme.aquaBlue);
+
+  @observable
+  bool isENLocal = false;
+
+  @computed
+  Locale get locale => isENLocal
+      ? AppLocalizations.supportedLocales.first
+      : AppLocalizations.supportedLocales.last;
+
+  @observable
+  ViewState viewState = ViewState.Idle;
+
+  @observable
   GlobalKey<FormState> formKeyUserName = GlobalKey<FormState>();
 
   @observable
   GlobalKey<FormState> formKeyJoin = GlobalKey<FormState>();
 
   @observable
-  PageController pageController = PageController(initialPage: 0);
-
-  @observable
-  String? userName = "";
+  PageController homePageController = PageController(initialPage: 0);
 
   @observable
   RoomModel roomModel = RoomModel(
@@ -37,116 +56,10 @@ abstract class _ViewModelBase with Store {
     roomThirdWinner: "",
     roomTakenNumber: 0,
     roomStatus: "wait",
+    roomCode: "",
+    roomCreator: "",
+    roomId: "",
   );
-
-  @action
-  Future<bool> createRoom() async {
-    try {
-      roomModel.roomCode = Random().nextInt(100000).toString();
-      var newUserName = "Oyun kurucu - " + userName.toString();
-      userName = newUserName;
-      roomModel.roomCreator = userName;
-
-      roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
-
-      var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
-          roomModel.roomCode!, roomModel.roomCreator!);
-      playerModel = playerModelAndRoomModel[0];
-      //roomModeli burda oluşturduğumuz için  almaya gerek yok
-      //roomModel = playerModelAndRoomModel[1];
-
-      if (playerModel.userId != null) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      print("Oda oluşturmada hata oluştu: $e");
-      return false;
-    }
-  }
-
-  @observable
-  late ObservableList<PlayerModel>? playersList = ObservableList<PlayerModel>();
-
-  @action
-  playersStream() {
-    try {
-      _firebaseDatabaseService.playersStream(roomModel).forEach((event) {
-        playersList = event.docs
-            .map((e) => PlayerModel.fromJson(e.data()))
-            .toList()
-            .asObservable();
-
-        /* playersList!.forEach((element) {
-          print(element.userName);
-        });*/
-      });
-    } catch (e) {
-      print("Oda kullanici bulma hata oluştu: $e");
-    }
-  }
-
-  @observable
-  Map<int, bool> takenNumbersMap = <int, bool>{};
-  @observable
-  ReactionDisposer? takenNumberReaction;
-  @action
-  roomStream() {
-    try {
-      /* _firebaseDatabaseService.roomStream(roomModel).forEach((element) {
-        roomModel = RoomModel.fromJson(element.data());
-        print("tekrar sayısı üst");
-
-        if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
-          print("tekrar sayısı listeye dahil deği lise");
-
-          takenNumber = roomModel.roomTakenNumber!;
-          takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
-
-          //takenNumbersMap[takenNumber] = false;
-          //print(takenNumbersMap);
-          //takenNumbersMap.update(number.toString(), (value) => value = true);
-
-          print("taken number from database: ${takenNumber}");
-          print(
-              "taken number from takenNumbersListFromDatabase: ${takenNumbersListFromDatabase}");
-        }
-      });*/
-
-      _firebaseDatabaseService.roomStream(roomModel).listen((event) {
-        roomModel = RoomModel.fromJson(event.data());
-
-        print("tekrar sayısı üst");
-
-        if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
-          print("tekrar sayısı listeye dahil deği lise");
-
-          takenNumber = roomModel.roomTakenNumber!;
-          takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
-
-          //takenNumbersMap[takenNumber] = false;
-          //print(takenNumbersMap);
-          //takenNumbersMap.update(number.toString(), (value) => value = true);
-
-          print("taken number from database: ${takenNumber}");
-          print(
-              "taken number from takenNumbersListFromDatabase: ${takenNumbersListFromDatabase}");
-        }
-
-        /* print("tekrar sayısı");
-        if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
-          takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
-          takenNumber = roomModel.roomTakenNumber!;
-        }*/
-      });
-
-      //roomModel = RoomModel.fromJson(event.docChanges.first.doc.data());
-
-    } catch (e) {
-      print("Oda döküman hata oluştu: $e");
-    }
-  }
 
   @observable
   PlayerModel playerModel = PlayerModel(
@@ -156,22 +69,84 @@ abstract class _ViewModelBase with Store {
   );
 
   @action
-  Future<void> setPlayerStatus(bool playerStatus) async {
+  Future<bool> createRoom() async {
     try {
-      playerModel.userStatus = playerStatus;
-      await _firebaseDatabaseService.setPlayerStatus(roomModel, playerModel);
+      viewState = ViewState.Busy;
+      reInit();
+      //creating random room code
+      roomModel.roomCode = Random().nextInt(100000).toString();
+      var newUserName = isENLocal
+          ? "Game Creator - "
+          : "Oyun Kurucu - " + playerModel.userName.toString();
+      playerModel.userName = newUserName;
+      roomModel.roomCreator = playerModel.userName;
+      //getting room Id
+      roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
+
+      bool isJoined = await joinRoom();
+
+      return isJoined;
     } catch (e) {
-      print("setPlayerStatus hata oluştu: $e");
+      print("sorun oda oluşturmada" + e.toString());
+      return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
+  }
+
+  @observable
+  ObservableList<PlayerModel>? playersList = ObservableList<PlayerModel>();
+
+  @action
+  playersStream() {
+    _firebaseDatabaseService.playersStream(roomModel).forEach((event) {
+      playersList = event.docs
+          .map((e) => PlayerModel.fromJson(e.data()))
+          .toList()
+          .asObservable();
+    });
+  }
+
+  @observable
+  Map<int, bool> takenNumbersMap = <int, bool>{};
+
+  @observable
+  ReactionDisposer? takenNumberReaction;
+
+  @action
+  roomStream() {
+    _firebaseDatabaseService.roomStream(roomModel).listen((event) {
+      roomModel = RoomModel.fromJson(event.data());
+      //taken number event
+      if (!takenNumbersListFromDatabase.contains(roomModel.roomTakenNumber)) {
+        takenNumber = roomModel.roomTakenNumber!;
+        takenNumbersListFromDatabase.add(roomModel.roomTakenNumber!);
+      }
+    });
+  }
+
+  @action
+  Future<void> setPlayerStatus(bool playerStatus) async {
+    playerModel.userStatus = playerStatus;
+    await _firebaseDatabaseService.setPlayerStatus(roomModel, playerModel);
   }
 
   @action
   Future<bool> joinRoom() async {
     try {
+      viewState = ViewState.Busy;
+
+      if (roomModel.roomCreator != playerModel.userName) {
+        reInit();
+      }
+      
       var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
-          roomModel.roomCode!, userName!);
+          roomModel.roomCode!, playerModel.userName!);
+      //setting message model username
+      messageModel.messageSenderName = playerModel.userName;
+      //setting player model
       playerModel = playerModelAndRoomModel[0];
-      //roomModeli burada set ediyoruz
+      //setting room model
       roomModel = playerModelAndRoomModel[1];
       if (playerModel.userId != null) {
         return true;
@@ -179,66 +154,57 @@ abstract class _ViewModelBase with Store {
         return false;
       }
     } catch (e) {
-      print("Odaya katilimda hata oluştu: $e");
       return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
   }
 
   @action
   Future<bool> startGame() async {
     try {
+      viewState = ViewState.Busy;
       roomModel.roomStatus = "started";
-
       await _firebaseDatabaseService.updateGame(roomModel);
       return true;
     } catch (e) {
-      print("Oyun başlatmada hata oluştu: $e");
       return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
   }
 
-  /* @action
-  Future<bool> deleteGame() async {
-    try {
-      await _firebaseDatabaseService.deleteGame(roomId: roomId);
-      return true;
-    } catch (e) {
-      print("Oyunu silmede hata oluştu: $e");
-      return false;
-    }
-  }*/
+  @observable
+  List<int> allNumbersList = List<int>.generate(99, (i) => i + 1);
 
   @observable
-  List<int> numbersList = List<int>.generate(99, (i) => i + 1);
-  @observable
   int takenNumber = 0;
+
+  //for game creator
   @observable
   List<int> takenNumbersList = [];
 
+  //for players
   @observable
   List<int> takenNumbersListFromDatabase = [];
 
   @action
   Future<bool> takeNumber() async {
     try {
-      takenNumber = (numbersList..shuffle()).first;
-      numbersList.remove(takenNumber);
+      takenNumber = (allNumbersList..shuffle()).first;
+      allNumbersList.remove(takenNumber);
       takenNumbersList.add(takenNumber);
       roomModel.roomTakenNumber = takenNumber;
       await _firebaseDatabaseService.updateGame(roomModel);
 
       return true;
     } catch (e) {
-      print("Taş çekmede hata oluştu: $e");
       return false;
     }
   }
 
   @observable
   bool? isChatOpen = false;
-
-  @observable
-  String? singleMessage = "";
 
   @observable
   GlobalKey<FormState> formKeyMessageWaiting = GlobalKey<FormState>();
@@ -253,67 +219,33 @@ abstract class _ViewModelBase with Store {
   TextEditingController? messageControllerGameCard = TextEditingController();
 
   @observable
-  GlobalKey<FormState> formKeyMessageGameTable = GlobalKey<FormState>();
-
-  @observable
-  TextEditingController? messageControllerGameTable = TextEditingController();
-
-  @observable
   ObservableList<MessageModel>? messageList = ObservableList<MessageModel>();
 
   @action
-  SnackBar snackbar(Color color, String message) {
-    return SnackBar(
-      dismissDirection: DismissDirection.horizontal,
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: color,
-      content: Text(message),
-    );
+  messageStream() {
+    _firebaseDatabaseService.messageStream(roomModel).forEach((event) {
+      messageList = event.docs
+          .map((e) => MessageModel.fromJson(e.data()))
+          .toList()
+          .asObservable();
+    });
   }
 
-  @action
-  messageStream() {
-    try {
-      _firebaseDatabaseService.messageStream(roomModel).forEach((event) {
-        messageList = event.docs
-            .map((e) => MessageModel.fromJson(e.data()))
-            .toList()
-            .asObservable();
-      });
-    } catch (e) {
-      print("Mesaj stream  hata oluştu: $e");
-    }
-  }
+  @observable
+  MessageModel messageModel = MessageModel(
+    messageSenderName: "",
+    messageText: "",
+  );
 
   @action
   Future<bool> sendMessage() async {
     try {
-      MessageModel messageModel = MessageModel(
-        messageText: singleMessage,
-        messageSenderName: playerModel.userName!.isEmpty
-            ? roomModel.roomCreator
-            : playerModel.userName,
-        messageSentTime: Timestamp.now().toDate(),
-      );
       await _firebaseDatabaseService.sendMessage(roomModel, messageModel);
       return true;
     } catch (e) {
-      print("mesaj göndermede hata oluştu: $e");
       return false;
     }
   }
-
-  /* @action
-  dispose() {
-    userName = null;
-    roomModel = RoomModel();
-    playersList = ObservableList<PlayerModel>();
-    playerModel = PlayerModel();
-    roomCode = null;
-    takenNumbersList = [];
-    messageList = ObservableList<MessageModel>();
-    cardNumbersList = [];
-  }*/
 
   @observable
   List<int> cardNumbersList = [];
@@ -321,67 +253,49 @@ abstract class _ViewModelBase with Store {
   @observable
   Color randomColor = Colors.transparent;
 
+  @observable
+  List<int>? rangeOf1and15Numbers;
+  @observable
+  List<int>? rangeOf16and30Numbers;
+  @observable
+  List<int>? rangeOf31and45Numbers;
+  @observable
+  List<int>? rangeOf46and60Numbers;
+  @observable
+  List<int>? rangeOf61and75Numbers;
+  @observable
+  List<int>? rangeOf76and90Numbers;
+  @observable
+  List<int>? rangeOf91and99Numbers;
+
   @action
   createGameCard() {
     randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
-    print("randomColor: $randomColor");
 
-    if (cardNumbersList.isNotEmpty) {
-      cardNumbersList.clear();
-    }
-
-    final rangeOf1and15Numbers = List<int>.generate(15, (i) => i + 1);
-    print("rangeOf1and15Numbers: $rangeOf1and15Numbers");
-    final rangeOf16and30Numbers = List<int>.generate(15, (i) => i + 16);
-    print("rangeOf16and30Numbers: $rangeOf16and30Numbers");
-    final rangeOf31and45Numbers = List<int>.generate(15, (i) => i + 31);
-    print("rangeOf31and45Numbers: $rangeOf31and45Numbers");
-    final rangeOf46and60Numbers = List<int>.generate(15, (i) => i + 46);
-    print("rangeOf46and60Numbers: $rangeOf46and60Numbers");
-    final rangeOf61and75Numbers = List<int>.generate(15, (i) => i + 61);
-    print("rangeOf61and75Numbers: $rangeOf61and75Numbers");
-    final rangeOf76and90Numbers = List<int>.generate(15, (i) => i + 76);
-    print("rangeOf76and90Numbers: $rangeOf76and90Numbers");
-    final rangeOf91and99Numbers = List<int>.generate(9, (i) => i + 91);
-    print("rangeOf91and99Numbers: $rangeOf91and99Numbers");
+    rangeOf1and15Numbers = allNumbersList.sublist(0, 15)..shuffle();
+    rangeOf16and30Numbers = allNumbersList.sublist(15, 30)..shuffle();
+    rangeOf31and45Numbers = allNumbersList.sublist(30, 45)..shuffle();
+    rangeOf46and60Numbers = allNumbersList.sublist(45, 60)..shuffle();
+    rangeOf61and75Numbers = allNumbersList.sublist(60, 75)..shuffle();
+    rangeOf76and90Numbers = allNumbersList.sublist(75, 90)..shuffle();
+    rangeOf91and99Numbers = allNumbersList.sublist(90, 99)..shuffle();
 
     for (var i = 0; i < 2; i++) {
-      var randomNumber = (rangeOf1and15Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber);
-      rangeOf1and15Numbers.remove(randomNumber);
-      var randomNumber2 = (rangeOf16and30Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber2);
-      rangeOf16and30Numbers.remove(randomNumber2);
-      var randomNumber3 = (rangeOf31and45Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber3);
-      rangeOf31and45Numbers.remove(randomNumber3);
-      var randomNumber4 = (rangeOf46and60Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber4);
-      rangeOf46and60Numbers.remove(randomNumber4);
-      var randomNumber5 = (rangeOf61and75Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber5);
-      rangeOf61and75Numbers.remove(randomNumber5);
-      var randomNumber6 = (rangeOf76and90Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber6);
-      rangeOf76and90Numbers.remove(randomNumber6);
-      var randomNumber7 = (rangeOf91and99Numbers..shuffle()).first;
-      cardNumbersList.add(randomNumber7);
-      rangeOf91and99Numbers.remove(randomNumber7);
+      cardNumbersList.add(rangeOf1and15Numbers![i]);
+      cardNumbersList.add(rangeOf16and30Numbers![i]);
+      cardNumbersList.add(rangeOf31and45Numbers![i]);
+      cardNumbersList.add(rangeOf46and60Numbers![i]);
+      cardNumbersList.add(rangeOf61and75Numbers![i]);
+      cardNumbersList.add(rangeOf76and90Numbers![i]);
+      cardNumbersList.add(rangeOf91and99Numbers![i]);
     }
-    print("cardNumbersList: $cardNumbersList");
-    //numaraları sıralıyoruz
+
     cardNumbersList.sort();
     takenNumbersMap = {for (var e in cardNumbersList) e: false};
-    print("takenNumbersMap: $takenNumbersMap");
-    print("sıralı: $cardNumbersList");
   }
 
   @observable
   GlobalKey<ScaffoldMessengerState> gameCardScaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
-
-  @observable
-  GlobalKey<ScaffoldMessengerState> gameTableScaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
   @observable
@@ -393,9 +307,6 @@ abstract class _ViewModelBase with Store {
 
   @action
   Future<bool> winnerControl(int i) async {
-    print(cardNumbersList);
-    print(takenNumbersMap);
-
     if (i == 1 &&
         roomModel.roomFirstWinner == "" &&
         takenNumbersMap[cardNumbersList[0]]! &&
@@ -403,7 +314,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[6]]! &&
         takenNumbersMap[cardNumbersList[9]]! &&
         takenNumbersMap[cardNumbersList[12]]!) {
-      //first line
       await setWinner(1);
       return true;
     } else if (i == 1 &&
@@ -413,7 +323,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[7]]! &&
         takenNumbersMap[cardNumbersList[10]]! &&
         takenNumbersMap[cardNumbersList[13]]!) {
-      //second line
       await setWinner(1);
       return true;
     } else if (i == 1 &&
@@ -422,7 +331,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[5]]! &&
         takenNumbersMap[cardNumbersList[8]]! &&
         takenNumbersMap[cardNumbersList[11]]!) {
-      //third line
       await setWinner(1);
       return true;
     } else if (i == 2 &&
@@ -437,7 +345,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[7]]! &&
         takenNumbersMap[cardNumbersList[10]]! &&
         takenNumbersMap[cardNumbersList[13]]!) {
-      // first and second line
       await setWinner(2);
       return true;
     } else if (i == 2 &&
@@ -451,7 +358,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[5]]! &&
         takenNumbersMap[cardNumbersList[8]]! &&
         takenNumbersMap[cardNumbersList[11]]!) {
-      // first and third line
       await setWinner(2);
       return true;
     } else if (i == 2 &&
@@ -465,7 +371,6 @@ abstract class _ViewModelBase with Store {
         takenNumbersMap[cardNumbersList[5]]! &&
         takenNumbersMap[cardNumbersList[8]]! &&
         takenNumbersMap[cardNumbersList[11]]!) {
-      // second and third line
       await setWinner(2);
       return true;
     } else if (i == 3 &&
@@ -496,15 +401,16 @@ abstract class _ViewModelBase with Store {
     try {
       switch (i) {
         case 1:
-          roomModel.roomFirstWinner = userName;
+          roomModel.roomFirstWinner = playerModel.userName;
           break;
 
         case 2:
-          roomModel.roomSecondWinner = userName;
+          roomModel.roomSecondWinner = playerModel.userName;
           break;
 
         case 3:
-          roomModel.roomThirdWinner = userName;
+          roomModel.roomThirdWinner = playerModel.userName;
+          roomModel.roomStatus = "finished";
           break;
         default:
       }
@@ -513,7 +419,6 @@ abstract class _ViewModelBase with Store {
 
       return true;
     } catch (e) {
-      print("setWinner hata oluştu: $e");
       return false;
     }
   }
@@ -528,8 +433,48 @@ abstract class _ViewModelBase with Store {
 
       return true;
     } catch (e) {
-      print("delete game hata oluştu: $e");
       return false;
     }
+  }
+
+  @action
+  reInit() {
+    /* roomModel = RoomModel(
+      roomFirstWinner: "",
+      roomSecondWinner: "",
+      roomThirdWinner: "",
+      roomTakenNumber: 0,
+      roomStatus: "wait",
+      roomCode: "",
+      roomCreator: "",
+      roomId: "",
+    );*/
+    /*  playerModel = PlayerModel(
+      userId: "",
+      userName: "",
+      userStatus: false,
+    );*/
+    roomModel.roomFirstWinner = "";
+    roomModel.roomSecondWinner = "";
+    roomModel.roomThirdWinner = "";
+    roomModel.roomTakenNumber = 0;
+    roomModel.roomStatus = "wait";
+    roomModel.roomCreator = "";
+    roomModel.roomId = "";
+    playerModel.userId = "";
+    playerModel.userStatus = false;
+    playersList = ObservableList<PlayerModel>();
+    takenNumbersMap = {};
+    takenNumber = 0;
+    takenNumbersList = [];
+    takenNumbersListFromDatabase = [];
+    isChatOpen = false;
+    messageList = ObservableList<MessageModel>();
+    messageModel = MessageModel(
+      messageSenderName: "",
+      messageText: "",
+    );
+    cardNumbersList = [];
+    isGameAutoTakeNumber = false;
   }
 }

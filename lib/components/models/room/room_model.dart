@@ -12,7 +12,6 @@ class RoomModel {
   String? roomSecondWinner;
   String? roomThirdWinner;
   int? roomTakenNumber;
-  //List? roomNumbersList;
 
   RoomModel({
     this.roomId,
@@ -23,7 +22,6 @@ class RoomModel {
     this.roomSecondWinner,
     this.roomThirdWinner,
     this.roomTakenNumber,
-    //this.roomNumbersList,
   });
 
   factory RoomModel.fromJson(Map<String, dynamic>? json) =>

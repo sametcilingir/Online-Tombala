@@ -10,6 +10,7 @@ class FirebaseDatabaseService implements DatabaseService {
 
   //  "takenNumbersList": FieldValue.arrayUnion([]),
 
+  @override
   Future<String?> createRoom(RoomModel roomModel) async {
     var documentRef = _firestore.collection("rooms").doc();
     roomModel.roomId = documentRef.id;
@@ -19,6 +20,7 @@ class FirebaseDatabaseService implements DatabaseService {
     return roomModel.roomId;
   }
 
+  @override
   Stream<QuerySnapshot<Map<String, dynamic>>> playersStream(
       RoomModel roomModel) {
     final playersList = _firestore
@@ -30,6 +32,7 @@ class FirebaseDatabaseService implements DatabaseService {
     return playersList;
   }
 
+  @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> roomStream(
       RoomModel roomModel) {
     final roomStream =
@@ -37,6 +40,7 @@ class FirebaseDatabaseService implements DatabaseService {
     return roomStream;
   }
 
+  @override
   Future<void> setPlayerStatus(
       RoomModel roomModel, PlayerModel playerModel) async {
     var documentRef = _firestore
@@ -48,6 +52,7 @@ class FirebaseDatabaseService implements DatabaseService {
     await documentRef.update(playerModel.toJson());
   }
 
+  @override
   Future<List> joinRoom(String roomCode, String userName) async {
     var querySnapshot = await _firestore
         .collection("rooms")
@@ -78,6 +83,7 @@ class FirebaseDatabaseService implements DatabaseService {
     }
   }
 
+  @override
   Future<void> updateGame(RoomModel roomModel) async {
     await _firestore
         .collection("rooms")
@@ -85,12 +91,12 @@ class FirebaseDatabaseService implements DatabaseService {
         .update(roomModel.toJson());
   }
 
-
-
+  @override
   Future<void> deleteGame(RoomModel roomModel) async {
     await _firestore.collection("rooms").doc(roomModel.roomId).delete();
   }
 
+  @override
   Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(
       RoomModel roomModel) {
     final messagesList = _firestore
@@ -103,6 +109,7 @@ class FirebaseDatabaseService implements DatabaseService {
     return messagesList;
   }
 
+  @override
   Future<bool> sendMessage(
       RoomModel roomModel, MessageModel messageModel) async {
     var documentRef = _firestore
@@ -110,6 +117,7 @@ class FirebaseDatabaseService implements DatabaseService {
         .doc(roomModel.roomId)
         .collection("messages")
         .doc();
+    messageModel.messageSentTime = Timestamp.now().toDate();
 
     await documentRef.set(
       messageModel.toJson(),
@@ -117,6 +125,4 @@ class FirebaseDatabaseService implements DatabaseService {
 
     return true;
   }
-
-
 }

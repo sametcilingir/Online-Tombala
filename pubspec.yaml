@@ -29,6 +29,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  flutter_localizations: 
+    sdk: flutter
+  intl: ^0.17.0 
+
+
 # Firebase
   firebase_core: ^1.10.6
   firebase_analytics: ^9.0.4
@@ -58,6 +64,7 @@ dependencies:
   flutter_styled_toast: ^2.0.0
   snapping_sheet: ^3.1.0
   flex_color_scheme: ^4.2.0
+  loading_overlay: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +82,8 @@ flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
+
+  generate: true
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:tombala/utils/theme/app_theme.dart';
 
-class SnackBarWidget {
-  final Color color;
-  final String message;
-  const SnackBarWidget({required this.color, required this.message});
 
-  SnackBar get snackBar => SnackBar(
-        dismissDirection: DismissDirection.horizontal,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: color,
-        content: Text(message,
-            style: TextStyle(
-              fontSize: 18,
-            )),
-      );
+SnackBar snackBar(Color color, String message ) {
+  return SnackBar(
+    dismissDirection: DismissDirection.horizontal,
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: color,
+    content: Text(
+      message,
+      style: AppTheme().headline6,
+    ),
+  );
 }

@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../components/models/message_model/message_model.dart';
+import '../../components/models/player_model/player_model.dart';
+import '../../components/models/room_model/room_model.dart';
 
-import '../../components/models/message/message_model.dart';
-import '../../components/models/player/player_model.dart';
-import '../../components/models/room/room_model.dart';
+
 import 'database_service.dart';
 
 class FirebaseDatabaseService implements DatabaseService {

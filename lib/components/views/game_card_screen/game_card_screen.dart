@@ -33,42 +33,44 @@ class _GameCardScreenState extends State<GameCardScreen> {
     _viewModel.takenNumberReaction =
         reaction((_) => _viewModel.takenNumber, (v) {
       _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBarWidget(
-          message:
-              "${AppLocalizations.of(context)!.takenNumber} ${_viewModel.takenNumber}",
-          color: Colors.amber,
-        ).snackBar,
+        snackBar(
+          Colors.amber,
+          "${AppLocalizations.of(context)!.takenNumber} ${_viewModel.takenNumber}",
+        ),
       );
     }, delay: 1000);
 
     _viewModel.firstWinnerReaction = reaction(
         (_) => _viewModel.roomModel.roomFirstWinner,
-        (firstWinner) => _viewModel.gameCardScaffoldMessengerKey.currentState
-                ?.showSnackBar(SnackBarWidget(
-              message:
-                  "${AppLocalizations.of(context)!.theWinner1} : $firstWinner",
-              color: Colors.green,
-            ).snackBar),
+        (firstWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              snackBar(
+                Colors.green,
+                "${AppLocalizations.of(context)!.theWinner1} : $firstWinner",
+              ),
+            ),
         delay: 1000);
 
     _viewModel.firstWinnerReaction = reaction(
         (_) => _viewModel.roomModel.roomSecondWinner,
-        (secondWinner) => _viewModel.gameCardScaffoldMessengerKey.currentState
-                ?.showSnackBar(SnackBarWidget(
-              message:
-                  "${AppLocalizations.of(context)!.theWinner2} : $secondWinner",
-              color: Colors.green,
-            ).snackBar),
+        (secondWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              snackBar(
+                Colors.green,
+                "${AppLocalizations.of(context)!.theWinner2} : $secondWinner",
+              ),
+            ),
         delay: 1000);
 
     _viewModel.firstWinnerReaction = reaction(
         (_) => _viewModel.roomModel.roomThirdWinner,
-        (thirdWinner) => _viewModel.gameCardScaffoldMessengerKey.currentState
-                ?.showSnackBar(SnackBarWidget(
-              message:
-                  "${AppLocalizations.of(context)!.theWinner3} : $thirdWinner",
-              color: Colors.green,
-            ).snackBar),
+        (thirdWinner) =>
+            _viewModel.gameCardScaffoldMessengerKey.currentState?.showSnackBar(
+              snackBar(
+                Colors.green,
+                "${AppLocalizations.of(context)!.theWinner3} : $thirdWinner",
+              ),
+            ),
         delay: 1000);
 
 //auto taş çekme yeri
@@ -151,31 +153,34 @@ class _GameCardScreenState extends State<GameCardScreen> {
                       bool isWin = await _viewModel.winnerControl(1);
                       if (!isWin) {
                         _viewModel.gameCardScaffoldMessengerKey.currentState
-                            ?.showSnackBar(SnackBarWidget(
-                          message:
-                              AppLocalizations.of(context)!.controlYourNumbers,
-                          color: Colors.red,
-                        ).snackBar);
+                            ?.showSnackBar(
+                          snackBar(
+                            Colors.red,
+                            AppLocalizations.of(context)!.controlYourNumbers,
+                          ),
+                        );
                       }
                     } else if (_viewModel.roomModel.roomSecondWinner == "") {
                       bool isWin = await _viewModel.winnerControl(2);
                       if (!isWin) {
                         _viewModel.gameCardScaffoldMessengerKey.currentState
-                            ?.showSnackBar(SnackBarWidget(
-                          message:
-                              AppLocalizations.of(context)!.controlYourNumbers,
-                          color: Colors.red,
-                        ).snackBar);
+                            ?.showSnackBar(
+                          snackBar(
+                            Colors.red,
+                            AppLocalizations.of(context)!.controlYourNumbers,
+                          ),
+                        );
                       }
                     } else if (_viewModel.roomModel.roomThirdWinner == "") {
                       bool isWin = await _viewModel.winnerControl(3);
                       if (!isWin) {
                         _viewModel.gameCardScaffoldMessengerKey.currentState
-                            ?.showSnackBar(SnackBarWidget(
-                          message:
-                              AppLocalizations.of(context)!.controlYourNumbers,
-                          color: Colors.red,
-                        ).snackBar);
+                            ?.showSnackBar(
+                          snackBar(
+                            Colors.red,
+                            AppLocalizations.of(context)!.controlYourNumbers,
+                          ),
+                        );
                       }
                     } else {
                       Navigator.of(context).popUntil((route) => route.isFirst);

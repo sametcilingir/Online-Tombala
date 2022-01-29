@@ -14,7 +14,7 @@
   "ready": "I am ready",
   "notReady": "I am not ready",
   "deleteGame": "Wipe the game",
-  "autoTakeNumber": "Get an auto numbers in every 10 saios?",
+  "autoTakeNumber": "Get an auto numbers in every 10 seconds?",
   "startGame": "Start the game",
   "waitingToStart": "Expected to start the game",
   "chat": "Chat",
@@ -36,5 +36,10 @@
   "yes": "Yes",
   "no": "No",
   "reallyWantToLEave": "Do you want to leave the game?",
-  "attension": "Warning"
+  "attension": "Warning",
+  "howtoJoinRoom": "How can I get in the room?",
+  "howtoJoinRoomParag": "Press the 'Create Room' button after entering your username to create a room\n\nTo enter the room, press the 'Enter the room' button after entering your username.\nOn the newcomer screen, enter the game code given to you and press the 'Enter the Room' button again.",
+  "howToPlay": "How to play ?",
+  "howToPlayParag": "The card will be created for you after you start the quarterback game.\n\nWhen the number taken the number in your wife matches the number in your coat and activate the number on your floor.\n\nIf all the numbers in each milk are activated, announce that you have earned by clicking 'Zinc' zinc in the right lower corner.\n \n To enter the room, press the 'Enter the Room' button after entering your user name"
+
 }

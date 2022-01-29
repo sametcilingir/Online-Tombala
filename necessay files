@@ -7,3 +7,29 @@ flutter build web
 firebase deploy
 
 flutter run -d chrome
+
+
+
+cd ios
+
+sudo gem uninstall cocoapods
+
+pod deintegrate
+pod cache clean --all
+
+flutter clean
+
+rm Flutter/Flutter.podspec
+rm podfile.lock
+
+flutter packages get
+
+arch -arm64 brew install cocoapods
+
+arch -arm64 pod install
+
+arch -arm64 pod install --repo-update
+
+sudo arch -arm64 gem install ffi
+
+sudo gem update

@@ -114,6 +114,39 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$homeScaffoldMessengerKeyAtom =
+      Atom(name: '_ViewModelBase.homeScaffoldMessengerKey');
+
+  @override
+  GlobalKey<ScaffoldMessengerState> get homeScaffoldMessengerKey {
+    _$homeScaffoldMessengerKeyAtom.reportRead();
+    return super.homeScaffoldMessengerKey;
+  }
+
+  @override
+  set homeScaffoldMessengerKey(GlobalKey<ScaffoldMessengerState> value) {
+    _$homeScaffoldMessengerKeyAtom
+        .reportWrite(value, super.homeScaffoldMessengerKey, () {
+      super.homeScaffoldMessengerKey = value;
+    });
+  }
+
+  final _$startGameReactionAtom =
+      Atom(name: '_ViewModelBase.startGameReaction');
+
+  @override
+  ReactionDisposer? get startGameReaction {
+    _$startGameReactionAtom.reportRead();
+    return super.startGameReaction;
+  }
+
+  @override
+  set startGameReaction(ReactionDisposer? value) {
+    _$startGameReactionAtom.reportWrite(value, super.startGameReaction, () {
+      super.startGameReaction = value;
+    });
+  }
+
   final _$roomModelAtom = Atom(name: '_ViewModelBase.roomModel');
 
   @override
@@ -730,6 +763,8 @@ viewState: ${viewState},
 formKeyUserName: ${formKeyUserName},
 formKeyJoin: ${formKeyJoin},
 homePageController: ${homePageController},
+homeScaffoldMessengerKey: ${homeScaffoldMessengerKey},
+startGameReaction: ${startGameReaction},
 roomModel: ${roomModel},
 playerModel: ${playerModel},
 playersList: ${playersList},

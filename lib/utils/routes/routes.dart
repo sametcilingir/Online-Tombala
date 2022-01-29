@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../components/views/game_card/game_card.dart';
-import '../../components/views/home/home.dart';
-import '../../components/views/waiting/waiting.dart';
+import '../../components/views/game_card_screen/game_card_screen.dart';
+import '../../components/views/home_screen/home_screen.dart';
+import '../../components/views/waiting_screen/waiting_screen.dart';
 
 class Routes {
   static const String home = '/home';
@@ -12,5 +12,6 @@ class Routes {
     home: (BuildContext context) => const HomeScreen(),
     waitingRoom: (BuildContext context) => const WaitingScreen(),
     gameCard: (BuildContext context) => const GameCardScreen()
+
   };
 }

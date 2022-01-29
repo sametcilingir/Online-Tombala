@@ -36,5 +36,9 @@
     "yes": "Evet",
     "no": "Hayır",
     "reallyWantToLEave": "Oyundan ayrılmak istiyor musunuz?",
-    "attension": "Uyarı"
+    "attension": "Uyarı",
+    "howtoJoinRoom": "Nasıl Odaya girebilirim ?",
+    "howtoJoinRoomParag": "Oda oluşturmak için kullanıcı adınızı girdikten sonra 'Oda Oluştur' butonuna basınız\n\nOdaya girmek için kullanıcı adınızı girdikten sonra 'Odaya Gir' butonuna basınız.\nYeni gelen ekranda size verilen oyun kodunu girip tekrardan 'Odaya Gir' butonuna basınız.",
+    "howToPlay": "Nasıl Oynanır ?",
+    "howToPlayParag": "Oyun kurucu oyunu başlattıktan sonra size için kart oluşturulacaktır.\n\nÇekilen sayı ile karınızdaki sayı eşleştiğinde, katınızdaki sayıya tıklayıp aktive edin.\n\nHer bir sütündaki tüm sayılar aktive edilmiş ise sağ alt kösedeki 'Çinko ilan et' butonuna tıklayarak kazandığınızı herkese duyurun.\n \n Odaya girmek için kullanıcı adınızı girdikten sonra 'Odaya Gir' butonuna basınız"
 }

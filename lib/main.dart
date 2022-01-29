@@ -28,6 +28,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final ViewModel _viewModel = locator<ViewModel>();
 
+
   @override
   Widget build(BuildContext context) {
     return Observer(builder: (_) {

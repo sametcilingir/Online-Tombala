@@ -3,9 +3,10 @@ import 'dart:math';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
-import '../models/message/message_model.dart';
-import '../models/player/player_model.dart';
-import '../models/room/room_model.dart';
+import 'package:tombala/utils/theme/app_theme.dart';
+import '../models/message_model/message_model.dart';
+import '../models/player_model/player_model.dart';
+import '../models/room_model/room_model.dart';
 import '../../utils/services/firebase_database_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -18,6 +19,8 @@ enum ViewState { Idle, Busy }
 class ViewModel = _ViewModelBase with _$ViewModel;
 
 abstract class _ViewModelBase with Store {
+
+  
   final FirebaseDatabaseService _firebaseDatabaseService =
       locator<FirebaseDatabaseService>();
 
@@ -25,9 +28,7 @@ abstract class _ViewModelBase with Store {
   bool isDarkModel = true;
 
   @computed
-  ThemeData get appTheme => isDarkModel
-      ? FlexThemeData.dark(scheme: FlexScheme.aquaBlue)
-      : FlexThemeData.light(scheme: FlexScheme.aquaBlue);
+  ThemeData get appTheme => AppTheme().theme;
 
   @observable
   bool isENLocal = false;
@@ -48,6 +49,13 @@ abstract class _ViewModelBase with Store {
 
   @observable
   PageController homePageController = PageController(initialPage: 0);
+
+  @observable
+  GlobalKey<ScaffoldMessengerState> homeScaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  @observable
+  ReactionDisposer? startGameReaction;
 
   @observable
   RoomModel roomModel = RoomModel(
@@ -139,7 +147,7 @@ abstract class _ViewModelBase with Store {
       if (roomModel.roomCreator != playerModel.userName) {
         reInit();
       }
-      
+
       var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
           roomModel.roomCode!, playerModel.userName!);
       //setting message model username

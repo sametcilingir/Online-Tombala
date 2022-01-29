@@ -23,16 +23,12 @@ class _GameCardScreenState extends State<GameCardScreen> {
   void initState() {
     super.initState();
 
+    if (_viewModel.roomModel.roomId == null) {
+      Navigator.of(context).pushNamed(Routes.home);
+    }
+
     _viewModel.roomStream();
     _viewModel.messageStream();
-
-    if (_viewModel.roomModel.roomId == null) {
-      reaction(
-          (_) => _viewModel.roomModel.roomId,
-          (string) => string == "null"
-              ? Navigator.of(context).pushNamed(Routes.home)
-              : null);
-    }
 
     _viewModel.takenNumberReaction =
         reaction((_) => _viewModel.takenNumber, (v) {
@@ -108,18 +104,18 @@ class _GameCardScreenState extends State<GameCardScreen> {
                 showDialog<String>(
                   context: context,
                   builder: (BuildContext context) => AlertDialog(
-                    title:  Text(AppLocalizations.of(context)!.attension),
+                    title: Text(AppLocalizations.of(context)!.attension),
                     content:
-                         Text(AppLocalizations.of(context)!.reallyWantToLEave),
+                        Text(AppLocalizations.of(context)!.reallyWantToLEave),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child:  Text(AppLocalizations.of(context)!.no),
+                        child: Text(AppLocalizations.of(context)!.no),
                       ),
                       TextButton(
                         onPressed: () => Navigator.of(context)
                             .popUntil((route) => route.isFirst),
-                        child:  Text(AppLocalizations.of(context)!.yes),
+                        child: Text(AppLocalizations.of(context)!.yes),
                       ),
                     ],
                   ),
@@ -187,7 +183,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                   },
                 ),
               ),
-              /* appBar: AppBar(
+              appBar: AppBar(
                 leadingWidth: 300,
                 leading: SingleChildScrollView(
                   child: Column(
@@ -195,21 +191,21 @@ class _GameCardScreenState extends State<GameCardScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _viewModel.roomModel.roomFirstWinner!.isNotEmpty
-                          ? Text("1. Çinko Yapan Oyuncu  :  " +
+                          ? Text(AppLocalizations.of(context)!.theWinner1 +
                               _viewModel.roomModel.roomFirstWinner.toString())
                           : SizedBox(),
                       SizedBox(
                         height: 10,
                       ),
                       _viewModel.roomModel.roomSecondWinner!.isNotEmpty
-                          ? Text("2. Çinko Yapan Oyuncu  :  " +
+                          ? Text(AppLocalizations.of(context)!.theWinner2 +
                               _viewModel.roomModel.roomSecondWinner.toString())
                           : SizedBox(),
                       SizedBox(
                         height: 10,
                       ),
                       _viewModel.roomModel.roomThirdWinner!.isNotEmpty
-                          ? Text("Tombala Yapan Oyuncu  :  " +
+                          ? Text(AppLocalizations.of(context)!.theWinner3 +
                               _viewModel.roomModel.roomThirdWinner.toString())
                           : SizedBox(),
                       SizedBox(
@@ -233,7 +229,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
                     ),
                   )
                 ],
-              ),*/
+              ),
               body: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -253,55 +249,27 @@ class _GameCardScreenState extends State<GameCardScreen> {
                         child:
                             Text(AppLocalizations.of(context)!.showGameTable),
                       ),
-                      !_viewModel.isGameAutoTakeNumber
-                          ? OutlinedButton(
+                      (() {
+                        if (_viewModel.roomModel.roomCreator ==
+                            _viewModel.playerModel.userName) {
+                          if (!_viewModel.isGameAutoTakeNumber) {
+                            return OutlinedButton(
                               onPressed: () async {
                                 if (_viewModel
                                     .roomModel.roomThirdWinner!.isEmpty) {
                                   await _viewModel.takeNumber();
-
-                                  /*  AwesomeDialog(
-                      context: context,
-                      dialogType: DialogType.NO_HEADER,
-                      animType: AnimType.SCALE,
-                      autoHide: Duration(seconds: 5),
-                      dialogBackgroundColor: Colors.green,
-                      body: Container(
-                        height: 200,
-                        width: 150,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                _viewModel.takenNumber.toString(),
-                                style: TextStyle(fontSize: 42),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Text(
-                                'Çekilen sayi',
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ).show();*/
-                                } else {
-                                  //Navigator.of(context).popUntil((route) => route.isFirst);
-
-                                }
+                                } else {}
                               },
                               child: Text(
                                   AppLocalizations.of(context)!.takeNumber),
-                            )
-                          : SizedBox(),
+                            );
+                          } else {
+                            return SizedBox();
+                          }
+                        } else {
+                          return SizedBox();
+                        }
+                      }()),
                       SizedBox(
                         height: 10,
                       ),

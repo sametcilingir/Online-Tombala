@@ -53,6 +53,21 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
+  final _$viewStateAtom = Atom(name: '_ViewModelBase.viewState');
+
+  @override
+  ViewState get viewState {
+    _$viewStateAtom.reportRead();
+    return super.viewState;
+  }
+
+  @override
+  set viewState(ViewState value) {
+    _$viewStateAtom.reportWrite(value, super.viewState, () {
+      super.viewState = value;
+    });
+  }
+
   final _$formKeyUserNameAtom = Atom(name: '_ViewModelBase.formKeyUserName');
 
   @override
@@ -711,6 +726,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
     return '''
 isDarkModel: ${isDarkModel},
 isENLocal: ${isENLocal},
+viewState: ${viewState},
 formKeyUserName: ${formKeyUserName},
 formKeyJoin: ${formKeyJoin},
 homePageController: ${homePageController},

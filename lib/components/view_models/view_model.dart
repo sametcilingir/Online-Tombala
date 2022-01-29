@@ -13,6 +13,8 @@ import '../../utils/locator/locator.dart';
 
 part 'view_model.g.dart';
 
+enum ViewState { Idle, Busy }
+
 class ViewModel = _ViewModelBase with _$ViewModel;
 
 abstract class _ViewModelBase with Store {
@@ -24,8 +26,8 @@ abstract class _ViewModelBase with Store {
 
   @computed
   ThemeData get appTheme => isDarkModel
-      ? FlexThemeData.dark(scheme: FlexScheme.blueWhale)
-      : FlexThemeData.light(scheme: FlexScheme.blueWhale);
+      ? FlexThemeData.dark(scheme: FlexScheme.aquaBlue)
+      : FlexThemeData.light(scheme: FlexScheme.aquaBlue);
 
   @observable
   bool isENLocal = false;
@@ -34,6 +36,9 @@ abstract class _ViewModelBase with Store {
   Locale get locale => isENLocal
       ? AppLocalizations.supportedLocales.first
       : AppLocalizations.supportedLocales.last;
+
+  @observable
+  ViewState viewState = ViewState.Idle;
 
   @observable
   GlobalKey<FormState> formKeyUserName = GlobalKey<FormState>();
@@ -66,6 +71,7 @@ abstract class _ViewModelBase with Store {
   @action
   Future<bool> createRoom() async {
     try {
+      viewState = ViewState.Busy;
       reInit();
       //creating random room code
       roomModel.roomCode = Random().nextInt(100000).toString();
@@ -78,10 +84,13 @@ abstract class _ViewModelBase with Store {
       roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
 
       bool isJoined = await joinRoom();
+
       return isJoined;
     } catch (e) {
       print("sorun oda oluşturmada" + e.toString());
       return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
   }
 
@@ -125,6 +134,12 @@ abstract class _ViewModelBase with Store {
   @action
   Future<bool> joinRoom() async {
     try {
+      viewState = ViewState.Busy;
+
+      if (roomModel.roomCreator != playerModel.userName) {
+        reInit();
+      }
+      
       var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
           roomModel.roomCode!, playerModel.userName!);
       //setting message model username
@@ -140,17 +155,22 @@ abstract class _ViewModelBase with Store {
       }
     } catch (e) {
       return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
   }
 
   @action
   Future<bool> startGame() async {
     try {
+      viewState = ViewState.Busy;
       roomModel.roomStatus = "started";
       await _firebaseDatabaseService.updateGame(roomModel);
       return true;
     } catch (e) {
       return false;
+    } finally {
+      viewState = ViewState.Idle;
     }
   }
 
@@ -419,7 +439,7 @@ abstract class _ViewModelBase with Store {
 
   @action
   reInit() {
-    roomModel = RoomModel(
+    /* roomModel = RoomModel(
       roomFirstWinner: "",
       roomSecondWinner: "",
       roomThirdWinner: "",
@@ -428,12 +448,21 @@ abstract class _ViewModelBase with Store {
       roomCode: "",
       roomCreator: "",
       roomId: "",
-    );
-    playerModel = PlayerModel(
+    );*/
+    /*  playerModel = PlayerModel(
       userId: "",
       userName: "",
       userStatus: false,
-    );
+    );*/
+    roomModel.roomFirstWinner = "";
+    roomModel.roomSecondWinner = "";
+    roomModel.roomThirdWinner = "";
+    roomModel.roomTakenNumber = 0;
+    roomModel.roomStatus = "wait";
+    roomModel.roomCreator = "";
+    roomModel.roomId = "";
+    playerModel.userId = "";
+    playerModel.userStatus = false;
     playersList = ObservableList<PlayerModel>();
     takenNumbersMap = {};
     takenNumber = 0;

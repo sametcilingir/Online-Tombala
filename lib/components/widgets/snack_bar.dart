@@ -9,6 +9,9 @@ class SnackBarWidget {
         dismissDirection: DismissDirection.horizontal,
         behavior: SnackBarBehavior.floating,
         backgroundColor: color,
-        content: Text(message),
+        content: Text(message,
+            style: TextStyle(
+              fontSize: 18,
+            )),
       );
 }

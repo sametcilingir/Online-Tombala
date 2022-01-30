@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import '../../../core/app/color/app_color.dart';
 import '../../../core/app/duration/app_duration.dart';
 import '../../../core/app/theme/app_theme.dart';
 import '../../../core/constants/string_constants.dart';
@@ -20,28 +22,37 @@ class _HomeScreenState extends State<HomeScreen> {
   ViewModel get _viewModel => locator<ViewModel>();
 
   @override
+  void initState() {
+    super.initState();
+    _viewModel.reInit();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return buildWillPopScope();
   }
 
   WillPopScope buildWillPopScope() {
     return WillPopScope(
-        onWillPop: () => Future.sync(() {
-              _viewModel.homePageController.animateToPage(
-                0,
-                duration: AppDuration.lowDuration,
-                curve: Curves.easeIn,
-              );
-              return false;
-            }),
-        child: loading());
+      onWillPop: () => Future.sync(() {
+        _viewModel.homePageController.animateToPage(
+          0,
+          duration: AppDuration.lowDuration,
+          curve: Curves.easeIn,
+        );
+        return false;
+      }),
+      child: loading(),
+    );
   }
 
-  LoadingWidget loading() {
-    return LoadingWidget(
-      viewModel: _viewModel,
-      child: scaffold(),
-    );
+  Widget loading() {
+    return Observer(builder: (_) {
+      return LoadingWidget(
+        viewModel: _viewModel,
+        child: scaffold(),
+      );
+    });
   }
 
   Scaffold scaffold() {
@@ -55,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   AppBar appBar() {
     return AppBar(
       leading: appBarLeadingTextButton(),
-      elevation: 0,
       title: appBarTitleText(),
       centerTitle: true,
       actions: [
@@ -64,30 +74,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  TextButton appBarLeadingTextButton() {
+  Widget appBarLeadingTextButton() {
     return TextButton(
-      child: appBarLeadingTextButtonText(),
       onPressed: () {
         _viewModel.isENLocal = !_viewModel.isENLocal;
       },
+      child: appBarLeadingTextButtonText(),
     );
   }
 
-  Text appBarLeadingTextButtonText() {
+  Widget appBarLeadingTextButtonText() {
     return Text(
       _viewModel.isENLocal ? StringConstants.langTr : StringConstants.langEn,
+      style: AppTheme.textStyle.button!.copyWith(color: Colors.white),
     );
   }
 
-  Text appBarTitleText() {
+  Widget appBarTitleText() {
     return Text(
       StringConstants.appName,
-      style: AppTheme.headline5,
-      //
+     
     );
   }
 
-  IconButton appBarActionIconButton() {
+  Widget appBarActionIconButton() {
     return IconButton(
       icon: Icon(_viewModel.isDarkModel ? Icons.dark_mode : Icons.light_mode),
       onPressed: () {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../color/app_color.dart';
 
 class AppIcon {
   AppIcon._();

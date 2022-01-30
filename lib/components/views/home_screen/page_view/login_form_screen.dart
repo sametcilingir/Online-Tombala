@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+
 import '../../../../core/app/color/app_color.dart';
 import '../../../../core/app/duration/app_duration.dart';
 import '../../../../core/app/size/app_size.dart';
@@ -8,7 +11,6 @@ import '../../../../core/locator/locator.dart';
 import '../../../../core/routes/routes.dart';
 import '../../../view_models/view_model.dart';
 import '../../../widgets/snack_bar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({Key? key}) : super(key: key);
@@ -23,25 +25,28 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        child: Padding(
-      padding: context.paddingMedium,
-      child: loginForm(),
-    ));
-  }
-
-  Form loginForm() {
-    return Form(
-      key: _viewModel.formKeyUserName,
-      child: Column(
-        children: [
-          howToTextContainer(),
-          AppSize.mediumHeightSizedBox,
-          userNameTextFormField(),
-          AppSize.mediumHeightSizedBox,
-          buttonsRow(),
-        ],
+      child: Padding(
+        padding: context.paddingMedium,
+        child: loginForm(),
       ),
     );
+  }
+
+  Widget loginForm() {
+    return Observer(builder: (_) {
+      return Form(
+        key: _viewModel.formKeyUserName,
+        child: Column(
+          children: [
+            howToTextContainer(),
+            AppSize.mediumHeightSizedBox,
+            userNameTextFormField(),
+            AppSize.mediumHeightSizedBox,
+            buttonsRow(),
+          ],
+        ),
+      );
+    });
   }
 
   Row buttonsRow() {
@@ -49,7 +54,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         createRoomOutlinedButton(),
-      AppSize.mediumHeightSizedBox,
+        AppSize.mediumHeightSizedBox,
         joinPageTransferElevatedButton(),
       ],
     );
@@ -58,7 +63,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   ElevatedButton joinPageTransferElevatedButton() {
     return ElevatedButton(
       onPressed: () {
-        var val = _viewModel.formKeyUserName.currentState!.validate();
+        final val = _viewModel.formKeyUserName.currentState!.validate();
         if (val) {
           _viewModel.formKeyUserName.currentState!.save();
 
@@ -73,21 +78,20 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     );
   }
 
-  Text joinPageTransferElevatedButtonText() {
+  Widget joinPageTransferElevatedButtonText() {
     return Text(
       AppLocalizations.of(context)!.joinRoom,
-      style: AppTheme.button,
     );
   }
 
-  OutlinedButton createRoomOutlinedButton() {
+  Widget createRoomOutlinedButton() {
     return OutlinedButton(
       onPressed: () async {
-        var val = _viewModel.formKeyUserName.currentState!.validate();
+        final val = _viewModel.formKeyUserName.currentState!.validate();
 
         if (val) {
           _viewModel.formKeyUserName.currentState!.save();
-          bool isRoomCreated = await _viewModel.createRoom();
+          final isRoomCreated = await _viewModel.createRoom();
           if (isRoomCreated) {
             Navigator.of(context).pushNamed(Routes.waitingRoom);
           } else {
@@ -104,10 +108,10 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     );
   }
 
-  Text createRoomOutlinedButtonText() {
+  Widget createRoomOutlinedButtonText() {
     return Text(
       AppLocalizations.of(context)!.createRoom,
-      style: AppTheme.button,
+     
     );
   }
 
@@ -118,7 +122,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         border: const OutlineInputBorder(),
       ),
       onSaved: (newValue) {
-        _viewModel.playerModel.userName = newValue!;
+        _viewModel.playerModel.userName = newValue;
       },
       validator: (value) {
         if (value == "") {
@@ -141,15 +145,17 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
     );
   }
 
-  Text howToJoinRoomPragText() {
+  Widget howToJoinRoomPragText() {
     return Text(
       AppLocalizations.of(context)!.howtoJoinRoomParag,
-      style: AppTheme.headline6,
+      style: AppTheme.textStyle.headline6,
     );
   }
 
-  Text howToJoinRoomText() {
-    return Text(AppLocalizations.of(context)!.howtoJoinRoom,
-        style: AppTheme.headline5);
+  Widget howToJoinRoomText() {
+    return Text(
+      AppLocalizations.of(context)!.howtoJoinRoom,
+      style: AppTheme.textStyle.headline5,
+    );
   }
 }

@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 
 class AppNavigator {
   AppNavigator({
-    required context,
+    required BuildContext context,
   }) : _context = context;
 
   final BuildContext? _context;
 
-  push({required String route}) {
+ void push({required String route}) {
     Navigator.pushNamed(_context!, route);
   }
 
-  popUntilFirst() {
+ void popUntilFirst() {
     Navigator.of(_context!).popUntil((route) => route.isFirst);
   }
 
-  pop() {
+ void pop() {
     Navigator.pop(_context!);
   }
 }

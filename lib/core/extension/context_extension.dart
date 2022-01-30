@@ -20,4 +20,3 @@ extension EdgeInsetsExtension on BuildContext {
   EdgeInsets get paddingMedium => EdgeInsets.all(mediumValue);
   EdgeInsets get paddingHigh => EdgeInsets.all(highValue);
 }
-

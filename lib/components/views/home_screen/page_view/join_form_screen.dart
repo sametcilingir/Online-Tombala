@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+
 import '../../../../core/app/color/app_color.dart';
 import '../../../../core/app/duration/app_duration.dart';
 import '../../../../core/app/size/app_size.dart';
@@ -8,7 +11,7 @@ import '../../../../core/locator/locator.dart';
 import '../../../../core/routes/routes.dart';
 import '../../../view_models/view_model.dart';
 import '../../../widgets/snack_bar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class JoinFormScreen extends StatelessWidget {
   const JoinFormScreen({Key? key}) : super(key: key);
 
@@ -18,26 +21,28 @@ class JoinFormScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: context.paddingLow,
-        child: joinForm( context),
+        padding: context.paddingMedium,
+        child: joinForm(context),
       ),
     );
   }
 
-  Form joinForm(BuildContext context) {
-    return Form(
-      key: _viewModel.formKeyJoin,
-      child: Column(
-        children: [
-          howToTextContainer(context),
-          AppSize.mediumHeightSizedBox,
-          roomCodeTextformField(context),
-          AppSize.mediumHeightSizedBox,
-          joinRoomElevatedButton(context),
-          backToLoginPageViewTextButton(context),
-        ],
-      ),
-    );
+  Widget joinForm(BuildContext context) {
+    return Observer(builder: (_) {
+      return Form(
+        key: _viewModel.formKeyJoin,
+        child: Column(
+          children: [
+            howToTextContainer(context),
+            AppSize.mediumHeightSizedBox,
+            roomCodeTextformField(context),
+            AppSize.mediumHeightSizedBox,
+            joinRoomElevatedButton(context),
+            backToLoginPageViewTextButton(context),
+          ],
+        ),
+      );
+    });
   }
 
   TextButton backToLoginPageViewTextButton(BuildContext context) {
@@ -56,35 +61,34 @@ class JoinFormScreen extends StatelessWidget {
   Text backToLoginPageViewTextButtonText(BuildContext context) {
     return Text(
       AppLocalizations.of(context)!.back,
-      style: AppTheme.button,
     );
   }
 
   ElevatedButton joinRoomElevatedButton(BuildContext context) {
     return ElevatedButton(
-        onPressed: () async {
-          _viewModel.formKeyJoin.currentState!.save();
+      onPressed: () async {
+        _viewModel.formKeyJoin.currentState!.save();
 
-          final isJoined = await _viewModel.joinRoom();
-          if (isJoined) {
-            //_viewModel.createGameCard();
-            Navigator.of(context).pushNamed(Routes.waitingRoom);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              snackBar(
-                Colors.red,
-                AppLocalizations.of(context)!.cantJoinRoom,
-              ),
-            );
-          }
-        },
-        child: joinRoomElevatedButtonText(context));
+        final isJoined = await _viewModel.joinRoom();
+        if (isJoined) {
+          //_viewModel.createGameCard();
+          Navigator.of(context).pushNamed(Routes.waitingRoom);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            snackBar(
+              Colors.red,
+              AppLocalizations.of(context)!.cantJoinRoom,
+            ),
+          );
+        }
+      },
+      child: joinRoomElevatedButtonText(context),
+    );
   }
 
   Text joinRoomElevatedButtonText(BuildContext context) {
     return Text(
       AppLocalizations.of(context)!.joinRoom,
-      style: AppTheme.button,
     );
   }
 
@@ -96,7 +100,7 @@ class JoinFormScreen extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onSaved: (newValue) {
-        _viewModel.roomModel.roomCode = newValue!;
+        _viewModel.roomModel.roomCode = newValue;
       },
     );
   }
@@ -115,15 +119,17 @@ class JoinFormScreen extends StatelessWidget {
     );
   }
 
-  Text howToPlayTextParag(BuildContext context) {
+  Widget howToPlayText(BuildContext context) {
     return Text(
-      AppLocalizations.of(context)!.howToPlayParag,
-      style: AppTheme.headline6,
+      AppLocalizations.of(context)!.howToPlay,
+      style: AppTheme.textStyle.headline6,
     );
   }
 
-  Text howToPlayText(BuildContext context) {
-    return Text(AppLocalizations.of(context)!.howToPlay,
-        style: AppTheme.headline5);
+  Widget howToPlayTextParag(BuildContext context) {
+    return Text(
+      AppLocalizations.of(context)!.howToPlayParag,
+      style: AppTheme.textStyle.headline6,
+    );
   }
 }

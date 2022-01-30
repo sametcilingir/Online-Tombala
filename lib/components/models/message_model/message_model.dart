@@ -11,7 +11,7 @@ class MessageModel {
   DateTime? messageSentTime;
 
   MessageModel(
-      {this.messageSenderName, this.messageText, this.messageSentTime});
+      {this.messageSenderName, this.messageText, this.messageSentTime,});
 
   factory MessageModel.fromJson(Map<String, dynamic>? json) =>
       _$MessageModelFromJson(json!);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
+
 import '../../../core/app/color/app_color.dart';
 import '../../../core/app/icon/app_icon.dart';
 import '../../../core/app/navigator/app_navigator.dart';
@@ -9,10 +11,9 @@ import '../../../core/app/theme/app_theme.dart';
 import '../../../core/extension/context_extension.dart';
 import '../../../core/locator/locator.dart';
 import '../../../core/routes/routes.dart';
+import '../../view_models/view_model.dart';
 import '../../widgets/chat_sheet.dart';
 import '../../widgets/loading_widget.dart';
-import '../../view_models/view_model.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WaitingScreen extends StatefulWidget {
   const WaitingScreen({Key? key}) : super(key: key);
@@ -32,24 +33,23 @@ class _WaitingScreenState extends State<WaitingScreen> {
     }
     _viewModel.createGameCard();
 
+    if (_viewModel.roomModel.roomCreator != _viewModel.playerModel.userName) {
+      _viewModel.startGameReaction = reaction(
+        (_) => _viewModel.roomModel.roomStatus,
+        (string) => string == "started"
+            ? AppNavigator(context: context).push(route: Routes.gameCard)
+            : null,
+      );
+    }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-
     _viewModel.roomStream();
     _viewModel.playersStream();
     _viewModel.messageStream();
-
-    if (_viewModel.roomModel.roomCreator != _viewModel.playerModel.userName) {
-      _viewModel.startGameReaction = reaction(
-          (_) => _viewModel.roomModel.roomStatus,
-          (string) => string == "started"
-              ? AppNavigator(context: context).push(route: Routes.gameCard)
-              : null);
-    }
   }
 
   @override
@@ -65,9 +65,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
   }
 
   Observer buildObserver() {
-    return Observer(builder: (_) {
-      return loading();
-    });
+    return Observer(
+      builder: (_) {
+        return loading();
+      },
+    );
   }
 
   LoadingWidget loading() {
@@ -79,25 +81,24 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
   Scaffold scaffold() {
     return Scaffold(
+      appBar: appBar(),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              appBar(),
+              AppSize.mediumHeightSizedBox,
               roomCodeText(),
               AppSize.mediumHeightSizedBox,
               playersContainer(),
               AppSize.mediumHeightSizedBox,
-              _viewModel.roomModel.roomCreator ==
-                      _viewModel.playerModel.userName
-                  ? roomCreatorColumn()
-                  : AppSize.zeroSizedBox,
-              _viewModel.roomModel.roomCreator !=
-                      _viewModel.playerModel.userName
-                  ? roomPlayerPadding()
-                  : AppSize.zeroSizedBox,
+              if (_viewModel.roomModel.roomCreator ==
+                  _viewModel.playerModel.userName)
+                roomCreatorColumn(),
+              if (_viewModel.roomModel.roomCreator !=
+                  _viewModel.playerModel.userName)
+                roomPlayerPadding(),
+              setPlayerStatusRow(),
             ],
           ),
         ),
@@ -107,22 +108,20 @@ class _WaitingScreenState extends State<WaitingScreen> {
 
   AppBar appBar() {
     return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: appBareLeadingBackButton(),
+      leading: appBarLeadingBackButton(),
       actions: [
-        _viewModel.roomModel.roomCreator == _viewModel.playerModel.userName
-            ? Padding(
-                padding: context.paddingLow,
-                child: appBarActionOutlinedButton(),
-              )
-            : AppSize.zeroSizedBox,
+        if (_viewModel.roomModel.roomCreator == _viewModel.playerModel.userName)
+          Padding(
+            padding: context.paddingLow,
+            child: appBarActionOutlinedButton(),
+          ),
       ],
     );
   }
 
-  BackButton appBareLeadingBackButton() {
-    return BackButton(
+  IconButton appBarLeadingBackButton() {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         AppNavigator(context: context).pop();
       },
@@ -130,20 +129,38 @@ class _WaitingScreenState extends State<WaitingScreen> {
   }
 
   OutlinedButton appBarActionOutlinedButton() {
-    return OutlinedButton.icon(
+    return OutlinedButton(
+      style: ButtonStyle(
+        side: MaterialStateProperty.all(
+          BorderSide(color: Colors.white.withOpacity(0.4)),
+        ),
+      ),
       onPressed: () async {
         await _viewModel.deleteGame();
         AppNavigator(context: context).pop();
       },
-      icon: AppIcon.closeIcon,
-      label: Text(AppLocalizations.of(context)!.deleteGame),
+      child: Row(
+        children: [
+          AppIcon.colorfulIcon(
+            appColor: Colors.white,
+            appIcon: AppIcon.close,
+          ),
+          AppSize.lowWidthSizedBox,
+          Text(
+            AppLocalizations.of(context)!.deleteGame,
+            style: AppTheme.textStyle.button!.copyWith(
+              color: Colors.white,
+            ),
+          )
+        ],
+      ),
     );
   }
 
   Text roomCodeText() {
     return Text(
       "${AppLocalizations.of(context)!.gameCode}: ${_viewModel.roomModel.roomCode}",
-      style: AppTheme.headline4?.copyWith(
+      style: AppTheme.textStyle.headline4?.copyWith(
         fontWeight: FontWeight.bold,
       ),
     );
@@ -155,22 +172,27 @@ class _WaitingScreenState extends State<WaitingScreen> {
       width: 500,
       margin: context.paddingLow,
       decoration: BoxDecoration(
-          color: AppTheme.theme.colorScheme.primary.withOpacity(0.4),
-          borderRadius: const BorderRadius.all(
-            Radius.circular(
-              AppSize.low,
-            ),
-          )),
+        color: AppTheme.theme.colorScheme.primary.withOpacity(0.4),
+        borderRadius: const BorderRadius.all(
+          Radius.circular(
+            AppSize.low,
+          ),
+        ),
+      ),
       child: Padding(
         padding: context.paddingLow,
-        child: Column(children: [
-          Text(AppLocalizations.of(context)!.players,
-              style: AppTheme.headline4),
-          AppSize.mediumHeightSizedBox,
-          playersList(),
-          AppSize.lowHeightSizedBox,
-          openChatOutlinedButton()
-        ]),
+        child: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context)!.players,
+              style: AppTheme.textStyle.headline4,
+            ),
+            AppSize.mediumHeightSizedBox,
+            playersList(),
+            AppSize.lowHeightSizedBox,
+            openChatOutlinedButton()
+          ],
+        ),
       ),
     );
   }
@@ -180,13 +202,27 @@ class _WaitingScreenState extends State<WaitingScreen> {
       child: SizedBox(
         height: context.height * 0.32,
         child: ListView.builder(
-          addAutomaticKeepAlives: true,
           itemCount: _viewModel.playersList!.length,
           shrinkWrap: true,
-          scrollDirection: Axis.vertical,
           itemBuilder: (context, index) => playersListItem(context, index),
         ),
       ),
+    );
+  }
+
+  OutlinedButton openChatOutlinedButton() {
+    return OutlinedButton.icon(
+      onPressed: () {
+        showModalBottomSheet<dynamic>(
+          enableDrag: true,
+          isDismissible: true,
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => const ChatBottomSheetWidget(),
+        );
+      },
+      icon: AppIcon.chatIcon,
+      label: Text(AppLocalizations.of(context)!.chat),
     );
   }
 
@@ -196,13 +232,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
       child: ListTile(
         title: Text(
           _viewModel.playersList![index].userName.toString(),
-          style: AppTheme.headline6,
+          style: AppTheme.textStyle.headline6,
         ),
         subtitle: Text(
           _viewModel.playersList![index].userStatus == true
               ? AppLocalizations.of(context)!.playersReady
               : AppLocalizations.of(context)!.playersNotReady,
-          style: AppTheme.subtitle1,
+          style: AppTheme.textStyle.subtitle1,
         ),
         trailing: _viewModel.playersList![index].userStatus == true
             ? AppIcon.colorfulIcon(
@@ -212,23 +248,8 @@ class _WaitingScreenState extends State<WaitingScreen> {
             : AppIcon.colorfulIcon(
                 appColor: AppColor.redColor,
                 appIcon: AppIcon.info,
-              )
+              ),
       ),
-    );
-  }
-
-  OutlinedButton openChatOutlinedButton() {
-    return OutlinedButton.icon(
-      onPressed: () {
-        showModalBottomSheet(
-          enableDrag: true,
-          isDismissible: true,
-          context: context,
-          builder: (context) => const ChatBommSheetWidget(),
-        );
-      },
-      icon: AppIcon.chatIcon,
-      label: Text(AppLocalizations.of(context)!.chat),
     );
   }
 
@@ -243,15 +264,17 @@ class _WaitingScreenState extends State<WaitingScreen> {
               AppLocalizations.of(context)!.autoTakeNumber,
             ),
             Switch(
-                value: _viewModel.isGameAutoTakeNumber,
-                onChanged: (value) {
-                  _viewModel.isGameAutoTakeNumber = value;
-                }),
+              value: _viewModel.isGameAutoTakeNumber,
+              onChanged: (value) {
+                _viewModel.isGameAutoTakeNumber = value;
+              },
+            ),
           ],
         ),
-        _viewModel.roomModel.roomStatus != "started"
-            ? startGameElevatedButton()
-            : errorWidget(),
+        if (_viewModel.roomModel.roomStatus != "started")
+          startGameElevatedButton()
+        else
+          errorWidget(),
       ],
     );
   }
@@ -259,7 +282,7 @@ class _WaitingScreenState extends State<WaitingScreen> {
   ElevatedButton startGameElevatedButton() {
     return ElevatedButton(
       onPressed: () async {
-        bool isGameStarted = await _viewModel.startGame();
+        final isGameStarted = await _viewModel.startGame();
         if (isGameStarted) {
           AppNavigator(context: context).push(
             route: Routes.gameCard,
@@ -268,7 +291,6 @@ class _WaitingScreenState extends State<WaitingScreen> {
       },
       child: Text(
         AppLocalizations.of(context)!.startGame,
-        style: Theme.of(context).textTheme.button,
       ),
     );
   }
@@ -280,12 +302,13 @@ class _WaitingScreenState extends State<WaitingScreen> {
         children: [
           Text(AppLocalizations.of(context)!.isAlreadyStarted),
           ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                AppLocalizations.of(context)!.back,
-              )),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              AppLocalizations.of(context)!.back,
+            ),
+          ),
         ],
       ),
     );
@@ -295,7 +318,6 @@ class _WaitingScreenState extends State<WaitingScreen> {
     return Padding(
       padding: context.paddingLow,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const SizedBox(
             height: 25,
@@ -305,11 +327,10 @@ class _WaitingScreenState extends State<WaitingScreen> {
           AppSize.mediumHeightSizedBox,
           Text(
             "${_viewModel.roomModel.roomCreator} ${AppLocalizations.of(context)!.waitingToStart}",
-            style: AppTheme.subtitle1,
+            style: AppTheme.textStyle.subtitle1,
             textAlign: TextAlign.center,
           ),
           AppSize.mediumHeightSizedBox,
-          setPlayerStatusRow(),
         ],
       ),
     );
@@ -320,25 +341,20 @@ class _WaitingScreenState extends State<WaitingScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                  width: 1, color: Theme.of(context).colorScheme.primary),
-            ),
-            onPressed: () async {
-              await _viewModel.setPlayerStatus(false);
-            },
-            child: Text(
-              AppLocalizations.of(context)!.notReady,
-              style: Theme.of(context).textTheme.button,
-            )),
+          onPressed: () async {
+            await _viewModel.setPlayerStatus(playerStatus: false);
+          },
+          child: Text(
+            AppLocalizations.of(context)!.notReady,
+          ),
+        ),
         AppSize.mediumWidthSizedBox,
         ElevatedButton(
           onPressed: () async {
-            await _viewModel.setPlayerStatus(true);
+            await _viewModel.setPlayerStatus(playerStatus: true);
           },
           child: Text(
             AppLocalizations.of(context)!.ready,
-            style: Theme.of(context).textTheme.button,
           ),
         ),
       ],

@@ -285,21 +285,6 @@ mixin _$ViewModel on _ViewModelBase, Store {
     });
   }
 
-  final _$isChatOpenAtom = Atom(name: '_ViewModelBase.isChatOpen');
-
-  @override
-  bool? get isChatOpen {
-    _$isChatOpenAtom.reportRead();
-    return super.isChatOpen;
-  }
-
-  @override
-  set isChatOpen(bool? value) {
-    _$isChatOpenAtom.reportWrite(value, super.isChatOpen, () {
-      super.isChatOpen = value;
-    });
-  }
-
   final _$formKeyMessageWaitingAtom =
       Atom(name: '_ViewModelBase.formKeyMessageWaiting');
 
@@ -641,9 +626,9 @@ mixin _$ViewModel on _ViewModelBase, Store {
       AsyncAction('_ViewModelBase.setPlayerStatus');
 
   @override
-  Future<void> setPlayerStatus(bool playerStatus) {
+  Future<void> setPlayerStatus({required bool playerStatus}) {
     return _$setPlayerStatusAsyncAction
-        .run(() => super.setPlayerStatus(playerStatus));
+        .run(() => super.setPlayerStatus(playerStatus: playerStatus));
   }
 
   final _$joinRoomAsyncAction = AsyncAction('_ViewModelBase.joinRoom');
@@ -700,7 +685,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
       ActionController(name: '_ViewModelBase');
 
   @override
-  dynamic playersStream() {
+  void playersStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.playersStream');
     try {
@@ -711,7 +696,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic roomStream() {
+  void roomStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.roomStream');
     try {
@@ -722,7 +707,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic messageStream() {
+  void messageStream() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.messageStream');
     try {
@@ -733,7 +718,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic createGameCard() {
+  void createGameCard() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.createGameCard');
     try {
@@ -744,7 +729,7 @@ mixin _$ViewModel on _ViewModelBase, Store {
   }
 
   @override
-  dynamic reInit() {
+  void reInit() {
     final _$actionInfo = _$_ViewModelBaseActionController.startAction(
         name: '_ViewModelBase.reInit');
     try {
@@ -774,7 +759,6 @@ allNumbersList: ${allNumbersList},
 takenNumber: ${takenNumber},
 takenNumbersList: ${takenNumbersList},
 takenNumbersListFromDatabase: ${takenNumbersListFromDatabase},
-isChatOpen: ${isChatOpen},
 formKeyMessageWaiting: ${formKeyMessageWaiting},
 messageControllerWaiting: ${messageControllerWaiting},
 formKeyMessageGameCard: ${formKeyMessageGameCard},

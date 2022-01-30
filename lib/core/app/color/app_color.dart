@@ -5,7 +5,7 @@ class AppColor {
   static const transparent = "";
 
   static Color? get transparentColor =>
-      Color(int.parse("0xff" + transparent.toString()));
+      Color(int.parse("0xff$transparent"));
 
   static Color? get greenColor => Colors.green;
   static Color? get redColor => Colors.red;

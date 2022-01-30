@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../components/models/message_model/message_model.dart';
 import '../../components/models/player_model/player_model.dart';
 import '../../components/models/room_model/room_model.dart';
-
-
 import 'database_service.dart';
 
 class FirebaseDatabaseService implements DatabaseService {
@@ -13,7 +12,7 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Future<String?> createRoom(RoomModel roomModel) async {
-    var documentRef = _firestore.collection("rooms").doc();
+    final documentRef = _firestore.collection("rooms").doc();
     roomModel.roomId = documentRef.id;
     await documentRef.set(
       roomModel.toJson(),
@@ -23,7 +22,7 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> playersStream(
-      RoomModel roomModel) {
+      RoomModel roomModel,) {
     final playersList = _firestore
         .collection("rooms")
         .doc(roomModel.roomId)
@@ -35,7 +34,7 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> roomStream(
-      RoomModel roomModel) {
+      RoomModel roomModel,) {
     final roomStream =
         _firestore.collection("rooms").doc(roomModel.roomId).snapshots();
     return roomStream;
@@ -43,8 +42,10 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Future<void> setPlayerStatus(
-      RoomModel roomModel, PlayerModel playerModel) async {
-    var documentRef = _firestore
+    RoomModel roomModel,
+    PlayerModel playerModel,
+  ) async {
+    final documentRef = _firestore
         .collection("rooms")
         .doc(roomModel.roomId)
         .collection("players")
@@ -55,22 +56,22 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Future<List> joinRoom(String roomCode, String userName) async {
-    var querySnapshot = await _firestore
+    final querySnapshot = await _firestore
         .collection("rooms")
         .where("roomCode", isEqualTo: roomCode)
         .get();
     if (querySnapshot.docs.isNotEmpty) {
       RoomModel roomModel = RoomModel();
       //querySnapshot.docs.forEach((element) {
-      for (var element in querySnapshot.docs) {
+      for (final element in querySnapshot.docs) {
         roomModel = RoomModel.fromJson(element.data());
       }
-      var documentReferance = _firestore
+      final documentReferance = _firestore
           .collection("rooms")
           .doc(roomModel.roomId)
           .collection("players")
           .doc();
-      PlayerModel playerModel = PlayerModel(
+      final playerModel = PlayerModel(
         userId: documentReferance.id,
         userName: userName,
         userStatus: false,
@@ -99,7 +100,8 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> messageStream(
-      RoomModel roomModel) {
+    RoomModel roomModel,
+  ) {
     final messagesList = _firestore
         .collection("rooms")
         .doc(roomModel.roomId)
@@ -112,8 +114,10 @@ class FirebaseDatabaseService implements DatabaseService {
 
   @override
   Future<bool> sendMessage(
-      RoomModel roomModel, MessageModel messageModel) async {
-    var documentRef = _firestore
+    RoomModel roomModel,
+    MessageModel messageModel,
+  ) async {
+    final documentRef = _firestore
         .collection("rooms")
         .doc(roomModel.roomId)
         .collection("messages")

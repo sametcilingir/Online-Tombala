@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../../components/views/game_card_screen/game_card_screen.dart';
 import '../../components/views/home_screen/home_screen.dart';
 import '../../components/views/waiting_screen/waiting_screen.dart';
 
 class Routes {
-  //Routes._();
+  Routes._();
   static const String home = '/home';
   static const String waitingRoom = '/home/waiting_room';
   static const String gameCard = '/home/waiting_room/game_card';

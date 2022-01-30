@@ -1,42 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:tombala/core/extension/context_extension.dart';
 import '../../core/app/size/app_size.dart';
 import '../../core/app/theme/app_theme.dart';
 import '../../core/locator/locator.dart';
 import '../view_models/view_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ChatBommSheetWidget extends StatefulWidget {
-  const ChatBommSheetWidget({Key? key}) : super(key: key);
+class ChatBottomSheetWidget extends StatefulWidget {
+  const ChatBottomSheetWidget({Key? key}) : super(key: key);
 
   @override
-  State<ChatBommSheetWidget> createState() => _ChatBommSheetWidgetState();
+  State<ChatBottomSheetWidget> createState() => _ChatBottomSheetWidgetState();
 }
 
-class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
+class _ChatBottomSheetWidgetState extends State<ChatBottomSheetWidget> {
   final ViewModel _viewModel = locator<ViewModel>();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: MediaQuery.of(context).viewInsets,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          openedChatIconButton(_viewModel),
-          messagesContainer(_viewModel),
-          messageSendPadding(_viewModel),
-        ],
+    return Scaffold(
+      appBar: appBar(_viewModel),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            messagesContainer(_viewModel),
+            messageSendPadding(_viewModel),
+            AppSize.lowHeightSizedBox
+          ],
+        ),
       ),
+    );
+  }
+
+  AppBar appBar(ViewModel _viewModel) {
+    return AppBar(
+      toolbarHeight: 80,
+      automaticallyImplyLeading: false,
+      title: Text(
+        AppLocalizations.of(context)!.chat,
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: openedChatIconButtonIcon(),
+        )
+      ],
     );
   }
 
   Padding messageSendPadding(ViewModel _viewModel) {
     return Padding(
-      padding: EdgeInsets.all(AppSize.low),
+      padding: const EdgeInsets.all(AppSize.low),
       child: SizedBox(
-        height: AppSize.high,
+        height: AppSize.high * 1.2,
         width: double.infinity,
         child: messageSendForm(_viewModel),
       ),
@@ -57,7 +78,6 @@ class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: AppLocalizations.of(context)!.message,
         border: OutlineInputBorder(
-          borderSide: const BorderSide(),
           borderRadius: BorderRadius.circular(8),
         ),
         suffix: messageSendTextFormFiedSuffixElevatedButton(_viewModel),
@@ -74,14 +94,15 @@ class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
   }
 
   ElevatedButton messageSendTextFormFiedSuffixElevatedButton(
-      ViewModel _viewModel) {
+    ViewModel _viewModel,
+  ) {
     return ElevatedButton(
       onPressed: () async {
-        var val = _viewModel.formKeyMessageWaiting.currentState!.validate();
+        final val = _viewModel.formKeyMessageWaiting.currentState!.validate();
         if (val && _viewModel.messageModel.messageText!.isNotEmpty) {
           _viewModel.formKeyMessageWaiting.currentState!.save();
 
-          bool isMassageSent = await _viewModel.sendMessage();
+          final isMassageSent = await _viewModel.sendMessage();
 
           if (isMassageSent) {
             _viewModel.messageModel.messageText = "";
@@ -96,46 +117,35 @@ class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
   Text messageSendTextFormFiedSuffixElevatedButtonText(ViewModel _viewModel) =>
       Text(AppLocalizations.of(context)!.send);
 
-  Container messagesContainer(ViewModel _viewModel) {
-    return Container(
-      height: 310,
-      child: Observer(builder: (_) {
-        return ListView.builder(
-          itemCount: _viewModel.messageList!.length,
-          addAutomaticKeepAlives: true,
-          shrinkWrap: true,
-          reverse: true,
-          scrollDirection: Axis.vertical,
-          itemBuilder: (context, index) =>
-              messageItemPadding(_viewModel, index),
+  Widget messagesContainer(ViewModel _viewModel) {
+    return Observer(
+      builder: (_) {
+        return Container(
+          height: context.height * 0.8,
+          child: ListView.builder(
+            itemCount: _viewModel.messageList!.length,
+            shrinkWrap: true,
+            reverse: true,
+            itemBuilder: (context, index) => messageItem(_viewModel, index),
+          ),
         );
-      }),
+      },
     );
   }
 
-  Padding messageItemPadding(ViewModel _viewModel, int index) {
+  Widget messageItem(ViewModel _viewModel, int index) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(top: AppSize.medium),
       child: ListTile(
         title: Text(
           _viewModel.messageList![index].messageText.toString(),
-          style: AppTheme.headline6,
+          style: AppTheme.textStyle.headline6,
         ),
         subtitle: Text(
           _viewModel.messageList![index].messageSenderName.toString(),
-          style: AppTheme.bodyText1,
+          style: AppTheme.textStyle.bodyText1,
         ),
       ),
-    );
-  }
-
-  IconButton openedChatIconButton(ViewModel _viewModel) {
-    return IconButton(
-      onPressed: () {
-        _viewModel.isChatOpen = false;
-        Navigator.of(context).pop();
-      },
-      icon: openedChatIconButtonIcon(),
     );
   }
 

@@ -2,11 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'components/view_models/view_model.dart';
-import 'utils/routes/routes.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'core/locator/locator.dart';
+import 'core/routes/routes.dart';
 import 'firebase_options.dart';
-import 'utils/locator/locator.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();

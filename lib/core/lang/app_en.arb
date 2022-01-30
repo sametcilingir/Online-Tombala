@@ -21,7 +21,7 @@
   "message": "Message",
   "send": "Send",
   "showGameTable": "Show the game table",
-  "takenNumber": "Number taken:",
+  "takenNumber": "Last taken number : ",
   "takeNumber": "Take a number",
   "setWinner1": "Announce that you are the first winner",
   "setWinner2": "Announce that you are the second winner",

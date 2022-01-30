@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tombala/components/widgets/loading_widget.dart';
-import 'package:tombala/utils/constants/duration_constants.dart';
-import 'package:tombala/utils/constants/string_constants.dart';
-import 'package:tombala/utils/extension/duration_extension.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
+import '../../../core/app/duration/app_duration.dart';
+import '../../../core/app/theme/app_theme.dart';
+import '../../../core/constants/string_constants.dart';
+import '../../../core/locator/locator.dart';
+import '../../widgets/loading_widget.dart';
 import '../../view_models/view_model.dart';
-import '../../../utils/locator/locator.dart';
 
 import 'page_view/join_form_screen.dart';
 import 'page_view/login_form_screen.dart';
@@ -30,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onWillPop: () => Future.sync(() {
               _viewModel.homePageController.animateToPage(
                 0,
-                duration: DurationConstants().durationLow,
+                duration: AppDuration.lowDuration,
                 curve: Curves.easeIn,
               );
               return false;
@@ -83,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Text appBarTitleText() {
     return Text(
       StringConstants.appName,
-      style: AppTheme().headline5,
+      style: AppTheme.headline5,
       //
     );
   }

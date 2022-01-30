@@ -4,6 +4,7 @@ import '../../components/views/home_screen/home_screen.dart';
 import '../../components/views/waiting_screen/waiting_screen.dart';
 
 class Routes {
+  //Routes._();
   static const String home = '/home';
   static const String waitingRoom = '/home/waiting_room';
   static const String gameCard = '/home/waiting_room/game_card';
@@ -12,6 +13,6 @@ class Routes {
     home: (BuildContext context) => const HomeScreen(),
     waitingRoom: (BuildContext context) => const WaitingScreen(),
     gameCard: (BuildContext context) => const GameCardScreen()
-
   };
+
 }

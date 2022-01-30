@@ -1,3 +1,0 @@
- class ColorConstants {
-  final  transparent = "";
-}

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
-import 'package:tombala/components/view_models/view_model.dart';
+import '../view_models/view_model.dart';
 
 class LoadingWidget extends StatefulWidget {
   const LoadingWidget({

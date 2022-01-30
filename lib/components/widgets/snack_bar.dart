@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
+import '../../core/app/theme/app_theme.dart';
 
 
 SnackBar snackBar(Color color, String message ) {
@@ -9,7 +9,7 @@ SnackBar snackBar(Color color, String message ) {
     backgroundColor: color,
     content: Text(
       message,
-      style: AppTheme().headline6,
+      style: AppTheme.headline6,
     ),
   );
 }

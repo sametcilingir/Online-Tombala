@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:tombala/components/view_models/view_model.dart';
-import 'package:tombala/utils/constants/size_constants.dart';
-import 'package:tombala/utils/locator/locator.dart';
+import '../../core/app/size/app_size.dart';
+import '../../core/app/theme/app_theme.dart';
+import '../../core/locator/locator.dart';
+import '../view_models/view_model.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
 
 class ChatBommSheetWidget extends StatefulWidget {
   const ChatBommSheetWidget({Key? key}) : super(key: key);
@@ -34,9 +34,9 @@ class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
 
   Padding messageSendPadding(ViewModel _viewModel) {
     return Padding(
-      padding: EdgeInsets.all(SizeConstants().low),
+      padding: EdgeInsets.all(AppSize.low),
       child: SizedBox(
-        height: SizeConstants().high,
+        height: AppSize.high,
         width: double.infinity,
         child: messageSendForm(_viewModel),
       ),
@@ -119,11 +119,11 @@ class _ChatBommSheetWidgetState extends State<ChatBommSheetWidget> {
       child: ListTile(
         title: Text(
           _viewModel.messageList![index].messageText.toString(),
-          style: AppTheme().headline6,
+          style: AppTheme.headline6,
         ),
         subtitle: Text(
           _viewModel.messageList![index].messageSenderName.toString(),
-          style: AppTheme().bodyText1,
+          style: AppTheme.bodyText1,
         ),
       ),
     );

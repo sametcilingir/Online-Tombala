@@ -1,16 +1,15 @@
 import 'dart:math';
 
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
+
+import '../../core/app/theme/app_theme.dart';
+import '../../core/locator/locator.dart';
+import '../../core/services/firebase_database_service.dart';
 import '../models/message_model/message_model.dart';
 import '../models/player_model/player_model.dart';
 import '../models/room_model/room_model.dart';
-import '../../utils/services/firebase_database_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../../utils/locator/locator.dart';
 
 part 'view_model.g.dart';
 
@@ -28,7 +27,7 @@ abstract class _ViewModelBase with Store {
   bool isDarkModel = true;
 
   @computed
-  ThemeData get appTheme => AppTheme().theme;
+  ThemeData get appTheme => AppTheme.theme;
 
   @observable
   bool isENLocal = false;
@@ -95,7 +94,6 @@ abstract class _ViewModelBase with Store {
 
       return isJoined;
     } catch (e) {
-      print("sorun oda oluşturmada" + e.toString());
       return false;
     } finally {
       viewState = ViewState.Idle;

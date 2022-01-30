@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:tombala/components/view_models/view_model.dart';
-import 'package:tombala/components/widgets/snack_bar.dart';
-import 'package:tombala/utils/constants/color_constants.dart';
-import 'package:tombala/utils/constants/duration_constants.dart';
-import 'package:tombala/utils/constants/size_constants.dart';
-import 'package:tombala/utils/extension/color_extension.dart';
-import 'package:tombala/utils/extension/context_extension.dart';
+import '../../../../core/app/color/app_color.dart';
+import '../../../../core/app/duration/app_duration.dart';
+import '../../../../core/app/size/app_size.dart';
+import '../../../../core/app/theme/app_theme.dart';
+import '../../../../core/extension/context_extension.dart';
+import '../../../../core/locator/locator.dart';
+import '../../../../core/routes/routes.dart';
+import '../../../view_models/view_model.dart';
+import '../../../widgets/snack_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:tombala/utils/extension/duration_extension.dart';
-import 'package:tombala/utils/extension/size_extension.dart';
-import 'package:tombala/utils/locator/locator.dart';
-import 'package:tombala/utils/routes/routes.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
-
 class JoinFormScreen extends StatelessWidget {
   const JoinFormScreen({Key? key}) : super(key: key);
 
@@ -34,9 +30,9 @@ class JoinFormScreen extends StatelessWidget {
       child: Column(
         children: [
           howToTextContainer(context),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           roomCodeTextformField(context),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           joinRoomElevatedButton(context),
           backToLoginPageViewTextButton(context),
         ],
@@ -49,7 +45,7 @@ class JoinFormScreen extends StatelessWidget {
       onPressed: () {
         _viewModel.homePageController.animateToPage(
           0,
-          duration: DurationConstants().durationLow,
+          duration: AppDuration.lowDuration,
           curve: Curves.easeIn,
         );
       },
@@ -60,7 +56,7 @@ class JoinFormScreen extends StatelessWidget {
   Text backToLoginPageViewTextButtonText(BuildContext context) {
     return Text(
       AppLocalizations.of(context)!.back,
-      style: AppTheme().button,
+      style: AppTheme.button,
     );
   }
 
@@ -88,7 +84,7 @@ class JoinFormScreen extends StatelessWidget {
   Text joinRoomElevatedButtonText(BuildContext context) {
     return Text(
       AppLocalizations.of(context)!.joinRoom,
-      style: AppTheme().button,
+      style: AppTheme.button,
     );
   }
 
@@ -107,13 +103,13 @@ class JoinFormScreen extends StatelessWidget {
 
   Container howToTextContainer(BuildContext context) {
     return Container(
-      color: ColorConstants().transparentColor,
+      color: AppColor.transparentColor,
       child: Column(
         children: [
           howToPlayText(context),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           howToPlayTextParag(context),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
         ],
       ),
     );
@@ -122,12 +118,12 @@ class JoinFormScreen extends StatelessWidget {
   Text howToPlayTextParag(BuildContext context) {
     return Text(
       AppLocalizations.of(context)!.howToPlayParag,
-      style: AppTheme().headline6,
+      style: AppTheme.headline6,
     );
   }
 
   Text howToPlayText(BuildContext context) {
     return Text(AppLocalizations.of(context)!.howToPlay,
-        style: AppTheme().headline5);
+        style: AppTheme.headline5);
   }
 }

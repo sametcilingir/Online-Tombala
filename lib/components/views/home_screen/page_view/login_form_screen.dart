@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:tombala/components/view_models/view_model.dart';
-import 'package:tombala/components/widgets/snack_bar.dart';
-import 'package:tombala/utils/constants/color_constants.dart';
-import 'package:tombala/utils/constants/duration_constants.dart';
-import 'package:tombala/utils/constants/size_constants.dart';
-import 'package:tombala/utils/extension/color_extension.dart';
-import 'package:tombala/utils/extension/context_extension.dart';
-import 'package:tombala/utils/extension/duration_extension.dart';
-import 'package:tombala/utils/extension/size_extension.dart';
-import 'package:tombala/utils/locator/locator.dart';
+import '../../../../core/app/color/app_color.dart';
+import '../../../../core/app/duration/app_duration.dart';
+import '../../../../core/app/size/app_size.dart';
+import '../../../../core/app/theme/app_theme.dart';
+import '../../../../core/extension/context_extension.dart';
+import '../../../../core/locator/locator.dart';
+import '../../../../core/routes/routes.dart';
+import '../../../view_models/view_model.dart';
+import '../../../widgets/snack_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:tombala/utils/routes/routes.dart';
-import 'package:tombala/utils/theme/app_theme.dart';
 
 class LoginFormScreen extends StatefulWidget {
   const LoginFormScreen({Key? key}) : super(key: key);
@@ -24,13 +20,11 @@ class LoginFormScreen extends StatefulWidget {
 class _LoginFormScreenState extends State<LoginFormScreen> {
   final ViewModel _viewModel = locator<ViewModel>();
 
-
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Padding(
-      padding: context.paddingNormal,
+      padding: context.paddingMedium,
       child: loginForm(),
     ));
   }
@@ -41,9 +35,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       child: Column(
         children: [
           howToTextContainer(),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           userNameTextFormField(),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           buttonsRow(),
         ],
       ),
@@ -55,7 +49,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         createRoomOutlinedButton(),
-        SizeConstants().mediumHeight,
+      AppSize.mediumHeightSizedBox,
         joinPageTransferElevatedButton(),
       ],
     );
@@ -70,7 +64,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
           _viewModel.homePageController.animateToPage(
             1,
-            duration: DurationConstants().durationLow,
+            duration: AppDuration.lowDuration,
             curve: Curves.easeIn,
           );
         }
@@ -81,8 +75,8 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
   Text joinPageTransferElevatedButtonText() {
     return Text(
-     AppLocalizations.of(context)!.joinRoom,
-      style: AppTheme().button,
+      AppLocalizations.of(context)!.joinRoom,
+      style: AppTheme.button,
     );
   }
 
@@ -100,7 +94,7 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               snackBar(
                 Colors.red,
-               AppLocalizations.of(context)!.cantCreateRoom,
+                AppLocalizations.of(context)!.cantCreateRoom,
               ),
             );
           }
@@ -112,15 +106,15 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
   Text createRoomOutlinedButtonText() {
     return Text(
-     AppLocalizations.of(context)!.createRoom,
-      style: AppTheme().button,
+      AppLocalizations.of(context)!.createRoom,
+      style: AppTheme.button,
     );
   }
 
   TextFormField userNameTextFormField() {
     return TextFormField(
       decoration: InputDecoration(
-        labelText:AppLocalizations.of(context)!.textFieldUserName,
+        labelText: AppLocalizations.of(context)!.textFieldUserName,
         border: const OutlineInputBorder(),
       ),
       onSaved: (newValue) {
@@ -136,11 +130,11 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
   Container howToTextContainer() {
     return Container(
-      color: ColorConstants().transparentColor,
+      color: AppColor.transparentColor,
       child: Column(
         children: [
           howToJoinRoomText(),
-          SizeConstants().mediumHeight,
+          AppSize.mediumHeightSizedBox,
           howToJoinRoomPragText(),
         ],
       ),
@@ -149,13 +143,13 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
 
   Text howToJoinRoomPragText() {
     return Text(
-     AppLocalizations.of(context)!.howtoJoinRoomParag,
-      style: AppTheme().headline6,
+      AppLocalizations.of(context)!.howtoJoinRoomParag,
+      style: AppTheme.headline6,
     );
   }
 
   Text howToJoinRoomText() {
     return Text(AppLocalizations.of(context)!.howtoJoinRoom,
-        style: AppTheme().headline5);
+        style: AppTheme.headline5);
   }
 }

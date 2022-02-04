@@ -33,3 +33,8 @@ arch -arm64 pod install --repo-update
 sudo arch -arm64 gem install ffi
 
 sudo gem update
+
+
+git rm -r --cached .
+git add .
+git commit -m ".gitignore is now working"

@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    
     _viewModel.reInit();
   }
 
@@ -59,7 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _viewModel.homeScaffoldMessengerKey,
       appBar: appBar(),
-      body: pageView(),
+      body: Center(
+        child: SizedBox(
+          width: 500,
+          child: pageView(),
+        ),
+      ),
     );
   }
 
@@ -93,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget appBarTitleText() {
     return Text(
       StringConstants.appName,
-     
     );
   }
 

@@ -95,9 +95,11 @@ class _WaitingScreenState extends State<WaitingScreen> {
               if (_viewModel.roomModel.roomCreator ==
                   _viewModel.playerModel.userName)
                 roomCreatorColumn(),
+              AppSize.mediumHeightSizedBox,
               if (_viewModel.roomModel.roomCreator !=
                   _viewModel.playerModel.userName)
                 roomPlayerPadding(),
+              AppSize.mediumHeightSizedBox,
               setPlayerStatusRow(),
             ],
           ),

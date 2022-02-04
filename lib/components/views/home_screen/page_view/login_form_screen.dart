@@ -39,9 +39,9 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
         child: Column(
           children: [
             howToTextContainer(),
-            AppSize.mediumHeightSizedBox,
+            AppSize.highHeightSizedBox,
             userNameTextFormField(),
-            AppSize.mediumHeightSizedBox,
+            AppSize.highHeightSizedBox,
             buttonsRow(),
           ],
         ),
@@ -111,7 +111,6 @@ class _LoginFormScreenState extends State<LoginFormScreen> {
   Widget createRoomOutlinedButtonText() {
     return Text(
       AppLocalizations.of(context)!.createRoom,
-     
     );
   }
 

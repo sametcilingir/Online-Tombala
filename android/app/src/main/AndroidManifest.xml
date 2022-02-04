@@ -6,7 +6,7 @@
 
     
    <application
-        android:label="tombala"
+        android:label="Online Tombala"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

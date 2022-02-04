@@ -37,6 +37,12 @@ class _GameCardScreenState extends State<GameCardScreen> {
     if (_viewModel.roomModel.roomId == null) {
       AppNavigator(context: context).push(route: Routes.home);
     }
+
+    autoTakeNumberMethod();
+
+    takenNumberMethod();
+
+    winnerReactionsMethod();
   }
 
   @override
@@ -46,11 +52,7 @@ class _GameCardScreenState extends State<GameCardScreen> {
     _viewModel.roomStream();
     _viewModel.messageStream();
 
-    autoTakeNumberMethod();
-
-    takenNumberMethod();
-
-    winnerReactionsMethod();
+   
   }
 
   void takenNumberMethod() {
@@ -187,7 +189,12 @@ class _GameCardScreenState extends State<GameCardScreen> {
   Scaffold scaffold() {
     return Scaffold(
       appBar: appBar(),
-      body: body(),
+      body: Center(
+        child: SizedBox(
+          width: 500,
+          child: body(),
+        ),
+      ),
     );
   }
 

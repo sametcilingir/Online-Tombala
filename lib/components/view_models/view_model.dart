@@ -1,19 +1,19 @@
 import 'dart:math';
 
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
-import '../models/message/message_model.dart';
-import '../models/player/player_model.dart';
-import '../models/room/room_model.dart';
-import '../../utils/services/firebase_database_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mobx/mobx.dart';
 
-import '../../utils/locator/locator.dart';
+import '../../core/app/theme/app_theme.dart';
+import '../../core/locator/locator.dart';
+import '../../core/services/firebase_database_service.dart';
+import '../models/message_model/message_model.dart';
+import '../models/player_model/player_model.dart';
+import '../models/room_model/room_model.dart';
 
 part 'view_model.g.dart';
 
-enum ViewState { Idle, Busy }
+enum ViewState { idle, busy }
 
 class ViewModel = _ViewModelBase with _$ViewModel;
 
@@ -25,9 +25,7 @@ abstract class _ViewModelBase with Store {
   bool isDarkModel = true;
 
   @computed
-  ThemeData get appTheme => isDarkModel
-      ? FlexThemeData.dark(scheme: FlexScheme.aquaBlue)
-      : FlexThemeData.light(scheme: FlexScheme.aquaBlue);
+  ThemeData get appTheme => AppTheme.theme;
 
   @observable
   bool isENLocal = false;
@@ -38,7 +36,7 @@ abstract class _ViewModelBase with Store {
       : AppLocalizations.supportedLocales.last;
 
   @observable
-  ViewState viewState = ViewState.Idle;
+  ViewState viewState = ViewState.idle;
 
   @observable
   GlobalKey<FormState> formKeyUserName = GlobalKey<FormState>();
@@ -47,7 +45,14 @@ abstract class _ViewModelBase with Store {
   GlobalKey<FormState> formKeyJoin = GlobalKey<FormState>();
 
   @observable
-  PageController homePageController = PageController(initialPage: 0);
+  PageController homePageController = PageController();
+
+  @observable
+  GlobalKey<ScaffoldMessengerState> homeScaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  @observable
+  ReactionDisposer? startGameReaction;
 
   @observable
   RoomModel roomModel = RoomModel(
@@ -71,26 +76,25 @@ abstract class _ViewModelBase with Store {
   @action
   Future<bool> createRoom() async {
     try {
-      viewState = ViewState.Busy;
+      viewState = ViewState.busy;
       reInit();
       //creating random room code
       roomModel.roomCode = Random().nextInt(100000).toString();
-      var newUserName = isENLocal
-          ? "Game Creator - "
-          : "Oyun Kurucu - " + playerModel.userName.toString();
+      final newUserName = isENLocal
+          ? "Game Creator - ${playerModel.userName}"
+          : "Oyun Kurucu - ${playerModel.userName}";
       playerModel.userName = newUserName;
       roomModel.roomCreator = playerModel.userName;
       //getting room Id
       roomModel.roomId = await _firebaseDatabaseService.createRoom(roomModel);
 
-      bool isJoined = await joinRoom();
+      final isJoined = await joinRoom();
 
       return isJoined;
     } catch (e) {
-      print("sorun oda oluşturmada" + e.toString());
       return false;
     } finally {
-      viewState = ViewState.Idle;
+      viewState = ViewState.idle;
     }
   }
 
@@ -98,7 +102,7 @@ abstract class _ViewModelBase with Store {
   ObservableList<PlayerModel>? playersList = ObservableList<PlayerModel>();
 
   @action
-  playersStream() {
+  void playersStream() {
     _firebaseDatabaseService.playersStream(roomModel).forEach((event) {
       playersList = event.docs
           .map((e) => PlayerModel.fromJson(e.data()))
@@ -114,7 +118,7 @@ abstract class _ViewModelBase with Store {
   ReactionDisposer? takenNumberReaction;
 
   @action
-  roomStream() {
+  void roomStream() {
     _firebaseDatabaseService.roomStream(roomModel).listen((event) {
       roomModel = RoomModel.fromJson(event.data());
       //taken number event
@@ -126,7 +130,7 @@ abstract class _ViewModelBase with Store {
   }
 
   @action
-  Future<void> setPlayerStatus(bool playerStatus) async {
+  Future<void> setPlayerStatus({required bool playerStatus}) async {
     playerModel.userStatus = playerStatus;
     await _firebaseDatabaseService.setPlayerStatus(roomModel, playerModel);
   }
@@ -134,20 +138,22 @@ abstract class _ViewModelBase with Store {
   @action
   Future<bool> joinRoom() async {
     try {
-      viewState = ViewState.Busy;
+      viewState = ViewState.busy;
 
       if (roomModel.roomCreator != playerModel.userName) {
         reInit();
       }
-      
-      var playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
-          roomModel.roomCode!, playerModel.userName!);
+
+      final playerModelAndRoomModel = await _firebaseDatabaseService.joinRoom(
+        roomModel.roomCode!,
+        playerModel.userName!,
+      );
       //setting message model username
       messageModel.messageSenderName = playerModel.userName;
       //setting player model
-      playerModel = playerModelAndRoomModel[0];
+      playerModel = playerModelAndRoomModel[0] as PlayerModel;
       //setting room model
-      roomModel = playerModelAndRoomModel[1];
+      roomModel = playerModelAndRoomModel[1] as RoomModel;
       if (playerModel.userId != null) {
         return true;
       } else {
@@ -156,21 +162,21 @@ abstract class _ViewModelBase with Store {
     } catch (e) {
       return false;
     } finally {
-      viewState = ViewState.Idle;
+      viewState = ViewState.idle;
     }
   }
 
   @action
   Future<bool> startGame() async {
     try {
-      viewState = ViewState.Busy;
+      viewState = ViewState.busy;
       roomModel.roomStatus = "started";
       await _firebaseDatabaseService.updateGame(roomModel);
       return true;
     } catch (e) {
       return false;
     } finally {
-      viewState = ViewState.Idle;
+      viewState = ViewState.idle;
     }
   }
 
@@ -204,9 +210,6 @@ abstract class _ViewModelBase with Store {
   }
 
   @observable
-  bool? isChatOpen = false;
-
-  @observable
   GlobalKey<FormState> formKeyMessageWaiting = GlobalKey<FormState>();
 
   @observable
@@ -222,7 +225,7 @@ abstract class _ViewModelBase with Store {
   ObservableList<MessageModel>? messageList = ObservableList<MessageModel>();
 
   @action
-  messageStream() {
+  void messageStream() {
     _firebaseDatabaseService.messageStream(roomModel).forEach((event) {
       messageList = event.docs
           .map((e) => MessageModel.fromJson(e.data()))
@@ -268,17 +271,18 @@ abstract class _ViewModelBase with Store {
   @observable
   List<int>? rangeOf91and99Numbers;
 
-  @action
-  createGameCard() {
-    randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+  final allNumbersListForCard = List<int>.generate(99, (i) => i + 1);
 
-    rangeOf1and15Numbers = allNumbersList.sublist(0, 15)..shuffle();
-    rangeOf16and30Numbers = allNumbersList.sublist(15, 30)..shuffle();
-    rangeOf31and45Numbers = allNumbersList.sublist(30, 45)..shuffle();
-    rangeOf46and60Numbers = allNumbersList.sublist(45, 60)..shuffle();
-    rangeOf61and75Numbers = allNumbersList.sublist(60, 75)..shuffle();
-    rangeOf76and90Numbers = allNumbersList.sublist(75, 90)..shuffle();
-    rangeOf91and99Numbers = allNumbersList.sublist(90, 99)..shuffle();
+  @action
+  void createGameCard() {
+    randomColor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+    rangeOf1and15Numbers = allNumbersListForCard.sublist(0, 15)..shuffle();
+    rangeOf16and30Numbers = allNumbersListForCard.sublist(15, 30)..shuffle();
+    rangeOf31and45Numbers = allNumbersListForCard.sublist(30, 45)..shuffle();
+    rangeOf46and60Numbers = allNumbersListForCard.sublist(45, 60)..shuffle();
+    rangeOf61and75Numbers = allNumbersListForCard.sublist(60, 75)..shuffle();
+    rangeOf76and90Numbers = allNumbersListForCard.sublist(75, 90)..shuffle();
+    rangeOf91and99Numbers = allNumbersListForCard.sublist(90, 99)..shuffle();
 
     for (var i = 0; i < 2; i++) {
       cardNumbersList.add(rangeOf1and15Numbers![i]);
@@ -438,7 +442,7 @@ abstract class _ViewModelBase with Store {
   }
 
   @action
-  reInit() {
+  void reInit() {
     /* roomModel = RoomModel(
       roomFirstWinner: "",
       roomSecondWinner: "",
@@ -468,7 +472,7 @@ abstract class _ViewModelBase with Store {
     takenNumber = 0;
     takenNumbersList = [];
     takenNumbersListFromDatabase = [];
-    isChatOpen = false;
+
     messageList = ObservableList<MessageModel>();
     messageModel = MessageModel(
       messageSenderName: "",

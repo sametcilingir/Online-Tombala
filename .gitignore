@@ -59,9 +59,10 @@ linked_*.ds
 unlinked.ds
 unlinked_spec.ds
 
-# Flutter/Dart/Pub related
+# Firebase related
 .firebase/
 lib/firebase_options.dart
+lib/generated_plugin_registrant.dart
 
 # Android related
 **/android/**/gradle-wrapper.jar

@@ -74,6 +74,7 @@ lib/generated_plugin_registrant.dart
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+**/android/app/google-services.json
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
